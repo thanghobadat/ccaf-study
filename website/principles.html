@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>67 Nguyên Tắc Kiến Trúc — CCAF Learning Hub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .domain-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .domain-tab {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .domain-tab:hover, .domain-tab.active {
+      color: var(--text-primary);
+      border-color: var(--accent-purple);
+      background: var(--bg-tertiary);
+    }
+
+    .domain-tab.active {
+      color: var(--accent-purple);
+      box-shadow: 0 0 10px var(--accent-purple-glow);
+    }
+
+    .principles-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .completed-card {
+      border-color: var(--accent-emerald) !important;
+      background: rgba(16, 185, 129, 0.03);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo-badge">CCAF</div>
+      <div>
+        <span class="logo-text">Pass in 15 Days</span>
+        <span class="logo-sub">Claude Certified Architect Hub</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="index.html" class="nav-item">🏠 Trang Chủ</a>
+      <a href="learn.html" class="nav-item">📚 Lý Thuyết (13 Chương)</a>
+      <a href="principles.html" class="nav-item active">💡 67 Nguyên Tắc</a>
+      <a href="quiz.html" class="nav-item">🎯 Thi Thử (10 Câu)</a>
+      <a href="mock-exam.html" class="nav-item">🏆 Thi Thật Mô Phỏng (60 Câu)</a>
+      <a href="flashcards.html" class="nav-item">🎴 Flashcards</a>
+      <a href="plan.html" class="nav-item">📅 Lịch 15 Ngày</a>
+    </nav>
+
+    <div class="user-status">
+      <div class="streak-badge">🔥 <span id="user-streak-val">1</span> ngày</div>
+      <div class="xp-badge">⚡ <span id="user-xp-val">0</span> XP</div>
+      <button class="theme-toggle" id="theme-toggle-btn" title="Đổi giao diện Dark/Light">🌙</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">💡 67 Nguyên Tắc Kiến Trúc Cốt Lõi (Core Principles)</h1>
+      <p style="color: var(--text-secondary);">
+        Học lý thuyết song ngữ Anh - Việt được chắt lọc trực tiếp từ các bài thi thật của Anthropic. 
+        Đặc biệt chú ý phần <strong>Anti-Patterns (Sai lầm phổ biến)</strong> để tránh các phương án bẫy!
+      </p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="domain-tabs">
+        <button class="domain-tab active" data-domain="ALL" onclick="filterDomain('ALL')">Tất cả (67)</button>
+        <button class="domain-tab" data-domain="D1" onclick="filterDomain('D1')">D1: Agent Architecture (27%)</button>
+        <button class="domain-tab" data-domain="D2" onclick="filterDomain('D2')">D2: Tool & MCP (18%)</button>
+        <button class="domain-tab" data-domain="D3" onclick="filterDomain('D3')">D3: Claude Code (20%)</button>
+        <button class="domain-tab" data-domain="D4" onclick="filterDomain('D4')">D4: Prompt Eng (20%)</button>
+        <button class="domain-tab" data-domain="D5" onclick="filterDomain('D5')">D5: Context (15%)</button>
+      </div>
+
+      <button class="btn btn-secondary" id="antipattern-btn" onclick="toggleAntiPatternFilter()" style="font-size: 0.85rem;">
+        ⚠️ Chỉ hiện Anti-Patterns (Sai lầm cần tránh)
+      </button>
+    </div>
+
+    <div style="margin-bottom: 1rem; font-size: 0.88rem; color: var(--text-muted);" id="principles-count">
+      <!-- Count populated by JS -->
+    </div>
+
+    <!-- Principles List -->
+    <div class="principles-grid" id="principles-container">
+      <!-- Populated by JS -->
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/data/principles.js"></script>
+  <script src="js/principles.js"></script>
+</body>
+</html>

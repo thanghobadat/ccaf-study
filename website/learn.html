@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lý Thuyết CCAF (13 Chương) — CCAF Learning Hub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .learn-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .chapter-sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      position: sticky;
+      top: 5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+    }
+
+    .domain-filters-box {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .domain-filter-btn {
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .domain-filter-btn:hover, .domain-filter-btn.active {
+      color: var(--text-primary);
+      border-color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    .chapter-item {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+    }
+
+    .chapter-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .chapter-item.active {
+      background: var(--bg-tertiary);
+      border-color: var(--accent-purple);
+    }
+
+    .chapter-item.completed {
+      border-left: 4px solid var(--accent-emerald);
+    }
+
+    .chapter-content-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      min-height: 800px;
+    }
+
+    @media (max-width: 900px) {
+      .learn-layout {
+        grid-template-columns: 1fr;
+      }
+      .chapter-sidebar {
+        position: static;
+        max-height: 350px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo-badge">CCAF</div>
+      <div>
+        <span class="logo-text">Pass in 15 Days</span>
+        <span class="logo-sub">Claude Certified Architect Hub</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="index.html" class="nav-item">🏠 Trang Chủ</a>
+      <a href="learn.html" class="nav-item active">📚 Lý Thuyết (13 Chương)</a>
+      <a href="principles.html" class="nav-item">💡 67 Nguyên Tắc</a>
+      <a href="quiz.html" class="nav-item">🎯 Thi Thử (10 Câu)</a>
+      <a href="mock-exam.html" class="nav-item">🏆 Thi Thật Mô Phỏng (60 Câu)</a>
+      <a href="flashcards.html" class="nav-item">🎴 Flashcards</a>
+      <a href="plan.html" class="nav-item">📅 Lịch 15 Ngày</a>
+    </nav>
+
+    <div class="user-status">
+      <div class="streak-badge">🔥 <span id="user-streak-val">1</span> ngày</div>
+      <div class="xp-badge">⚡ <span id="user-xp-val">0</span> XP</div>
+      <button class="theme-toggle" id="theme-toggle-btn" title="Đổi giao diện Dark/Light">🌙</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="learn-layout">
+      <!-- Left Sidebar: Chapter List & Domain Filter -->
+      <aside class="chapter-sidebar">
+        <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">
+          📚 Lọc Bài Học Theo Domain
+        </h3>
+        
+        <div class="domain-filters-box">
+          <button class="domain-filter-btn active" data-domain="ALL" onclick="filterLearnDomain('ALL')">Tất cả (13)</button>
+          <button class="domain-filter-btn" data-domain="D1" onclick="filterLearnDomain('D1')">D1 (27%)</button>
+          <button class="domain-filter-btn" data-domain="D2" onclick="filterLearnDomain('D2')">D2 (18%)</button>
+          <button class="domain-filter-btn" data-domain="D3" onclick="filterLearnDomain('D3')">D3 (20%)</button>
+          <button class="domain-filter-btn" data-domain="D4" onclick="filterLearnDomain('D4')">D4 (20%)</button>
+          <button class="domain-filter-btn" data-domain="D5" onclick="filterLearnDomain('D5')">D5 (15%)</button>
+        </div>
+
+        <div id="chapter-list">
+          <!-- Dynamically populated -->
+        </div>
+      </aside>
+
+      <!-- Right Area: Chapter Details -->
+      <article class="chapter-content-box" id="chapter-content">
+        <!-- Dynamically loaded chapter content -->
+      </article>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/data/chapters.js"></script>
+  <script src="js/learn.js"></script>
+</body>
+</html>
