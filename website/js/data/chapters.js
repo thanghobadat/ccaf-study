@@ -467,7 +467,7 @@ Hãy chỉ tập trung vào file được chỉ định và trả về báo cáo
             <div class="kc-answer">
               <strong>Đáp án chuẩn Anthropic:</strong><br>
               - <strong>Nguyên nhân:</strong> Coordinator phát ra các thẻ gọi tool <code>Task</code> rải rác ở nhiều message phản hồi API khác nhau.<br>
-              - <strong>Cách sửa:</strong> Đảm bảo Coordinator phát ra <strong>nhiều lệnh gọi tool `Task` trong CÙNG MỘT message phản hồi API</strong>. Khi đó, Claude Agent SDK mới có đủ điều kiện để kích hoạt Parallel Execution thực sự!
+              - <strong>Cách sửa:</strong> Đảm bảo Coordinator phát ra <strong>nhiều lệnh gọi tool <code>Task</code> trong CÙNG MỘT message phản hồi API</strong>. Khi đó, Claude Agent SDK mới có đủ điều kiện để kích hoạt Parallel Execution thực sự!
             </div>
           </div>
         `
