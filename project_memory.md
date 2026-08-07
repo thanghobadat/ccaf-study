@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-07 17:43 (Local Time)*  
+> *Last Updated: 2026-08-07 23:35 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -89,7 +89,7 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 - **100% Technical Depth Overhaul across All 13 Theory Chapters:** Fully upgraded `website/js/data/chapters.js` with complete, unabridged technical depth for Chapters 1-13 (Request/Response API structs, `stop_reason` state machine, System Prompt XML rules, Context Window token math/Lost-in-the-middle, MCP Primitives, Resilient Enums, Message Batches API cost routing, Hooks, and Claim-Source Mapping).
-- **English-First Pedagogy + VI Accordions:** All 13 theory chapters display 100% official English text by default, with collapsible `[ 🇻🇳 Xem giải thích & bản dịch Tiếng Việt ]` toggle buttons under 100% of content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps).
+- **VI-First Pedagogy + EN Collapsible Details:** Upgraded 100% of theory chapters & learning modules (`website/js/learn.js`) to display Vietnamese translations directly by default across all content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps), with original English exam text neatly accessible inside collapsible details for quick reference.
 - **Responsive System & Zero Overflow:** Optimized header nav flex-wrap, table card stacking, `pre` line wrapping, and `min-width: 0` grid container fixes across PC, Tablet, iPhone X (375px), and iPhone 15 (393px).
 - **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng (Kho 1,000 Câu)`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.

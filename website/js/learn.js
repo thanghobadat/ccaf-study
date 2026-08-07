@@ -70,17 +70,14 @@ function loadChapter(index) {
         <span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary);">⏱️ ${ch.estimatedMinutes} phút đọc</span>
       </div>
       <h1 style="font-size: 2rem; margin-bottom: 0.75rem;">${ch.title}</h1>
-      <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6;">${ch.summary}</p>
-      
-      <div class="vi-translation-box" style="margin-top: 0.75rem;">
-        <button class="vi-toggle-btn">
-          <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Tóm tắt bài học)</span>
-          <span class="vi-arrow">▼</span>
-        </button>
-        <div class="vi-translation-body">
-          ${ch.summaryVI ? ch.summaryVI : `<p><strong>Bản dịch Tiếng Việt:</strong> Tóm tắt bài học <em>${ch.title}</em> giúp hệ thống hóa toàn bộ kiến thức kỹ thuật quan trọng của chương.</p>`}
-        </div>
+      <div style="color: var(--text-primary); font-size: 1.05rem; line-height: 1.6;">
+        ${ch.summaryVI ? ch.summaryVI : `<p>${ch.summary}</p>`}
       </div>
+      
+      <details style="margin-top: 0.75rem; font-size: 0.88rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.6rem 0.85rem; border-radius: var(--radius-md);">
+        <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem tóm tắt Tiếng Anh gốc (Original Summary)</summary>
+        <p style="margin-top: 0.5rem; line-height: 1.5; color: var(--text-secondary);">${ch.summary}</p>
+      </details>
     </div>
 
     <!-- Pedagogy Box 1: Learning Objectives -->
@@ -90,19 +87,15 @@ function loadChapter(index) {
           🎯 MỤC TIÊU BẠN CẦN NẮM ĐƯỢC SAU BÀI NÀY (LEARNING OBJECTIVES)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.95rem; color: var(--text-primary); line-height: 1.6;">
-          ${ch.learningObjectives.map(obj => `<li style="margin-bottom: 0.35rem;">${obj}</li>`).join('')}
+          ${(ch.learningObjectivesVI || ch.learningObjectives).map(obj => `<li style="margin-bottom: 0.35rem;">${obj}</li>`).join('')}
         </ul>
-        <div class="vi-translation-box" style="margin-top: 0.85rem;">
-          <button class="vi-toggle-btn">
-            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Mục tiêu bài học)</span>
-            <span class="vi-arrow">▼</span>
-          </button>
-          <div class="vi-translation-body">
-            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
-              ${(ch.learningObjectivesVI || ch.learningObjectives).map(obj => `<li style="margin-bottom: 0.35rem;">${obj}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
+
+        <details style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem mục tiêu Tiếng Anh gốc (Original Learning Objectives)</summary>
+          <ul style="padding-left: 1.25rem; margin-top: 0.4rem; color: var(--text-secondary); line-height: 1.5;">
+            ${ch.learningObjectives.map(obj => `<li style="margin-bottom: 0.25rem;">${obj}</li>`).join('')}
+          </ul>
+        </details>
       </div>
     ` : ''}
 
@@ -110,16 +103,12 @@ function loadChapter(index) {
     ${ch.examTip ? `
       <div class="callout callout-exam">
         <div class="callout-title">⚡ MẸO THI CCAF QUAN TRỌNG (EXAM TIP)</div>
-        <div>${ch.examTip}</div>
-        <div class="vi-translation-box" style="margin-top: 0.85rem;">
-          <button class="vi-toggle-btn">
-            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Mẹo thi)</span>
-            <span class="vi-arrow">▼</span>
-          </button>
-          <div class="vi-translation-body">
-            <div>${ch.examTipVI || ch.examTip}</div>
-          </div>
-        </div>
+        <div style="font-size: 0.98rem; line-height: 1.6;">${ch.examTipVI || ch.examTip}</div>
+        
+        <details style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem mẹo thi Tiếng Anh gốc (Original Exam Tip)</summary>
+          <div style="margin-top: 0.4rem; color: var(--text-secondary); line-height: 1.5;">${ch.examTip}</div>
+        </details>
       </div>
     ` : ''}
 
@@ -127,21 +116,21 @@ function loadChapter(index) {
     ${ch.sections.map((sec) => `
       <section style="margin: 2.25rem 0;">
         <h2 style="font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent-purple);">${sec.heading}</h2>
-        <div style="font-size: 1rem; line-height: 1.7; color: var(--text-primary);">${sec.content}</div>
+        
+        <div style="font-size: 1rem; line-height: 1.7; color: var(--text-primary);">
+          ${sec.contentVI ? sec.contentVI : sec.content}
+        </div>
 
         ${sec.codeExample ? `
           <pre><code>${sec.codeExample.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
         ` : ''}
 
-        <div class="vi-translation-box">
-          <button class="vi-toggle-btn">
-            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt</span>
-            <span class="vi-arrow">▼</span>
-          </button>
-          <div class="vi-translation-body">
-            ${sec.contentVI ? sec.contentVI : `<p><strong>Bản dịch Tiếng Việt:</strong> Nội dung chi tiết phần <em>${sec.heading}</em> hướng dẫn phân tích bản chất kỹ thuật theo tiêu chuẩn Anthropic CCAF.</p>`}
-          </div>
-        </div>
+        ${sec.contentVI ? `
+          <details style="margin-top: 0.85rem; font-size: 0.88rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md);">
+            <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem văn bản & bảng biểu Tiếng Anh gốc (Original Section & Tables)</summary>
+            <div style="margin-top: 0.5rem; color: var(--text-secondary); line-height: 1.6;">${sec.content}</div>
+          </details>
+        ` : ''}
       </section>
     `).join('')}
 
@@ -152,19 +141,15 @@ function loadChapter(index) {
           🔑 KIẾN THỨC CỐT LÕI BẮT BUỘC THUỘC (CORE MASTERIES)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: var(--text-primary); line-height: 1.6;">
-          ${ch.coreMasteries.map(m => `<li style="margin-bottom: 0.4rem;">${m}</li>`).join('')}
+          ${(ch.coreMasteriesVI || ch.coreMasteries).map(m => `<li style="margin-bottom: 0.4rem;">${m}</li>`).join('')}
         </ul>
-        <div class="vi-translation-box" style="margin-top: 0.85rem;">
-          <button class="vi-toggle-btn">
-            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Kiến thức cốt lõi)</span>
-            <span class="vi-arrow">▼</span>
-          </button>
-          <div class="vi-translation-body">
-            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
-              ${(ch.coreMasteriesVI || ch.coreMasteries).map(m => `<li style="margin-bottom: 0.4rem;">${m}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
+
+        <details style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem kiến thức cốt lõi Tiếng Anh gốc (Original Core Masteries)</summary>
+          <ul style="padding-left: 1.25rem; margin-top: 0.4rem; color: var(--text-secondary); line-height: 1.5;">
+            ${ch.coreMasteries.map(m => `<li style="margin-bottom: 0.3rem;">${m}</li>`).join('')}
+          </ul>
+        </details>
       </div>
     ` : ''}
 
@@ -175,19 +160,15 @@ function loadChapter(index) {
           ⚠️ CÁC BẪY ĐỀ THI HAY GẶP (ANTI-PATTERNS / EXAM TRAPS)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: var(--text-primary); line-height: 1.6;">
-          ${ch.examTraps.map(trap => `<li style="margin-bottom: 0.4rem;">${trap}</li>`).join('')}
+          ${(ch.examTrapsVI || ch.examTraps).map(trap => `<li style="margin-bottom: 0.4rem;">${trap}</li>`).join('')}
         </ul>
-        <div class="vi-translation-box" style="margin-top: 0.85rem;">
-          <button class="vi-toggle-btn">
-            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Bẫy đề thi)</span>
-            <span class="vi-arrow">▼</span>
-          </button>
-          <div class="vi-translation-body">
-            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
-              ${(ch.examTrapsVI || ch.examTraps).map(trap => `<li style="margin-bottom: 0.4rem;">${trap}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
+
+        <details style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600;">🇬🇧 Xem các bẫy đề thi Tiếng Anh gốc (Original Exam Traps)</summary>
+          <ul style="padding-left: 1.25rem; margin-top: 0.4rem; color: var(--text-secondary); line-height: 1.5;">
+            ${ch.examTraps.map(trap => `<li style="margin-bottom: 0.3rem;">${trap}</li>`).join('')}
+          </ul>
+        </details>
       </div>
     ` : ''}
 
