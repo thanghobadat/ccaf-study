@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-07 12:49 (Local Time)*  
+> *Last Updated: 2026-08-07 17:43 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -88,18 +88,17 @@ d:\AI\CCAF\
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **English-First Pedagogy + VI Accordions:** All 13 theory chapters in `website/js/data/chapters.js` updated to 100% official English text by default, with collapsible `[ 🇻🇳 Xem giải thích & bản dịch Tiếng Việt ]` toggle buttons under 100% of content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps).
+- **100% Technical Depth Overhaul across All 13 Theory Chapters:** Fully upgraded `website/js/data/chapters.js` with complete, unabridged technical depth for Chapters 1-13 (Request/Response API structs, `stop_reason` state machine, System Prompt XML rules, Context Window token math/Lost-in-the-middle, MCP Primitives, Resilient Enums, Message Batches API cost routing, Hooks, and Claim-Source Mapping).
+- **English-First Pedagogy + VI Accordions:** All 13 theory chapters display 100% official English text by default, with collapsible `[ 🇻🇳 Xem giải thích & bản dịch Tiếng Việt ]` toggle buttons under 100% of content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps).
 - **Responsive System & Zero Overflow:** Optimized header nav flex-wrap, table card stacking, `pre` line wrapping, and `min-width: 0` grid container fixes across PC, Tablet, iPhone X (375px), and iPhone 15 (393px).
 - **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng (Kho 1,000 Câu)`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
-- **Rule 4 Enforced:** Manual Git Push & Project Memory Sync only executed when explicitly requested by user.
+- **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
 ---
 
 ## 🚨 6. AGENT WORKFLOW MANDATES (MUST OBEY ON RESUME)
 1. **Always read `d:\AI\CCAF\rule.md` first** before taking any action.
-2. **Always present an `Implementation Plan` first** before making file edits.
-3. **Always summarize accomplishments briefly** upon task completion.
-4. **Manual Git Push & Memory Sync Only**: Never auto-push or edit `project_memory.md` unless explicitly requested by the user.
-
-
+2. **Planning First:** Always present an Implementation Plan first before executing file edits.
+3. **Summary Rule:** Always summarize accomplishments briefly upon completion.
+4. **Manual Git Push & Memory Sync Only:** NEVER automatically `git push` or edit `project_memory.md` after editing files. ONLY run `git push` and update `project_memory.md` when the user explicitly requests it.
