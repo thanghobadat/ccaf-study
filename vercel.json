@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "ai-certificate-study",
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
