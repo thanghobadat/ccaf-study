@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-06 23:01 (Local Time)*  
+> *Last Updated: 2026-08-07 10:51 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -52,7 +52,8 @@
 
 ```
 d:\AI\CCAF\
-├── rule.md                          # Mandatory project rules (Planning First, Summary Rule)
+├── rule.md                          # Mandatory project rules (Planning First, Summary Rule, Rule 4 Manual Push)
+├── .agents/AGENTS.md                # Agent workspace customization rules
 ├── project_memory.md                # This machine-readable state snapshot
 ├── vercel.json                      # Vercel deployment configuration (cleanUrls & website rewrites)
 ├── .gitignore                       # Git ignore configuration
@@ -68,17 +69,17 @@ d:\AI\CCAF\
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system & global layout styles
+    │   └── style.css                # Dark/Light CSS design system & visual pedagogy UI components
     └── js/
         ├── app.js                   # AppStore state management, XP, Streak, Global Lang Switcher
-        ├── learn.js                 # Chapter reader logic & self-checklists
+        ├── learn.js                 # Chapter reader logic & Flash QA reveal handler
         ├── principles.js            # Principles filter & Anti-pattern mode logic
         ├── quiz.js                  # 10-Question Quiz Engine & Attempt Review Modal
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
         ├── plan.js                  # 15-day roadmap progress renderer
         └── data/
-            ├── chapters.js          # 13 Unabridged chapters data + 4 pedagogy boxes
+            ├── chapters.js          # 13 Complete visual theory modules (Analogies, Flow diagrams, BAD vs GOOD, Decision matrices, QA Flash)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── quiz-data.js        # 77 Official sample questions bilingual EN+VI + Explanations
             └── mock-exam-data.js    # ~1,000 Scenario questions pool bilingual EN+VI
@@ -87,10 +88,11 @@ d:\AI\CCAF\
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **Global Language Switcher (`AppStore.getLang()`):** Header widget `🇬🇧 EN / 🇻🇳 VI` persisted in `localStorage`.
-- **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Thật Mô Phỏng 60 Câu`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
-- **Detailed History Log & Attempt Review:** Both `quiz.html` and `mock-exam.html` record every exam attempt, correct/user answers, and open a review modal with explanations.
-- **Git Repository Status:** Initialized, clean `.gitignore`, synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
+- **100% Unabridged Theory Overhaul:** All 13 chapters in `website/js/data/chapters.js` upgraded with real-world analogies, step-by-step CSS flow diagrams (`.diagram-flow`), side-by-side BAD vs GOOD comparison cards (`.comparison-grid`), decision matrix tables (`.decision-matrix`), and interactive Knowledge Check QA cards (`.knowledge-check`).
+- **Responsive System & Zero Overflow:** Optimized header nav flex-wrap, table card stacking, `pre` line wrapping, and `min-width: 0` grid container fixes across PC, Tablet, iPhone X (375px), and iPhone 15 (393px).
+- **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng (Kho 1,000 Câu)`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
+- **Rule 4 Enforced:** Manual Git Push & Project Memory Sync only executed when explicitly requested by user.
+- **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
 ---
 
@@ -98,3 +100,5 @@ d:\AI\CCAF\
 1. **Always read `d:\AI\CCAF\rule.md` first** before taking any action.
 2. **Always present an `Implementation Plan` first** before making file edits.
 3. **Always summarize accomplishments briefly** upon task completion.
+4. **Manual Git Push & Memory Sync Only**: Never auto-push or edit `project_memory.md` unless explicitly requested by the user.
+

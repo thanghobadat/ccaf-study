@@ -8,3 +8,11 @@
 
 ## 📊 3. Quy tắc tóm tắt kết quả (Summary Rule)
 - Khi thực hiện xong yêu cầu, phải tóm tắt ngắn gọn nội dung yêu cầu, những gì đã làm được và kết quả cụ thể.
+
+## 🛑 4. Quy tắc quản lý Git & Project Memory (Manual Push & Sync Only)
+- **TUYỆT ĐỐI KHÔNG TỰ ĐỘNG PUSH GIT & CẬP NHẬT MEMORY**: Không tự động chạy `git push` mã nguồn lên GitHub hay tự động cập nhật file `project_memory.md` sau khi hoàn thành sửa code.
+- **CHỈ THỰC HIỆN KHI CÓ YÊU CẦU**: Chỉ thực hiện `git push` và đồng bộ file `project_memory.md` khi nhận được yêu cầu trực tiếp từ người dùng (ví dụ: *"push source"*, *"push git"*, *"lưu trạng thái"*...).
+- **QUY TRÌNH KHI ĐƯỢC YÊU CẦU PUSH**: Khi người dùng yêu cầu push source, bắt buộc thực hiện đồng thời:
+  1. Cập nhật lại file [project_memory.md](file:///d:/AI/CCAF/project_memory.md) để lưu vết trạng thái mới nhất của dự án.
+  2. Thực hiện `git add`, `git commit` và `git push` mã nguồn lên GitHub repository.
+
