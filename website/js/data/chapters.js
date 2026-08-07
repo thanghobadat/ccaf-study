@@ -1,4 +1,4 @@
-/* CCAF Learning Hub - Complete & Unabridged 13 Chapters Theory Data (Song ngữ Anh - Việt 100% Đầy Đủ) */
+/* CCAF Learning Hub - Complete & Unabridged 13 Chapters Theory Data (Song ngữ Anh - Việt 100% Đầy Đủ & Dễ Hiểu Vượt Trội) */
 
 const CHAPTERS_DATA = [
   {
@@ -6,19 +6,19 @@ const CHAPTERS_DATA = [
     title: "Chương 1: Claude API — Nền tảng tương tác với Model",
     domain: "D4",
     domainTitle: "Prompt Engineering & Structured Output",
-    estimatedMinutes: 20,
-    summary: "Hiểu sâu sắc cấu trúc Request/Response của Claude Messages API, các tham số bắt buộc, cơ chế Stateless, các vai trò message, trường stop_reason, System Prompt và các thách thức của Context Window.",
+    estimatedMinutes: 25,
+    summary: "Hiểu sâu sắc cấu trúc Request/Response của Claude Messages API, tính chất Stateless, các vai trò message, trường stop_reason, System Prompt và các thách thức của Context Window.",
     learningObjectives: [
       "Giải thích được lý do Claude API là Stateless và hậu quả nếu không gửi lại toàn bộ lịch sử tin nhắn.",
       "Phân biệt rõ 3 vai trò trong message: user, assistant, và tool (tool_result).",
       "Nhận biết và xử lý đúng 4 giá trị của trường stop_reason (end_turn, tool_use, max_tokens, stop_sequence).",
-      "Nắm vững đặc điểm của System Prompt và cảnh báo câu chữ khiến mô hình gọi thừa tool get_customer.",
+      "Nắm vững đặc điểm của System Prompt và bẫy câu chữ khiến mô hình gọi thừa tool get_customer.",
       "Phân tích 3 vấn đề lớn của Context Window: Hiệu ứng Lost-in-the-middle, Tích lũy kết quả tool thừa, và Mất mát khi tóm tắt lũy tiến."
     ],
     coreMasteries: [
       "Stateless API: Mô hình không lưu trạng thái giữa các lần gọi, bắt buộc phải gửi lại toàn bộ mảng messages.",
       "Message Roles: user (người dùng), assistant (phản hồi của Claude), tool (kết quả thực thi tool dưới dạng content block tool_result).",
-      "stop_reason = 'end_turn': Mô hình hoàn thành câu trả lời.",
+      "stop_reason = 'end_turn': Mô hình đã hoàn thành câu trả lời.",
       "stop_reason = 'tool_use': Mô hình muốn gọi một công cụ và chờ kết quả từ client.",
       "stop_reason = 'max_tokens': Phản hồi bị cắt ngang do thiếu token, cần tăng max_tokens.",
       "System Prompt: Được gửi ở trường 'system' riêng biệt, có độ ưu tiên cao hơn tin nhắn user.",
@@ -38,8 +38,11 @@ const CHAPTERS_DATA = [
     ],
     sections: [
       {
-        heading: "1.1 Cấu trúc yêu cầu API (API Request Structure)",
+        heading: "1.1 Cấu trúc yêu cầu API (API Request Structure) & Tính chất Stateless",
         content: `
+          <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Hãy tưởng tượng Claude API như một bác sĩ khám bệnh hoàn toàn mới mỗi lần bạn bước vào phòng. Bác sĩ không lưu bất kỳ hồ sơ nào trong đầu. Mỗi lần tái khám, bạn phải mang theo toàn bộ cuốn sổ khám bệnh (lịch sử hội thoại mảng <code>messages</code>). Nếu bạn quên mang sổ cũ, bác sĩ sẽ không thể biết lần trước đã chẩn đoán tới đâu!
+          </div>
           <p>Claude API hoạt động theo mô hình <strong>Request – Response (Yêu cầu & Phản hồi)</strong>. Mỗi yêu cầu gửi tới endpoint <code>/v1/messages</code> bắt buộc phải tuân theo cấu trúc JSON chuẩn.</p>
           <p>Điểm cốt lõi cần ghi nhớ: <strong>Claude API là Stateless (Không lưu trạng thái)</strong>. Mô hình không lưu giữ bất kỳ thông tin nào từ các cuộc gọi API trước đó. Để tiếp tục cuộc hội thoại, ứng dụng của bạn bắt buộc phải gửi lại toàn bộ lịch sử tin nhắn trong mảng <code>messages</code>.</p>
         `,
@@ -114,7 +117,7 @@ const CHAPTERS_DATA = [
         `
       },
       {
-        heading: "1.4 System Prompt",
+        heading: "1.4 System Prompt & Bẫy Chỉ Thị Quá Mức",
         content: `
           <p>System prompt là chỉ thị đặc biệt định nghĩa ngữ cảnh và các quy tắc hành vi cho Claude:</p>
           <ul>
@@ -145,7 +148,7 @@ const CHAPTERS_DATA = [
     title: "Chương 2: Tools và tool_use (Gọi công cụ bên ngoài)",
     domain: "D2",
     domainTitle: "Tool Design & MCP Integration",
-    estimatedMinutes: 20,
+    estimatedMinutes: 25,
     summary: "Cơ chế cho phép Claude gọi các hàm/tool bên ngoài để tra cứu dữ liệu, thực thi code hoặc thao tác hệ thống.",
     learningObjectives: [
       "Nắm chắc 4 bước trong vòng lặp Tool Use (The Tool Use Loop).",
@@ -154,7 +157,7 @@ const CHAPTERS_DATA = [
     ],
     coreMasteries: [
       "Tool Loop: Định nghĩa tools → Mô hình trả tool_use → Client chạy hàm → Client gửi tool_result.",
-      "Granular Tools: Chia nhỏ tool đơn nhiệm tốt hơn 1 tool đa năng cồng kềnh.",
+      "Granular Tools: Chia nhỏ tool đơn nhiệm tốt hơn 1 tool đa năng cồng kềnh (Monolithic Tool).",
       "tool_choice = 'auto': Mặc định, mô hình tự quyết định có dùng tool hay không.",
       "tool_choice = 'any': Bắt buộc mô hình phải chọn ít nhất 1 tool bất kỳ.",
       "tool_choice = 'tool': Bắt buộc mô hình phải gọi đúng 1 tool chỉ định."
@@ -170,22 +173,25 @@ const CHAPTERS_DATA = [
     ],
     sections: [
       {
-        heading: "2.1 Vòng lặp Tool Use (The Tool Use Loop)",
+        heading: "2.1 Vòng lặp Tool Use 4 bước (The Tool Use Loop)",
         content: `
+          <div class="callout callout-title" style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid var(--accent-blue); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Claude đóng vai trò như một vị bác sĩ kê đơn thuốc, nhưng Claude không tự mở tủ thuốc lấy thuốc. Claude viết đơn: <em>"Cần kiểm tra nhiệt độ bệnh nhân bằng nhiệt kế"</em> (trả về <code>stop_reason: tool_use</code>). Y tá (là ứng dụng backend của bạn) sẽ thực hiện thao tác đó ở phòng thí nghiệm, lấy kết quả đo được rồi nộp lại cho bác sĩ (gửi lại <code>tool_result</code>).
+          </div>
           <p>Claude không thể tự truy cập Internet hay tự chạy code trên máy tính của bạn. Tuy nhiên, nó có thể thông báo: <em>"Tôi muốn bạn chạy hàm này với các tham số sau"</em>. Đó chính là cơ chế <strong>tool_use</strong>.</p>
-          <p>Vòng lặp diễn ra theo 4 bước:</p>
+          <p>Vòng lặp diễn ra theo 4 bước chuẩn:</p>
           <ol>
-            <li>Bạn định nghĩa danh sách công cụ trong tham số <code>tools</code> khi gửi API.</li>
-            <li>Claude phân tích và trả về <code>stop_reason: "tool_use"</code> kèm thông tin hàm cần gọi.</li>
-            <li>Ứng dụng của bạn tự chạy hàm đó ở phía backend của bạn.</li>
-            <li>Bạn gửi lại kết quả chạy hàm cho Claude dưới dạng <code>tool_result</code>.</li>
+            <li><strong>Định nghĩa:</strong> Bạn gửi mảng <code>tools</code> chứa tên, mô tả và JSON Schema các tham số đầu vào.</li>
+            <li><strong>Kích hoạt:</strong> Mô hình phân tích và trả về <code>stop_reason: "tool_use"</code> kèm tên tool và JSON input.</li>
+            <li><strong>Thực thi:</strong> Backend của bạn nhận lệnh, tự thực thi hàm/API bên ngoài đó.</li>
+            <li><strong>Trả về:</strong> Backend của bạn đóng gói kết quả dưới dạng content block <code>tool_result</code> và gửi lại cho Claude.</li>
           </ol>
         `,
         codeExample: `// Định nghĩa tool gửi trong API
 "tools": [
   {
     "name": "get_weather",
-    "description": "Lấy nhiệt độ hiện tại của một thành phố",
+    "description": "Lấy nhiệt độ hiện tại của một thành phố cụ thể",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -195,6 +201,27 @@ const CHAPTERS_DATA = [
     }
   }
 ]`
+      },
+      {
+        heading: "2.2 Granular Tools vs Monolithic Tools",
+        content: `
+          <p>Trong thiết kế hệ thống thực tế:</p>
+          <ul>
+            <li><strong>Monolithic Tools (Công cụ cồng kềnh):</strong> Một tool nhận hàng chục tham số phức tạp để làm nhiều việc một lúc. Điều này khiến mô hình dễ nhầm lẫn và gọi lỗi.</li>
+            <li><strong>Granular Tools (Công cụ đơn nhiệm tinh gọn):</strong> Chia nhỏ thành các tool đơn giản, mỗi tool chỉ giải quyết đúng 1 chức năng (Ví dụ: <code>search_users</code>, <code>get_user_details</code>, <code>update_user_status</code>). Mô hình dễ dàng chọn đúng công cụ thích hợp.</li>
+          </ul>
+        `
+      },
+      {
+        heading: "2.3 Tham số tool_choice",
+        content: `
+          <p>Bạn có thể điều khiển cách Claude chọn tool thông qua tham số <code>tool_choice</code>:</p>
+          <ul>
+            <li><code>{"type": "auto"}</code> (Mặc định): Mô hình tự quyết định có dùng tool hay chỉ trả lời bằng văn bản.</li>
+            <li><code>{"type": "any"}</code>: Bắt buộc mô hình phải gọi ít nhất 1 tool (nhưng do mô hình tự chọn tool nào).</li>
+            <li><code>{"type": "tool", "name": "get_weather"}</code>: Bắt buộc mô hình phải gọi đúng 1 tool chỉ định.</li>
+          </ul>
+        `
       }
     ],
     examTip: "⚡ Mẹo thi CCAF: Đừng viết mô tả Tool chung chung (monolithic tool). Hãy chia nhỏ thành các tool có nhiệm vụ rõ ràng (granular tools)."
@@ -230,10 +257,24 @@ const CHAPTERS_DATA = [
       {
         heading: "3.1 Mô hình Coordinator - Worker (Lead & Subagents)",
         content: `
+          <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Coordinator giống như Trưởng Phòng Dự Án. Khi có một nhiệm vụ lớn (như xây dựng tính năng mới), Trưởng phòng không tự mình viết hết code và thiết kế giao diện. Trưởng phòng phân chia việc và gọi 3 chuyên viên (Subagents): Chuyên viên Frontend, Chuyên viên Backend, Chuyên viên Tester. Mỗi chuyên viên làm việc độc lập trong phòng riêng của mình (Context riêng), sau đó báo cáo kết quả về cho Trưởng phòng tổng hợp!
+          </div>
           <p>Khi giải quyết các bài toán lớn (như đọc 200 file code hoặc phân tích hợp đồng pháp lý), việc dùng một agent duy nhất sẽ làm cồng kềnh bộ nhớ context. Mô hình <strong>Orchestrator-Worker</strong> giải quyết bằng cách:</p>
           <ul>
             <li><strong>Coordinator (Agent chính):</strong> Lập kế hoạch, phân chia công việc, spawn (tạo) các agent con và tổng hợp kết quả cuối cùng.</li>
             <li><strong>Subagents (Agent con):</strong> Mỗi agent con có bộ nhớ context riêng biệt và tập tool riêng để thực hiện 1 nhiệm vụ nhỏ.</li>
+          </ul>
+        `
+      },
+      {
+        heading: "3.2 Bẫy allowedTools = ['Task'] & Parallel Execution",
+        content: `
+          <p>Để Coordinator có thể phân công nhiệm vụ cho Subagent, điều kiện tiên quyết là mảng <code>allowedTools</code> của Coordinator phải khai báo công cụ <code>"Task"</code>.</p>
+          <p><strong>Cảnh báo bẫy đề thi Anthropic CCAF:</strong></p>
+          <ul>
+            <li>Nếu thiếu <code>"Task"</code> trong <code>allowedTools</code>, Coordinator chỉ có thể xuất văn bản tự do mô tả dự định ủy quyền chứ không khởi chạy được Subagent.</li>
+            <li>Để các Subagents chạy **song song thật sự (Parallel Execution)**, Coordinator phải phát ra **nhiều lệnh gọi tool Task trong CÙNG MỘT message phản hồi API**. Việc dặn trong prompt "hãy chạy song song" hoàn toàn không có hiệu lực kỹ thuật nếu API xuất từng thẻ rải rác.</li>
           </ul>
         `
       }
@@ -245,28 +286,50 @@ const CHAPTERS_DATA = [
     title: "Chương 4: Model Context Protocol (MCP)",
     domain: "D2",
     domainTitle: "Tool Design & MCP Integration",
-    estimatedMinutes: 20,
+    estimatedMinutes: 25,
     summary: "Chuẩn giao tiếp mở giúp kết nối Claude bảo mật với các nguồn dữ liệu bên ngoài (Database, GitHub, File System).",
     learningObjectives: [
       "Hiểu khái niệm MCP Server & MCP Client.",
-      "Biết cơ chế cấp quyền và bảo mật của MCP đối với các thao tác đọc/ghi dữ liệu."
+      "Biết cơ chế cấp quyền và bảo mật của MCP đối với các thao tác đọc/ghi dữ liệu.",
+      "Phân biệt 3 thành phần chính trong MCP: Tools, Resources, Prompts."
     ],
     coreMasteries: [
       "MCP là chuẩn mở kết nối Claude an toàn với Database, GitHub, File System.",
-      "MCP Server cung cấp tài nguyên & công cụ; Client (Claude Code/Desktop) kết nối và thực thi."
+      "MCP Server cung cấp tài nguyên & công cụ; Client (Claude Code/Desktop) kết nối và thực thi.",
+      "3 thành phần MCP: Tools (Hàm gọi), Resources (Dữ liệu tĩnh/File), Prompts (Mẫu hướng dẫn sẵn)."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhầm lẫn MCP với API thông thường. MCP là giao thức tiêu chuẩn mở (Open Protocol)."
+      "⚠️ BẪY 1: Nhầm lẫn MCP với API thông thường. MCP là giao thức tiêu chuẩn mở (Open Protocol).",
+      "⚠️ BẪY 2: Cung cấp mô tả MCP thiếu rõ ràng khiến mô hình ưu tiên chạy lệnh bash/sed thô thay vì gọi MCP Server."
     ],
     selfChecklist: [
       "Tôi hiểu MCP đóng vai trò như chuẩn kết nối mở cho AI.",
-      "Tôi phân biệt được MCP Server và MCP Client."
+      "Tôi phân biệt được MCP Server và MCP Client.",
+      "Tôi thuộc 3 thành phần của MCP (Tools, Resources, Prompts)."
     ],
     sections: [
       {
-        heading: "4.1 MCP là gì?",
+        heading: "4.1 Khái niệm Model Context Protocol (MCP)",
         content: `
-          <p><strong>Model Context Protocol (MCP)</strong> là một chuẩn kết nối mở do Anthropic phát triển. Hãy tưởng tượng MCP như cổng USB-C dành cho AI: nó cho phép Claude kết nối an toàn với mọi cơ sở dữ liệu, công cụ hoặc ứng dụng doanh nghiệp mà không cần viết lại code tích hợp riêng cho từng hệ thống.</p>
+          <div class="callout callout-title" style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--accent-emerald); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Hãy tưởng tượng MCP như cổng cắm USB-C tiêu chuẩn trên máy tính. Trước đây, mỗi thiết bị (bàn phím, chuột, màn hình) cần một dây cáp và cổng cắm riêng biệt. MCP định nghĩa một cổng chuẩn hóa giúp Claude (Client) cắm thẳng vào bất kỳ Cơ sở dữ liệu, GitHub, Slack hay File System (MCP Servers) mà không phải viết lại code tùy chỉnh từ đầu!
+          </div>
+          <p><strong>Model Context Protocol (MCP)</strong> là một giao thức chuẩn mở được Anthropic thiết kế. Gồm 2 thành phần chính:</p>
+          <ul>
+            <li><strong>MCP Server:</strong> Nơi chứa dữ liệu thực tế (PostgreSQL, GitHub API, Local Directory) và cung cấp các endpoint an toàn.</li>
+            <li><strong>MCP Client:</strong> Ứng dụng như Claude Desktop hoặc Claude Code CLI kết nối tới Server để gửi yêu cầu và nhận dữ liệu.</li>
+          </ul>
+        `
+      },
+      {
+        heading: "4.2 3 Thành phần chính của MCP Protocol",
+        content: `
+          <p>Một MCP Server có thể cung cấp 3 loại tài nguyên cho Claude:</p>
+          <ol>
+            <li><strong>Tools (Công cụ):</strong> Các hàm thực thi hành động (vd: <code>create_issue</code>, <code>query_sql</code>).</li>
+            <li><strong>Resources (Tài nguyên):</strong> Các tệp dữ liệu đọc tĩnh hoặc luồng dữ liệu (vd: <code>file:///logs/app.log</code>).</li>
+            <li><strong>Prompts (Mẫu chỉ thị):</strong> Các template prompt được chuẩn hóa sẵn giúp người dùng thực hiện nhiệm vụ nhanh.</li>
+          </ol>
         `
       }
     ],
@@ -281,24 +344,39 @@ const CHAPTERS_DATA = [
     summary: "Sử dụng công cụ Claude Code CLI trong Terminal, cấu hình CLAUDE.md, quản lý quyền hạn và session.",
     learningObjectives: [
       "Nắm vững vai trò và nội dung nên ghi trong file CLAUDE.md.",
-      "Hiểu cờ CLI `--dangerously-skip-permissions` và rủi ro an toàn."
+      "Hiểu cờ CLI `--dangerously-skip-permissions` và rủi ro an toàn.",
+      "Biết cách thiết lập quy trình CI/CD PR Review tự động với Claude Code."
     ],
     coreMasteries: [
       "CLAUDE.md: File cấu hình dự án ghi các lệnh build/test và coding style cốt lõi.",
-      "--dangerously-skip-permissions: Bỏ qua bước hỏi cấp quyền, chỉ dùng trong Sandbox an toàn."
+      "--dangerously-skip-permissions: Bỏ qua bước hỏi cấp quyền, chỉ dùng trong Sandbox/CI-CD an toàn.",
+      "Glob/Grep trước View: Định vị file trước khi tải nội dung vào context."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhét toàn bộ tài liệu dự án dài dòng vào CLAUDE.md (chỉ nên ghi quy tắc & lệnh thiết yếu)."
+      "⚠️ BẪY 1: Nhét toàn bộ tài liệu dự án dài dòng vào CLAUDE.md (chỉ nên ghi quy tắc & lệnh thiết yếu).",
+      "⚠️ BẪY 2: Chạy cờ `--dangerously-skip-permissions` trên môi trường Production thực tế."
     ],
     selfChecklist: [
       "Tôi biết mục đích của file CLAUDE.md.",
-      "Tôi hiểu khi nào nên dùng cờ bỏ qua quyền hạn CLI."
+      "Tôi hiểu khi nào nên dùng cờ bỏ qua quyền hạn CLI.",
+      "Tôi nắm quy trình làm việc chuẩn trong Claude Code CLI."
     ],
     sections: [
       {
         heading: "5.1 Vai trò của file CLAUDE.md",
         content: `
+          <div class="callout callout-title" style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent-amber); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> File <code>CLAUDE.md</code> giống như "Tờ ghi chú dán trên màn hình" dành cho lập trình viên mới nhận việc. Nó chỉ chứa đúng những lệnh quan trọng nhất (Lệnh chạy test là gì? Lệnh build là gì? Quy tắc đặt tên biến là gì?). Nếu dán một cuốn sách 500 trang lên màn hình, lập trình viên sẽ bị ngợp và lãng phí thời gian đọc!
+          </div>
           <p><strong>CLAUDE.md</strong> là file cấu hình hướng dẫn dành riêng cho dự án khi bạn làm việc với Claude Code CLI. Khi Claude Code khởi chạy trong một thư mục, nó sẽ tự động đọc file này trước tiên.</p>
+          <p><strong>Quy tắc ghi CLAUDE.md:</strong> Chỉ ghi các thông tin ngắn gọn như lệnh test (<code>npm test</code>), lệnh lint, quy tắc code style cốt lõi. Tránh ghi tài liệu dài dòng vì sẽ gây lãng phí token context.</p>
+        `
+      },
+      {
+        heading: "5.2 Cờ lệnh --dangerously-skip-permissions",
+        content: `
+          <p>Mặc định, Claude Code CLI sẽ hỏi xin xác nhận của bạn trước khi thực thi lệnh Terminal nguy hại hoặc chỉnh sửa file. Cờ <code>--dangerously-skip-permissions</code> cho phép tự động duyệt toàn bộ lệnh.</p>
+          <p><strong>Quy tắc an toàn CCAF:</strong> Chỉ sử dụng cờ này trong môi trường <strong>Isolated Container / CI-CD Pipeline Sandbox</strong>. Không bao giờ chạy cờ này trên máy tính cá nhân chứa dữ liệu quan trọng.</p>
         `
       }
     ],
@@ -313,109 +391,164 @@ const CHAPTERS_DATA = [
     summary: "Tối ưu hóa prompt với Few-shot examples, JSON Schema, và kiểm soát định dạng đầu ra chuẩn xác.",
     learningObjectives: [
       "Sử dụng Few-shot Prompting để chuẩn hóa định dạng đầu ra.",
-      "Viết chỉ thị chống Hallucination (trả về null khi thiếu thông tin)."
+      "Viết chỉ thị chống Hallucination (trả về null khi thiếu thông tin).",
+      "Dùng thẻ XML để phân tách ranh giới dữ liệu an toàn."
     ],
     coreMasteries: [
       "Few-shot Examples: Đưa 2-3 ví dụ mẫu cụ thể là cách tốt nhất để ép định dạng đầu ra.",
-      "Explicit Null: Yêu cầu 'trả về null nếu không tìm thấy' để tránh mô hình bịa số liệu."
+      "Explicit Null: Yêu cầu 'trả về null nếu không tìm thấy' để tránh mô hình bịa số liệu.",
+      "XML Boundaries: Dùng thẻ <doc>...</doc> phân tách prompt chỉ thị và văn bản đầu vào."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Chỉ đặt temperature = 0 mà không cung cấp Few-shot hay JSON Schema."
+      "⚠️ BẪY 1: Nhầm tưởng để temperature = 0 là đủ chuẩn hóa định dạng mà không cần Few-shot.",
+      "⚠️ BẪY 2: Không yêu cầu Explicit Null khiến mô hình bịa ra số liệu plausible giả khi thiếu thông tin."
     ],
     selfChecklist: [
       "Tôi biết cách dùng Few-shot ví dụ mẫu.",
-      "Tôi biết câu dặn 'trả về null' giúp chống hallucination."
+      "Tôi viết được câu lệnh bắt buộc Explicit Null.",
+      "Tôi biết cách bao bọc dữ liệu bằng thẻ XML."
     ],
     sections: [
       {
         heading: "6.1 Few-Shot Prompting & Chuẩn hóa định dạng",
         content: `
-          <p>Để đảm bảo Claude luôn trả về kết quả đúng định dạng (ví dụ: ngày tháng YYYY-MM-DD hoặc cấu hình JSON chính xác), phương pháp hiệu quả nhất không phải là dặn đi dặn lại bằng lời mà là <strong>cung cấp các ví dụ mẫu (Few-shot examples)</strong> trực tiếp trong prompt.</p>
+          <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Nếu bạn yêu cầu thợ làm bánh "Hãy làm cho tôi một chiếc bánh", thợ sẽ làm theo ý họ. Nhưng nếu bạn đưa 3 bức ảnh mẫu chiếc bánh thực tế (Few-shot examples), thợ sẽ làm đúng 100% kiểu dáng bạn mong muốn. Đưa ví dụ mẫu luôn hiệu quả hơn trăm lời giải thích!
+          </div>
+          <p>Để đảm bảo Claude xuất đúng định dạng JSON hoặc phong cách văn bản mong muốn, phương pháp hiệu quả nhất là đưa 2-3 ví dụ đầu vào và đầu ra mẫu (Few-shot examples) ngay trong prompt.</p>
+        `
+      },
+      {
+        heading: "6.2 Kỹ thuật Explicit Null chống Bịa thông tin (Hallucination)",
+        content: `
+          <p>Khi trích xuất dữ liệu từ văn bản thiếu thông tin (ví dụ: tìm số điện thoại trong email nhưng email không có số điện thoại), mô hình có xu hướng bịa ra một số ngẫu nhiên plausible (có vẻ hợp lý).</p>
+          <p><strong>Giải pháp Anthropic:</strong> Luôn thêm chỉ thị rõ ràng: <em>"Nếu thông tin không xuất hiện trong văn bản, bắt buộc trả về giá trị null"</em>.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Đừng chỉ đặt temperature = 0. Để chuẩn hóa định dạng dữ liệu nhất quán 100%, hãy kết hợp Few-shot examples và JSON Schema."
+    examTip: "⚡ Mẹo thi CCAF: Luôn dùng Few-shot ví dụ mẫu kết hợp chỉ thị Explicit Null để có kết quả trích xuất dữ liệu chuẩn xác nhất."
   },
   {
     id: 7,
-    title: "Chương 7: Message Batches API (Xử lý hàng loạt)",
-    domain: "D5",
-    domainTitle: "Context Management & Reliability",
-    estimatedMinutes: 15,
-    summary: "Giảm 50% chi phí API cho các tác vụ xử lý tài liệu không yêu cầu thời gian thực bằng Batches API.",
+    title: "Chương 7: Thiết kế Schema nâng cao & Resilient Enums",
+    domain: "D4",
+    domainTitle: "Prompt Engineering & Structured Output",
+    estimatedMinutes: 25,
+    summary: "Xây dựng JSON Schema bền vững chống vỡ dữ liệu với Resilient Catch-Alls, Data Evolution và Schema Redundancy.",
     learningObjectives: [
-      "Nhận biết khi nào nên dùng Message Batches API thay vì Real-time API.",
-      "Hiểu lợi ích về chi phí (giảm 50%) và SLA (24h) của Batches API."
+      "Áp dụng mẫu Resilient Catch-All Enum để xử lý trường hợp dữ liệu lạ.",
+      "Thiết kế Schema Redundancy để phát hiện lỗi tính toán/OCR và đẩy sang duyệt thủ công.",
+      "Quản lý sự thay đổi dữ liệu theo thời gian (Data Evolution Rule)."
     ],
     coreMasteries: [
-      "Batches API: Giảm 50% giá API cho xử lý hàng loạt bất đồng bộ trong 24 giờ."
+      "Resilient Catch-All: Thêm giá trị 'other' vào enum kết hợp trường 'other_detail'.",
+      "Schema Redundancy: Yêu cầu cả 'calculated_total' và 'stated_total' để phát hiện sai lệch.",
+      "Data Evolution Rule: Lưu vết dữ liệu thay đổi gồm giá trị, nguồn và ngày có hiệu lực."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Dùng Real-time API cho công việc xử lý dữ liệu hàng đêm không cần gấp."
+      "⚠️ BẪY 1: Giới hạn cứng enum khiến JSON Schema báo lỗi Validation Error khi gặp loại dữ liệu mới.",
+      "⚠️ BẪY 2: Ghi đè dữ liệu cũ khi có phụ lục hợp đồng sửa đổi thay vì lưu vết đa giá trị kèm ngày hiệu lực."
     ],
     selfChecklist: [
-      "Tôi biết Batches API giúp tiết kiệm 50% chi phí.",
-      "Tôi biết trường hợp sử dụng phù hợp cho Batches API."
+      "Tôi thiết kế được Resilient Catch-All Enum trong JSON Schema.",
+      "Tôi giải thích được nguyên lý Schema Redundancy để bắt lỗi OCR.",
+      "Tôi biết cách lưu vết dữ liệu hợp đồng theo thời gian."
     ],
     sections: [
       {
-        heading: "7.1 Tiết kiệm chi phí với Batches API",
+        heading: "7.1 Anti-Pattern: Fragile Expansion & Giải pháp Resilient Catch-Alls",
         content: `
-          <p>Nếu bạn có 10.000 tài liệu cần trích xuất thông tin và không cần kết quả ngay lập tức trong vài giây, hãy dùng <strong>Message Batches API</strong>. Bạn gửi một tập hợp các yêu cầu, Claude sẽ xử lý bất đồng bộ trong vòng 24 giờ với <strong>giá rẻ hơn 50%</strong> so với API thông thường.</p>
+          <div class="callout callout-title" style="background: rgba(244, 63, 94, 0.08); border-left: 4px solid var(--accent-rose); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Hãy tưởng tượng một tủ phân loại thư chỉ có 3 ngăn: [Nhà riêng, Căn hộ, Biệt thự]. Khi có một lá thư gửi tới "Studio" hoặc "Nhà kho cải tạo", người đưa thư sẽ vứt lá thư đi vì không có ngăn phù hợp (Validation Error). Mẫu **Resilient Catch-All** thêm một ngăn thứ 4: [Khác (other)] kèm một ô ghi chú chi tiết bên cạnh!
+          </div>
+          <p>Trong thực tế Production, nếu bạn chỉ giới hạn enum cứng như <code>["house", "apartment", "condo"]</code>, khi văn bản xuất hiện loại hình "studio", hệ thống API sẽ báo lỗi Validation Error và thất bại.</p>
+          <p><strong>Cấu trúc JSON Schema chuẩn Resilient Catch-All:</strong></p>
+        `,
+        codeExample: `{
+  "type": "object",
+  "properties": {
+    "property_type": {
+      "type": "string",
+      "enum": ["house", "apartment", "condo", "other"]
+    },
+    "property_type_detail": {
+      "type": "string",
+      "description": "Chi tiết cụ thể nếu property_type là 'other'"
+    }
+  },
+  "required": ["property_type"]
+}`
+      },
+      {
+        heading: "7.2 Schema Redundancy — Phát hiện lỗi OCR & Đẩy Human Review",
+        content: `
+          <p>Khi trích xuất hóa đơn bị mờ (OCR kém), 18% trường hợp dòng hàng (line items) không khớp với tổng tiền trên hóa đơn.</p>
+          <p><strong>Giải pháp Schema Redundancy của Anthropic:</strong> Yêu cầu mô hình trích xuất cả 2 trường:</p>
+          <ul>
+            <li><code>stated_total</code>: Tổng tiền ghi trực tiếp trên hóa đơn.</li>
+            <li><code>calculated_total</code>: Tổng tiền do mô hình tự cộng từ các dòng hàng.</li>
+          </ul>
+          <p>Ở tầng code ứng dụng: Nếu <code>stated_total != calculated_total</code>, tự động đánh cờ đẩy vào hàng chờ <strong>Human Review Queue (Duyệt thủ công)</strong>.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Quy tắc định tuyến chi phí: Đừng bao giờ dùng Real-time Messages API cho các nhu cầu xử lý bất đồng bộ không gấp."
+    examTip: "⚡ Mẹo thi CCAF: Luôn thêm 'other' + trường detail vào Enum và dùng Schema Redundancy để tự động phát hiện lỗi sai lệch dữ liệu."
   },
   {
     id: 8,
-    title: "Chương 8: Chiến lược Phân rã Tác vụ (Task Decomposition)",
-    domain: "D1",
-    domainTitle: "Agent Architecture & Orchestration",
+    title: "Chương 8: Phân tuyến Chi phí & SLA — Messages vs Batch API",
+    domain: "D5",
+    domainTitle: "Context Management & Reliability",
     estimatedMinutes: 20,
-    summary: "Ba mô hình phân rã công việc: Prompt Chaining, Routing, và Orchestrator-Workers.",
+    summary: "Tối ưu hóa chi phí vận hành với Message Batches API (Tiết kiệm 50% chi phí) và điều hướng SLA phù hợp.",
     learningObjectives: [
-      "Phân biệt 3 mô hình: Prompt Chaining vs Routing vs Orchestrator-Workers."
+      "Phân biệt khi nào dùng Messages API (Real-time) vs Message Batches API (Async 24h).",
+      "Tận dụng mức giảm giá 50% chi phí của Batch API cho các tác vụ không thời gian thực."
     ],
     coreMasteries: [
-      "Prompt Chaining: Chuỗi các bước cố định tuần tự.",
-      "Routing: Phân loại đầu vào thành các nhóm rồi chuyển hướng.",
-      "Orchestrator-Workers: Phân công linh hoạt dựa trên LLM trung tâm."
+      "Messages API: Dành cho tương tác thời gian thực (Real-time), chi phí cao nhất.",
+      "Message Batches API: Tiết kiệm 50% chi phí, hoàn thành trong 24 giờ, phù hợp tác vụ xử lý lô bất đồng bộ.",
+      "Rule: Không bao giờ mặc định dùng Real-time API cho các nhu cầu xử lý bất đồng bộ."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Chọn Orchestrator-Workers cho quy trình cố định giống hệt nhau mỗi lần."
+      "⚠️ BẪY 1: Dùng Messages API thời gian thực để tổng hợp 50.000 tài liệu đêm gây lãng phí 50% chi phí ngân sách."
     ],
     selfChecklist: [
-      "Tôi phân biệt được 3 mô hình phân rã tác vụ."
+      "Tôi phân biệt được ưu/nhược điểm của Batch API.",
+      "Tôi áp dụng được quy tắc lựa chọn API theo SLA."
     ],
     sections: [
       {
-        heading: "8.1 Chọn đúng mẫu phân rã",
+        heading: "8.1 Quy tắc Routing theo SLA & Chi phí",
         content: `
+          <div class="callout callout-title" style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid var(--accent-blue); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Messages API như dịch vụ Giao hàng Hỏa tốc trong 15 phút (đắt tiền, cần dùng ngay). Message Batches API như dịch vụ Giao hàng Tiết kiệm trong ngày (giảm 50% giá cước). Nếu khách hàng đồng ý nhận tài liệu sau 6-12 tiếng, sử dụng Giao hàng Hỏa tốc là sự lãng phí ngân sách doanh nghiệp!
+          </div>
+          <p><strong>Message Batches API</strong> là tính năng gửi hàng loạt yêu cầu của Anthropic. Đặc điểm cốt lõi:</p>
           <ul>
-            <li><strong>Prompt Chaining (Chuỗi Prompt):</strong> Dùng khi quy trình cố định, bước 1 $\\rightarrow$ bước 2 $\\rightarrow$ bước 3 giống hệt nhau cho mọi đầu vào.</li>
-            <li><strong>Routing (Định tuyến):</strong> Dùng khi đầu vào chia làm các nhóm rõ ràng và mỗi nhóm cần một cách xử lý riêng.</li>
-            <li><strong>Orchestrator-Workers:</strong> Dùng khi công việc mở, không đoán trước được số lượng bước nhỏ, cần LLM linh hoạt phân công.</li>
+            <li><strong>Giảm 50% chi phí</strong> so với cuộc gọi API thời gian thực thông thường.</li>
+            <li>Hoàn thành và trả kết quả trong vòng 24 giờ.</li>
+            <li>Rất thích hợp cho tác vụ: OCR hàng ngàn hóa đơn, đánh giá bài thi định kỳ, phân tích sentiment hàng tuần.</li>
           </ul>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Nhớ kỹ sự khác biệt giữa Chaining (cố định), Routing (phân loại), và Orchestrator-Workers (linh hoạt)."
+    examTip: "⚡ Mẹo thi CCAF: Với các tác vụ bất đồng bộ không yêu cầu trả lời ngay lập tức, luôn chọn Message Batches API để tiết kiệm 50% chi phí."
   },
   {
     id: 9,
     title: "Chương 9: Escalation và Human-in-the-Loop (Duyệt thủ công)",
     domain: "D5",
     domainTitle: "Context Management & Reliability",
-    estimatedMinutes: 15,
+    estimatedMinutes: 20,
     summary: "Kết hợp trí tuệ nhân tạo và sự giám sát của con người cho các hành động rủi ro cao.",
     learningObjectives: [
       "Hiểu cơ chế duyệt thủ công dựa trên điểm tin cậy (Confidence Score) và ngưỡng giá trị.",
       "Sử dụng Application Intercept Hooks để chặn các hành vi rủi ro cao ở tầng code server."
     ],
     coreMasteries: [
-      "Confidence > 90%: Tự động hóa.",
-      "Confidence < 90% hoặc giá trị vượt ngưỡng: Đẩy sang Human Review Queue.",
+      "Confidence > 90%: Tự động hóa hoàn toàn.",
+      "Confidence < 90% hoặc giao dịch > $500: Đẩy sang Human Review Queue.",
       "Application Intercept Hooks: Chặn giao dịch nguy hiểm server-side thay vì phụ thuộc System Prompt."
     ],
     examTraps: [
@@ -429,7 +562,11 @@ const CHAPTERS_DATA = [
       {
         heading: "9.1 Ngưỡng tự động hóa & Can thiệp của con người",
         content: `
+          <div class="callout callout-title" style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent-amber); padding: 1rem; margin-bottom: 1rem;">
+            💡 <strong>Ẩn dụ trực quan:</strong> Hệ thống bảo mật ngân hàng tự động duyệt các giao dịch nhỏ $10. Tuy nhiên khi có giao dịch chuyển tiền $10.000 sang tài khoản lạ, hệ thống sẽ dừng lại và yêu cầu nhân viên xác minh OTP/gọi điện cho chủ tài khoản (Human-in-the-loop).
+          </div>
           <p>Trong các hệ thống thực tế (như duyệt hoàn tiền ngân hàng), hệ thống tự động xử lý khi độ tin cậy mô hình $>90\%$. Nếu $<90\%$ hoặc giá trị giao dịch vượt ngưỡng an toàn (vd $>500$), hệ thống sẽ đẩy vào hàng chờ duyệt của con người (Human Review Queue).</p>
+          <p><strong>Application Intercept Hooks:</strong> Luôn thực hiện chặn các quy tắc chính sách (policy constraints) ở tầng code backend của ứng dụng chứ không chỉ trông đợi vào System Prompt.</p>
         `
       }
     ],
@@ -437,10 +574,10 @@ const CHAPTERS_DATA = [
   },
   {
     id: 10,
-    title: "Chương 10: Xử lý lỗi trong hệ thống Đa Agent",
+    title: "Chương 10: Xử lý lỗi & Phục hồi trong Hệ thống Đa Agent",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
-    estimatedMinutes: 15,
+    estimatedMinutes: 20,
     summary: "Xử lý sự cố mạng, tràn bộ nhớ context và phục hồi trạng thái khi agent bị crash.",
     learningObjectives: [
       "Trả về kết quả tool chứa `isError: true` thay vì ném Exception.",
@@ -459,9 +596,10 @@ const CHAPTERS_DATA = [
     ],
     sections: [
       {
-        heading: "10.1 Xử lý lỗi Tool mượt mà",
+        heading: "10.1 Graceful Tool Failures với isError: true",
         content: `
-          <p>Khi tool gặp lỗi (vd API bên thứ 3 bị sập), đừng ném ra Exception làm sập agent. Hãy trả về kết quả tool chứa thuộc tính <code>"isError": true</code> để Claude biết và xử lý mượt mà.</p>
+          <p>Khi công cụ bên ngoài bị lỗi (vd API tra cứu thời tiết sập mạng), backend của bạn không được ném ra Exception làm vỡ ứng dụng.</p>
+          <p><strong>Giải pháp Anthropic:</strong> Đóng gói thông báo lỗi dưới dạng content block <code>tool_result</code> có thuộc tính <code>"isError": true</code>. Claude sẽ đọc thông báo lỗi này và tự điều chỉnh phương án khác mượt mà.</p>
         `
       }
     ],
@@ -469,7 +607,7 @@ const CHAPTERS_DATA = [
   },
   {
     id: 11,
-    title: "Chương 11: Quản lý Context trong Hệ thống Production",
+    title: "Chương 11: Quản lý Context nâng cao & Context Pruning",
     domain: "D5",
     domainTitle: "Context Management & Reliability",
     estimatedMinutes: 20,
@@ -491,7 +629,7 @@ const CHAPTERS_DATA = [
     ],
     sections: [
       {
-        heading: "11.1 Context Pruning",
+        heading: "11.1 Kỹ thuật Context Pruning",
         content: `
           <p>Khi gọi các API trả về 40+ trường dữ liệu rườm rà, ứng dụng nên tự lọc bớt chỉ giữ lại 4-5 trường cần thiết trước khi chèn vào hội thoại của Claude để tiết kiệm không gian context.</p>
         `
@@ -504,7 +642,7 @@ const CHAPTERS_DATA = [
     title: "Chương 12: Bảo toàn Provenance (Nguồn gốc Trích dẫn)",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
-    estimatedMinutes: 15,
+    estimatedMinutes: 20,
     summary: "Giữ nguyên nguồn gốc tài liệu và trích dẫn qua các tầng tổng hợp đa agent.",
     learningObjectives: [
       "Sử dụng Structured Claim-Source Mapping để giữ nguồn trích dẫn khi tổng hợp báo cáo."
@@ -530,13 +668,13 @@ const CHAPTERS_DATA = [
   },
   {
     id: 13,
-    title: "Chương 13: Các công cụ tích hợp của Claude Code",
+    title: "Chương 13: Các công cụ tích hợp trong Claude Code",
     domain: "D3",
     domainTitle: "Claude Code Configuration & Workflows",
-    estimatedMinutes: 15,
-    summary: "Hiểu sâu các công cụ tích hợp như Grep, Glob, View, Edit, Bash trong Claude Code.",
+    estimatedMinutes: 20,
+    summary: "Hiểu sâu các công cụ tích hợp như Grep, Glob, View, Edit, Bash trong Claude Code CLI.",
     learningObjectives: [
-      "Dùng Glob và Grep để định vị code thay vì đọc từng file một."
+      "Dùng Glob và Grep để định vị code trước khi nạp file vào context."
     ],
     coreMasteries: [
       "Glob/Grep First: Tìm kiếm cấu trúc và từ khóa trước khi tải nội dung file vào context."
@@ -549,7 +687,7 @@ const CHAPTERS_DATA = [
     ],
     sections: [
       {
-        heading: "13.1 Glob và Grep vs Đọc toàn bộ File",
+        heading: "13.1 Quy tắc Glob/Grep First",
         content: `
           <p>Khi khám phá một codebase lớn (hàng trăm file), việc đọc toàn bộ từng file là lãng phí context. Hãy dùng Glob để tìm cấu trúc file và Grep để định vị các từ khóa quan trọng trước.</p>
         `
