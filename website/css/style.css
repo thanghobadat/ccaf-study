@@ -376,12 +376,17 @@ pre code {
 
 /* Responsive Media Queries (Optimized for iPhone X 375px, iPhone 15 393px, Mobile & Tablets) */
 
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
     align-items: stretch;
-    padding: 0.75rem 1rem;
-    gap: 0.75rem;
+    padding: 0.75rem 0.85rem;
+    gap: 0.65rem;
   }
   
   .header-top {
@@ -393,28 +398,24 @@ pre code {
 
   .nav-links {
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
     padding: 0.2rem 0;
     width: 100%;
-  }
-  
-  .nav-links::-webkit-scrollbar {
-    display: none;
+    overflow-x: visible;
+    white-space: normal;
   }
 
   .nav-item {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
     flex-shrink: 0;
   }
 
   .main-container {
-    padding: 1.25rem 1rem 3rem;
+    padding: 1rem 0.75rem 3rem;
   }
 
   /* Grid Layouts */
@@ -436,17 +437,71 @@ pre code {
   pre {
     padding: 0.85rem;
     font-size: 0.82rem;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-x: visible !important;
   }
 
   table {
     display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+    width: 100%;
+    overflow-x: visible;
+  }
+
+  .decision-matrix-wrap {
+    overflow-x: visible;
+    width: 100%;
+  }
+
+  .decision-matrix {
+    display: block;
+    width: 100%;
+    border: none;
+    background: transparent;
+  }
+
+  .decision-matrix thead {
+    display: none;
+  }
+
+  .decision-matrix tbody, .decision-matrix tr {
+    display: block;
+    width: 100%;
+  }
+
+  .decision-matrix tr {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    padding: 0.85rem;
+  }
+
+  .decision-matrix td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px dashed var(--border-color);
+    font-size: 0.85rem;
+  }
+
+  .decision-matrix td:last-child {
+    border-bottom: none;
+  }
+
+  .decision-matrix td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-right: 0.5rem;
   }
 }
 
 /* iPhone X (375px) & iPhone 15 (393px) Specific Optimizations */
 @media (max-width: 430px) {
+
   body {
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
