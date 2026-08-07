@@ -236,3 +236,23 @@ document.addEventListener('DOMContentLoaded', () => {
   renderChapterList();
   loadChapter(currentChapterIndex);
 });
+
+// Interactive Knowledge Check QA Reveal Handler
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.classList.contains('kc-toggle-btn')) {
+    const card = e.target.closest('.knowledge-check');
+    if (!card) return;
+    const answer = card.querySelector('.kc-answer');
+    if (!answer) return;
+    
+    const isOpen = answer.classList.contains('open');
+    if (isOpen) {
+      answer.classList.remove('open');
+      e.target.textContent = '💡 Bấm để xem giải thích & đáp án chuẩn';
+    } else {
+      answer.classList.add('open');
+      e.target.textContent = '🙈 Ẩn đáp án';
+    }
+  }
+});
+

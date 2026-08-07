@@ -231,55 +231,249 @@ const CHAPTERS_DATA = [
     title: "Chương 3: Claude Agent SDK — Xây dựng hệ thống Agentic",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
-    estimatedMinutes: 25,
-    summary: "Mô hình Coordinator - Subagent, lập kế hoạch nhiệm vụ, điều phối và xử lý song song với Claude Agent SDK.",
+    estimatedMinutes: 30,
+    summary: "Mô hình Orchestrator - Worker, lập kế hoạch nhiệm vụ, Context Isolation, vòng lặp Agentic Loop 4 bước, AgentDefinition SDK, mẫu Task Tool chuẩn và hệ thống Hooks (PreToolUse/PostToolUse).",
     learningObjectives: [
-      "Hiểu kiến trúc Orchestrator-Worker (Lead & Subagents) và khi nào nên áp dụng.",
-      "Nắm quy tắc bắt buộc thêm 'Task' vào allowedTools của Coordinator.",
-      "Biết cách khởi chạy Subagents thực sự song song (Parallel Execution)."
+      "Hiểu kiến trúc Orchestrator-Worker (Lead & Subagents) và quy tắc Hub-and-Spoke.",
+      "Giải thích nguyên tắc Context Isolation: Subagent sở hữu bộ nhớ riêng, không tự động kế thừa mảng messages của Coordinator.",
+      "Nắm vững 4 bước trong vòng lặp Agentic Loop và các Anti-patterns khiến agent vòng lặp vô hạn.",
+      "Sử dụng AgentDefinition SDK để khai báo tên, mô tả, tools và prompt cho từng Subagent.",
+      "Phân biệt mẫu Task Tool BAD (truyền thừa context) vs GOOD (truyền prompt tinh gọn).",
+      "Vận dụng Hooks (PreToolUse/PostToolUse) để chặn lệnh nguy hiểm 100% Deterministic thay vì phụ thuộc System Prompt."
     ],
     coreMasteries: [
-      "Orchestrator-Worker: Agent chính (Coordinator) điều phối các Agent con (Subagents).",
-      "Flat Hierarchy: Phân cấp phẳng (Coordinator gọi trực tiếp Subagent song song), tránh lồng nhau quá sâu.",
-      "allowedTools = ['Task']: Nếu thiếu 'Task', Coordinator chỉ nói về việc ủy quyền mà không thể spawn subagent.",
-      "Parallel Execution: Chạy song song thật sự khi Coordinator phát ra nhiều thẻ Task tool_use trong CÙNG 1 message."
+      "Orchestrator-Worker: Agent chính (Coordinator) lập kế hoạch, điều phối các Agent con (Subagents) xử lý đơn nhiệm.",
+      "Context Isolation: Mỗi Subagent có mảng messages riêng biệt, giúp giải phóng Context Window cho Coordinator.",
+      "Agentic Loop 4 bước: Định nghĩa tools → Mô hình phát tool_use → Client chạy hàm → Client gửi lại tool_result.",
+      "allowedTools = ['Task']: Coordinator bắt buộc phải có tool 'Task' trong mảng allowedTools mới spawn được Subagent.",
+      "Parallel Execution: Chạy song song thật sự khi Coordinator phát ra nhiều thẻ Task tool_use trong CÙNG 1 API message.",
+      "Hooks > System Prompt: Hooks (PreToolUse) chặn lệnh sai ở tầng client 100% chắc chắn, còn System Prompt chỉ mang tính xác suất."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Quên thêm 'Task' vào allowedTools làm Coordinator chỉ nói mồm mà không chạy subagent.",
-      "⚠️ BẪY 2: Nhầm tưởng dặn 'Hãy chạy song song nhé' trong system prompt là đủ (thực tế phải gửi nhiều Task tool trong cùng 1 message)."
+      "⚠️ BẪY 1: Quên thêm 'Task' vào allowedTools làm Coordinator chỉ nói mồm mà không thể spawn được Subagent con.",
+      "⚠️ BẪY 2: Nghĩ rằng Subagent tự động thấy toàn bộ lịch sử trò chuyện của Coordinator (Thực tế Subagent chỉ thấy thông tin được truyền qua tham số prompt của Task tool).",
+      "⚠️ BẪY 3: Dùng System Prompt 'Cấm chạy lệnh rm -rf' để bảo mật thay vì dùng PreToolUse Hook (Prompt vẫn có xác suất bị bẫy Prompt Injection qua mặt)."
     ],
     selfChecklist: [
-      "Tôi giải thích được vai trò của Coordinator và Subagent.",
-      "Tôi biết lý do phải thêm 'Task' vào allowedTools.",
-      "Tôi nắm chắc điều kiện để các Subagent chạy song song thực sự."
+      "Tôi giải thích được tại sao Subagent giúp giải quyết bài toán sập Context Window.",
+      "Tôi hiểu nguyên tắc Context Isolation giữa Coordinator và các Subagents.",
+      "Tôi thuộc 4 bước của Agentic Loop và nhận diện được Anti-pattern vòng lặp vô hạn.",
+      "Tôi viết được code khởi tạo Subagent bằng AgentDefinition SDK.",
+      "Tôi phân biệt được khi nào dùng PreToolUse Hook vs System Prompt."
     ],
     sections: [
       {
-        heading: "3.1 Mô hình Coordinator - Worker (Lead & Subagents)",
+        heading: "3.1 Mô hình Orchestrator - Worker & Hub-and-Spoke Architecture",
         content: `
           <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
             💡 <strong>Ẩn dụ trực quan:</strong> Coordinator giống như Trưởng Phòng Dự Án. Khi có một nhiệm vụ lớn (như xây dựng tính năng mới), Trưởng phòng không tự mình viết hết code và thiết kế giao diện. Trưởng phòng phân chia việc và gọi 3 chuyên viên (Subagents): Chuyên viên Frontend, Chuyên viên Backend, Chuyên viên Tester. Mỗi chuyên viên làm việc độc lập trong phòng riêng của mình (Context riêng), sau đó báo cáo kết quả về cho Trưởng phòng tổng hợp!
           </div>
-          <p>Khi giải quyết các bài toán lớn (như đọc 200 file code hoặc phân tích hợp đồng pháp lý), việc dùng một agent duy nhất sẽ làm cồng kềnh bộ nhớ context. Mô hình <strong>Orchestrator-Worker</strong> giải quyết bằng cách:</p>
+          <p>Khi giải quyết các bài toán lớn (như đọc 200 file code hoặc phân tích hợp đồng hợp nộp), việc dùng một agent duy nhất sẽ làm cồng kềnh bộ nhớ context. Mô hình <strong>Orchestrator-Worker (Hub-and-Spoke)</strong> giải quyết bằng cách:</p>
           <ul>
             <li><strong>Coordinator (Agent chính):</strong> Lập kế hoạch, phân chia công việc, spawn (tạo) các agent con và tổng hợp kết quả cuối cùng.</li>
             <li><strong>Subagents (Agent con):</strong> Mỗi agent con có bộ nhớ context riêng biệt và tập tool riêng để thực hiện 1 nhiệm vụ nhỏ.</li>
           </ul>
+
+          <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem; margin: 1.25rem 0; text-align: center;">
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.75rem;">SƠ ĐỒ KIẾN TRÚC HUB-AND-SPOKE (COORDINATOR & SUBAGENTS)</div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--accent-purple); padding: 0.75rem 1rem; border-radius: 8px; font-weight: 700; color: var(--accent-purple);">
+                👑 Coordinator Agent<br><span style="font-weight:400; font-size:0.75rem;">(Lập kế hoạch & Tổng hợp)</span>
+              </div>
+              <div style="font-size: 1.5rem; color: var(--text-muted);">➔</div>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="background: rgba(14, 165, 233, 0.15); border: 1px solid var(--accent-blue); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--accent-blue);">
+                  🛠️ Subagent 1: Research (Context A)
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--accent-emerald);">
+                  💻 Subagent 2: Coder (Context B)
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--accent-amber);">
+                  🧪 Subagent 3: Tester (Context C)
+                </div>
+              </div>
+            </div>
+          </div>
         `
       },
       {
-        heading: "3.2 Bẫy allowedTools = ['Task'] & Parallel Execution",
+        heading: "3.2 Nguyên tắc Cô Lập Ngữ Cảnh (Context Isolation)",
         content: `
-          <p>Để Coordinator có thể phân công nhiệm vụ cho Subagent, điều kiện tiên quyết là mảng <code>allowedTools</code> của Coordinator phải khai báo công cụ <code>"Task"</code>.</p>
-          <p><strong>Cảnh báo bẫy đề thi Anthropic CCAF:</strong></p>
+          <p><strong>Context Isolation (Cô lập ngữ cảnh)</strong> là nguyên tắc quan trọng nhất của hệ thống Multi-Agent:</p>
           <ul>
-            <li>Nếu thiếu <code>"Task"</code> trong <code>allowedTools</code>, Coordinator chỉ có thể xuất văn bản tự do mô tả dự định ủy quyền chứ không khởi chạy được Subagent.</li>
-            <li>Để các Subagents chạy **song song thật sự (Parallel Execution)**, Coordinator phải phát ra **nhiều lệnh gọi tool Task trong CÙNG MỘT message phản hồi API**. Việc dặn trong prompt "hãy chạy song song" hoàn toàn không có hiệu lực kỹ thuật nếu API xuất từng thẻ rải rác.</li>
+            <li><strong>Không kế thừa tự động:</strong> Subagent được khởi tạo với một không gian nhớ hoàn toàn sạch. Subagent <strong>KHÔNG</strong> tự động đọc hay thấy lịch sử trò chuyện cũ của Coordinator.</li>
+            <li><strong>Truyền dữ liệu chủ động:</strong> Mọi ngữ cảnh cần thiết (như đường dẫn file, đoạn code cần sửa) phải được Coordinator truyền trực tiếp vào thuộc tính <code>prompt</code> khi gọi tool <code>Task</code>.</li>
+            <li><strong>Tiết kiệm Token tối đa:</strong> Khi Subagent hoàn thành công việc, nó chỉ trả lại kết quả tóm tắt cuối cùng cho Coordinator. 100 lượt gọi tool trung gian của Subagent bị hủy bỏ, giúp bộ nhớ Coordinator luôn tinh gọn!</li>
           </ul>
+        `
+      },
+      {
+        heading: "3.3 Vòng Lặp Agentic Loop 4 Bước (The 4-Step Tool Loop)",
+        content: `
+          <p>Mọi Agent trong Claude Agent SDK đều vận hành theo một **Agentic Loop 4 bước tuần hoàn**:</p>
+
+          <div class="diagram-flow">
+            <div class="flow-step">
+              <div class="flow-number">1</div>
+              <div class="flow-content">
+                <div class="flow-title">1. Khai Báo (Tool Definition)</div>
+                <div class="flow-desc">Client gửi danh sách các tools có sẵn (tên, mô tả, JSON schema tham số) kèm theo mảng messages hiện tại tới Claude API.</div>
+              </div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-number">2</div>
+              <div class="flow-content">
+                <div class="flow-title">2. Kích Hoạch (Model Decision & stop_reason: "tool_use")</div>
+                <div class="flow-desc">Claude phân tích yêu cầu, quyết định cần dùng tool và phản hồi về Client với <code>stop_reason: "tool_use"</code> kèm ID lệnh và tên hàm cần gọi.</div>
+              </div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-number">3</div>
+              <div class="flow-content">
+                <div class="flow-title">3. Thực Thi Tại Client (Backend Tool Execution)</div>
+                <div class="flow-desc">Ứng dụng Backend của bạn nhận được yêu cầu, tự chạy hàm/API/lệnh shell tương ứng ở máy chủ của bạn để lấy dữ liệu thực tế.</div>
+              </div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-number">4</div>
+              <div class="flow-content">
+                <div class="flow-title">4. Trả Kết Quả (Tool Result Feedback)</div>
+                <div class="flow-desc">Client gửi lại kết quả chạy dưới dạng content block <code>tool_result</code>. Claude tiếp tục vòng lặp cho đến khi trả về <code>stop_reason: "end_turn"</code>.</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        heading: "3.4 Khai Báo Subagent Bằng AgentDefinition SDK",
+        content: `
+          <p>Trong Claude Agent SDK, mỗi Subagent được khai báo thông qua cấu trúc <code>AgentDefinition</code> chuẩn:</p>
+        `,
+        codeExample: `# Cấu trúc khai báo Subagent trong Agent SDK (Python / TypeScript)
+from claude_agent_sdk import AgentDefinition, Tool
+
+code_reviewer_agent = AgentDefinition(
+    name="CodeReviewer",
+    description="Chuyên gia kiểm tra mã nguồn, tìm lỗi bảo mật và tối ưu hiệu năng",
+    tools=[
+        Tool(name="read_file", description="Đọc nội dung file"),
+        Tool(name="run_linter", description="Chạy linter tĩnh")
+    ],
+    prompt="""Bạn là một Senior Code Reviewer. 
+Nhiệm vụ của bạn là phân tích mã nguồn được giao và tìm các lỗi bảo mật. 
+Hãy chỉ tập trung vào file được chỉ định và trả về báo cáo ngắn gọn."""
+)`
+      },
+      {
+        heading: "3.5 Bẫy Mẫu Task Tool: BAD (Truyền Thừa) vs GOOD (Prompt Tinh Gọn)",
+        content: `
+          <p>Hãy so sánh hai cách thiết kế khi Coordinator gọi Subagent qua <code>Task</code> tool:</p>
+
+          <div class="comparison-grid">
+            <div class="card-bad">
+              <div class="card-header-bad">
+                🔴 BAD PATTERN (Cách Sai - Tràn Context)
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                Nhét toàn bộ 50 file code cũ vào prompt của Subagent:
+              </p>
+              <pre><code>// ❌ SAI: Nhét toàn bộ tài liệu dự án vào prompt
+"tools": [{
+  "name": "Task",
+  "input": {
+    "subagent": "CodeReviewer",
+    "prompt": "Hãy review file main.js. Đây là toàn bộ 50 file code của hệ thống: [NỘI DUNG 50 FILE...]"
+  }
+}]</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600; margin-top: 0.5rem;">
+                ❌ Hậu quả: Lãng phí token, làm sập Context Window của Subagent ngay lần đầu gọi!
+              </div>
+            </div>
+
+            <div class="card-good">
+              <div class="card-header-good">
+                🟢 GOOD PATTERN (Cách Chuẩn Anthropic)
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                Chỉ truyền chỉ thị tinh gọn kèm đường dẫn file để Subagent tự dùng tool đọc:
+              </p>
+              <pre><code>// ✅ ĐÚNG: Chỉ truyền chỉ thị ngắn & file path
+"tools": [{
+  "name": "Task",
+  "input": {
+    "subagent": "CodeReviewer",
+    "prompt": "Hãy dùng tool read_file để đọc 'src/main.js' và báo cáo 3 lỗi bảo mật hàng đầu."
+  }
+}]</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600; margin-top: 0.5rem;">
+                ✅ Ưu điểm: Context tinh gọn, Subagent chủ động dùng tool tự tra cứu chính xác!
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        heading: "3.6 Hệ Thống Hooks (PreToolUse & PostToolUse) & Decision Matrix",
+        content: `
+          <p><strong>Hooks</strong> là cơ chế cho phép code ứng dụng của bạn can thiệp trực tiếp trước (<code>PreToolUse</code>) hoặc sau (<code>PostToolUse</code>) khi một tool được thực thi.</p>
+
+          <div class="decision-matrix-wrap">
+            <table class="decision-matrix">
+              <thead>
+                <tr>
+                  <th>Tiêu chí so sánh</th>
+                  <th>🛡️ PreToolUse / PostToolUse Hooks</th>
+                  <th>💬 System Prompt Instructions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Mức độ chắc chắn</strong></td>
+                  <td><span class="status-badge yes">✅ 100% Deterministic (Tuyệt đối)</span></td>
+                  <td><span class="status-badge warn">⚠️ Probabilistic (~95-98% Có xác suất lỗi)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Chống Prompt Injection</strong></td>
+                  <td><span class="status-badge yes">✅ An toàn 100% (Chặn ở Server)</span></td>
+                  <td><span class="status-badge no">❌ Có thể bị bẫy lừa bởi hacker</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Vị trí thực thi</strong></td>
+                  <td>Tầng Code Client / Server Backend</td>
+                  <td>Bên trong bộ nhớ LLM Context</td>
+                </tr>
+                <tr>
+                  <td><strong>Trường hợp áp dụng</strong></td>
+                  <td>Chặn lệnh nguy hiểm (<code>rm -rf</code>, xóa DB), kiểm tra quyền admin</td>
+                  <td>Định hướng phong cách trả lời, vai trò nhân vật</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `
+      },
+      {
+        heading: "3.7 Thẻ Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        content: `
+          <div class="knowledge-check">
+            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 3</div>
+            <div class="kc-question">
+              Tình huống: Coordinator Agent của bạn cần gọi 3 Subagents để phân tích 3 file độc lập cùng lúc. Tuy nhiên, 3 Subagents lại chạy nối tiếp từng cái một (Sequential) gây tăng 300% độ trễ. Nguyên nhân kỹ thuật là gì và sửa như thế nào?
+            </div>
+            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <div class="kc-answer">
+              <strong>Đáp án chuẩn Anthropic:</strong><br>
+              - <strong>Nguyên nhân:</strong> Coordinator phát ra các thẻ gọi tool <code>Task</code> rải rác ở nhiều message phản hồi API khác nhau.<br>
+              - <strong>Cách sửa:</strong> Đảm bảo Coordinator phát ra <strong>nhiều lệnh gọi tool `Task` trong CÙNG MỘT message phản hồi API</strong>. Khi đó, Claude Agent SDK mới có đủ điều kiện để kích hoạt Parallel Execution thực sự!
+            </div>
+          </div>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Để chạy song song nhiều Subagent thật sự, Coordinator phải phát ra nhiều lệnh gọi tool 'Task' trong CÙNG MỘT message phản hồi."
+    examTip: "⚡ Mẹo thi CCAF: Luôn dùng PreToolUse Hook để chặn lệnh nguy hiểm 100% chắc chắn, và đảm bảo phát ra nhiều thẻ Task tool trong cùng 1 message để chạy song song thực sự."
   },
   {
     id: 4,
