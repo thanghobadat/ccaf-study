@@ -54,6 +54,7 @@
 d:\AI\CCAF\
 ├── rule.md                          # Mandatory project rules (Planning First, Summary Rule)
 ├── project_memory.md                # This machine-readable state snapshot
+├── vercel.json                      # Vercel deployment configuration (cleanUrls & website rewrites)
 ├── .gitignore                       # Git ignore configuration
 ├── tài liệu/
 │   ├── CCA_Foundations_Study_Guide.md
