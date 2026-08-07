@@ -1,222 +1,272 @@
-/* CCAF Learning Hub - Complete & Unabridged 13 Chapters Theory Data (Song ngữ Anh - Việt 100% Đầy Đủ & Dễ Hiểu Vượt Trội) */
+/* CCAF Learning Hub - 13 Complete Theory Chapters (English-First + Hidden Vietnamese Translation Accordions) */
 
 const CHAPTERS_DATA = [
   {
     id: 1,
-    title: "Chương 1: Claude API — Nền tảng tương tác với Model",
+    title: "Chapter 1: Claude Messages API — Foundation & Request Lifecycle",
     domain: "D4",
     domainTitle: "Prompt Engineering & Structured Output",
     estimatedMinutes: 25,
-    summary: "Hiểu sâu sắc cấu trúc Request/Response của Claude Messages API, tính chất Stateless, các vai trò message, trường stop_reason, System Prompt và các thách thức của Context Window.",
+    summary: "Master the structure of Claude Messages API request/response payloads, stateless nature, message roles, stop_reason fields, System Prompt design, and Context Window management.",
+  summaryVI: "Nắm vững cấu trúc Request/Response Payload của Claude Messages API, bản chất Stateless không lưu trạng thái, vai trò các message (user, assistant, tool), 4 giá trị stop_reason, thiết kế System Prompt và kỹ thuật quản lý Context Window.",
+  learningObjectivesVI: [
+    "Hiểu tại sao Claude API là Stateless và tại sao bắt buộc resend lại toàn bộ lịch sử trong mỗi lần gọi.",
+    "Phân biệt 3 vai trò message: user, assistant, và tool (tool_result content block).",
+    "Xử lý chuẩn xác 4 giá trị stop_reason: end_turn, tool_use, max_tokens, và stop_sequence.",
+    "Nhận biết bẫy over-instruction trong System Prompt gây gọi tool thừa vãi.",
+    "Khắc phục thách thức Context Window: Lost-in-the-middle, phình tool result và mất mát khi tóm tắt lũy tiến."
+  ],
+  examTipVI: "Mẹo thi CCAF: Claude API là Stateless. Luôn đặt các chỉ thị quan trọng ở ngay ĐẦU hoặc ĐUÔI payload context để tránh hiệu ứng Lost-in-the-middle.",
+  coreMasteriesVI: [
+    "API Stateless: Không có session lưu giữa các lần gọi; client phải tự giữ lịch sử hội thoại.",
+    "Message Roles: user (đầu vào), assistant (đầu ra mô hình), tool (kết quả tool gửi lại qua tool_result).",
+    "stop_reason = end_turn: Mô hình hoàn thành xong câu trả lời.",
+    "stop_reason = tool_use: Mô hình yêu cầu phía Client chạy tool trước khi tiếp tục.",
+    "stop_reason = max_tokens: Phản hồi bị ngắt do chạm giới hạn token.",
+    "Lost-in-the-middle: Thông tin ở giữa tài liệu dài dễ bị bỏ qua; luôn đưa thông tin quan trọng lên ĐẦU hoặc ĐUÔI."
+  ],
+  examTrapsVI: [
+    "⚠️ BẪY 1: Lầm tưởng Claude tự lưu trí nhớ qua các lần gọi API mà không cần gửi lại tin nhắn cũ.",
+    "⚠️ BẪY 2: Dùng chỉ thị tuyệt đối trong System Prompt như 'Luôn luôn kiểm tra ID khách hàng' khiến Claude gọi tool get_customer vô cớ.",
+    "⚠️ BẪY 3: Nhầm lẫn giữa end_turn và max_tokens khi phân tích câu trả lời bị ngắt."
+  ],
     learningObjectives: [
-      "Giải thích được lý do Claude API là Stateless và hậu quả nếu không gửi lại toàn bộ lịch sử tin nhắn.",
-      "Phân biệt rõ 3 vai trò trong message: user, assistant, và tool (tool_result).",
-      "Nhận biết và xử lý đúng 4 giá trị của trường stop_reason (end_turn, tool_use, max_tokens, stop_sequence).",
-      "Nắm vững đặc điểm của System Prompt và bẫy câu chữ khiến mô hình gọi thừa tool get_customer.",
-      "Phân tích 3 vấn đề lớn của Context Window: Hiệu ứng Lost-in-the-middle, Tích lũy kết quả tool thừa, và Mất mát khi tóm tắt lũy tiến."
+      "Understand why Claude API is Stateless and why complete message history must be resent in every call.",
+      "Distinguish between message roles: user, assistant, and tool (tool_result content block).",
+      "Correctly parse and handle all 4 stop_reason values: end_turn, tool_use, max_tokens, and stop_sequence.",
+      "Identify over-instruction traps in System Prompts that cause unwarranted tool execution.",
+      "Mitigate Context Window challenges: Lost-in-the-middle, tool result bloat, and progressive summarization loss."
     ],
     coreMasteries: [
-      "Stateless API: Mô hình không lưu trạng thái giữa các lần gọi, bắt buộc phải gửi lại toàn bộ mảng messages.",
-      "Message Roles: user (người dùng), assistant (phản hồi của Claude), tool (kết quả thực thi tool dưới dạng content block tool_result).",
-      "stop_reason = 'end_turn': Mô hình đã hoàn thành câu trả lời.",
-      "stop_reason = 'tool_use': Mô hình muốn gọi một công cụ và chờ kết quả từ client.",
-      "stop_reason = 'max_tokens': Phản hồi bị cắt ngang do thiếu token, cần tăng max_tokens.",
-      "System Prompt: Được gửi ở trường 'system' riêng biệt, có độ ưu tiên cao hơn tin nhắn user.",
-      "Lost-in-the-middle: Mô hình xử lý tốt thông tin ở đầu và cuối đầu vào dài nhưng dễ bỏ qua chi tiết ở giữa."
+      "Stateless API: No session state is retained between API calls; client must maintain conversation state.",
+      "Message Roles: user (input), assistant (model output), tool (tool execution output wrapped in tool_result).",
+      "stop_reason = 'end_turn': Model has finished generating response.",
+      "stop_reason = 'tool_use': Model demands tool execution at client before proceeding.",
+      "stop_reason = 'max_tokens': Output truncated due to token limit.",
+      "Lost-in-the-middle: Information in middle of long prompts is easily overlooked; place critical items at top or bottom."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhầm tưởng Claude tự lưu bộ nhớ phiên làm việc mà không cần truyền lại mảng messages cũ.",
-      "⚠️ BẪY 2: Viết câu chữ trong System Prompt như 'Luôn xác minh thông tin khách hàng' khiến mô hình lạm dụng gọi tool get_customer ngay cả khi không cần thiết.",
-      "⚠️ BẪY 3: Nhầm lẫn giữa stop_reason = 'end_turn' và 'max_tokens' khi phản hồi bị cắt dở dang."
+      "⚠️ TRAP 1: Assuming Claude automatically retains memory across API calls without resending past messages.",
+      "⚠️ TRAP 2: Using absolute System Directives like 'Always verify customer ID' which forces premature get_customer calls.",
+      "⚠️ TRAP 3: Confusing 'end_turn' with 'max_tokens' when inspecting truncated responses."
     ],
     selfChecklist: [
-      "Tôi giải thích được tại sao phải truyền lại toàn bộ lịch sử hội thoại trong mỗi request.",
-      "Tôi phân biệt được 3 vai trò trong mảng messages và cách truyền tool_result.",
-      "Tôi thuộc bảng 4 giá trị của stop_reason và hành động tương ứng ở Client.",
-      "Tôi hiểu sự nguy hiểm của chỉ thị quá mức trong System Prompt.",
-      "Tôi biết cách xử lý 3 vấn đề của Context Window (đặc biệt là Lost-in-the-middle)."
+      "I can explain why full conversation history is required in every API request.",
+      "I can handle all 4 stop_reason values programmatically at the client side.",
+      "I can prevent System Prompt over-instruction bugs."
     ],
     sections: [
       {
-        heading: "1.1 Cấu trúc yêu cầu API (API Request Structure) & Tính chất Stateless",
+        heading: "1.1 API Request Payload & Stateless Architecture",
         content: `
           <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Hãy tưởng tượng Claude API như một bác sĩ khám bệnh hoàn toàn mới mỗi lần bạn bước vào phòng. Bác sĩ không lưu bất kỳ hồ sơ nào trong đầu. Mỗi lần tái khám, bạn phải mang theo toàn bộ cuốn sổ khám bệnh (lịch sử hội thoại mảng <code>messages</code>). Nếu bạn quên mang sổ cũ, bác sĩ sẽ không thể biết lần trước đã chẩn đoán tới đâu!
+            💡 <strong>Visual Analogy:</strong> Think of Claude Messages API as a doctor who sees you for a brand new appointment every single time. The doctor has zero memory of past visits. Every time you consult, you must bring your entire medical history booklet (the <code>messages</code> array).
           </div>
-          <p>Claude API hoạt động theo mô hình <strong>Request – Response (Yêu cầu & Phản hồi)</strong>. Mỗi yêu cầu gửi tới endpoint <code>/v1/messages</code> bắt buộc phải tuân theo cấu trúc JSON chuẩn.</p>
-          <p>Điểm cốt lõi cần ghi nhớ: <strong>Claude API là Stateless (Không lưu trạng thái)</strong>. Mô hình không lưu giữ bất kỳ thông tin nào từ các cuộc gọi API trước đó. Để tiếp tục cuộc hội thoại, ứng dụng của bạn bắt buộc phải gửi lại toàn bộ lịch sử tin nhắn trong mảng <code>messages</code>.</p>
+          <p>Claude API operates on a strict <strong>Stateless Request-Response Lifecycle</strong> via <code>/v1/messages</code>. The API retains no conversation state on server side. To maintain context, client applications must append past interactions to the <code>messages</code> payload.</p>
         `,
         codeExample: `{
   "model": "claude-sonnet-4-6",
   "max_tokens": 1024,
-  "system": "Bạn là một trợ lý kiến trúc sư phần mềm chuyên nghiệp.",
+  "system": "You are an expert cloud architect assistant.",
   "messages": [
-    {"role": "user", "content": "Chào bạn!"},
-    {"role": "assistant", "content": "Xin chào! Tôi có thể giúp gì cho bạn?"},
-    {"role": "user", "content": "Hãy giải thích về Claude API."}
-  ],
-  "tools": [...],
-  "tool_choice": {"type": "auto"}
-}`
-      },
-      {
-        heading: "1.2 Các vai trò trong Message (Message Roles)",
-        content: `
-          <p>Mảng <code>messages</code> sử dụng ba vai trò chính:</p>
-          <ul>
-            <li><code>user</code> — Tin nhắn gửi từ phía người dùng.</li>
-            <li><code>assistant</code> — Phản hồi được sinh ra từ mô hình Claude (được đưa vào mảng khi gửi lại lịch sử hội thoại).</li>
-            <li><code>tool</code> (kết quả tool) — Kết quả thực thi công cụ ở phía client, xuất hiện dưới dạng content block <code>tool_result</code>.</li>
-          </ul>
+    {"role": "user", "content": "Hello!"},
+    {"role": "assistant", "content": "Hello! How can I assist you today?"},
+    {"role": "user", "content": "Explain Claude API architecture."}
+  ]
+}`,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong></p>
+          <p>Claude API vận hành theo mô hình <strong>Request-Response Stateless (Không lưu trạng thái)</strong> tại endpoint <code>/v1/messages</code>. Máy chủ Claude không tự ghi nhớ lịch sử trò chuyện. Để duy trì ngữ cảnh hội thoại, ứng dụng của bạn ở phía Client bắt buộc phải gửi lại toàn bộ mảng <code>messages</code> chứa tất cả các tin nhắn cũ trong mỗi lần gọi API.</p>
         `
       },
       {
-        heading: "1.3 Trường stop_reason trong phản hồi",
+        heading: "1.2 Understanding stop_reason Payload Field",
         content: `
-          <p>Phản hồi của Claude API luôn bao gồm trường <code>stop_reason</code> cho biết lý do chính xác mô hình dừng sinh nội dung:</p>
+          <p>The <code>stop_reason</code> field in the API response dictates client control flow:</p>
           <div class="decision-matrix-wrap">
             <table class="decision-matrix">
               <thead>
                 <tr>
-                  <th>Giá trị stop_reason</th>
-                  <th>Ý nghĩa phản hồi</th>
-                  <th>Hành động cần xử lý ở Client</th>
+                  <th>stop_reason Value</th>
+                  <th>Meaning</th>
+                  <th>Client Action Required</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><code>"end_turn"</code></td>
-                  <td>Mô hình hoàn thành câu trả lời.</td>
-                  <td>Hiển thị câu trả lời cuối cùng cho người dùng.</td>
+                  <td>Model completed turn naturally.</td>
+                  <td>Display response to end user.</td>
                 </tr>
                 <tr>
                   <td><code>"tool_use"</code></td>
-                  <td>Mô hình muốn gọi một công cụ (Tool).</td>
-                  <td>Chạy hàm ở backend và gửi lại tool_result.</td>
+                  <td>Model generated tool call block.</td>
+                  <td>Execute tool at client and return tool_result.</td>
                 </tr>
                 <tr>
                   <td><code>"max_tokens"</code></td>
-                  <td>Phản hồi bị cắt ngang do chạm trần token.</td>
-                  <td>Tăng tham số max_tokens hoặc gửi yêu cầu nối tiếp.</td>
+                  <td>Truncated due to token limit.</td>
+                  <td>Increase max_tokens or prompt continuation.</td>
                 </tr>
                 <tr>
                   <td><code>"stop_sequence"</code></td>
-                  <td>Gặp chuỗi ngắt ký tự do bạn chỉ định.</td>
-                  <td>Xử lý ngắt dòng theo logic ứng dụng.</td>
+                  <td>Matched custom stop pattern.</td>
+                  <td>Handle custom application logic.</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong></p>
+          <p>Trường <code>stop_reason</code> phản hồi từ API chỉ định chính xác lý do Claude dừng sinh văn bản và quyết định luồng xử lý ở phía Client:</p>
+          <ul>
+            <li><code>"end_turn"</code>: Mô hình đã hoàn thành xong câu trả lời.</li>
+            <li><code>"tool_use"</code>: Mô hình yêu cầu gọi công cụ, Backend của bạn phải thực thi hàm và gửi lại <code>tool_result</code>.</li>
+            <li><code>"max_tokens"</code>: Phản hồi bị chạm trần token tối đa, cần tăng <code>max_tokens</code>.</li>
+            <li><code>"stop_sequence"</code>: Gặp chuỗi ngắt ký tự tùy chỉnh.</li>
+          </ul>
         `
       },
       {
-        heading: "1.4 System Prompt & Bẫy Câu Chữ Quá Mức",
+        heading: "1.3 System Prompt Over-Instruction Traps",
         content: `
-          <p>System prompt là chỉ thị định nghĩa vai trò và ràng buộc hành vi chung cho Claude:</p>
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 BAD PATTERN (Chỉ thị quá mức)</div>
-              <pre><code>"system": "Luôn luôn xác minh thông tin tài khoản khách hàng trước khi trả lời bất kỳ câu hỏi nào."</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600; margin-top: 0.5rem;">
-                ❌ Hậu quả: Mô hình sẽ tự động gọi tool get_customer liên tục ngay cả khi khách chỉ hỏi giờ mở cửa!
+              <div class="card-header-bad">🔴 BAD PATTERN (Over-Instruction)</div>
+              <pre><code>"system": "Always verify customer ID before answering any query."</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">
+                ❌ Result: Triggers unnecessary get_customer tool calls even when user asks generic store hours!
               </div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 GOOD PATTERN (Chỉ thị có điều kiện)</div>
-              <pre><code>"system": "Khi người dùng hỏi thông tin cá nhân hoặc tài khoản, hãy xác minh tài khoản trước khi truy xuất dữ liệu."</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600; margin-top: 0.5rem;">
-                ✅ Ưu điểm: Mô hình chỉ gọi tool get_customer đúng lúc có thắc mắc tài khoản.
+              <div class="card-header-good">🟢 GOOD PATTERN (Conditional Directive)</div>
+              <pre><code>"system": "When account specific details are requested, verify customer ID first."</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">
+                ✅ Result: Tool is invoked only when relevant to account queries.
               </div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong></p>
+          <p>Tránh viết chỉ thị tuyệt đối quá mức trong System Prompt như <em>"Luôn luôn kiểm tra ID khách hàng"</em>. Điều này khiến Claude tự động gọi tool <code>get_customer</code> liên tục ngay cả đối với các thắc mắc thông thường như hỏi giờ mở cửa!</p>
         `
       },
       {
-        heading: "1.5 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "1.4 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 1</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 1</div>
             <div class="kc-question">
-              Tình huống: Khi gửi prompt dài 100.000 tokens, Claude thường bỏ qua thông tin quan trọng nằm ở giữa tài liệu. Đây là hiệu ứng gì và làm sao khắc phục?
+              Question: When prompt size reaches 100,000 tokens, Claude occasionally ignores key constraints placed in the middle of document. What is this phenomenon and how to fix it?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              - <strong>Hiện tượng:</strong> Hiệu ứng <strong>Lost-in-the-middle</strong> (do cơ chế Attention Mechanism của Transformer ưu tiên đầu và đuôi prompt).<br>
-              - <strong>Cách khắc phục:</strong> Đặt các chỉ thị quan trọng hoặc dữ liệu cốt lõi ở ngay <strong>ĐẦU hoặc ĐUÔI</strong> của prompt.
+              <strong>Official Anthropic Answer:</strong><br>
+              - <strong>Phenomenon:</strong> <strong>Lost-in-the-middle</strong> effect inherent in Transformer attention mechanisms.<br>
+              - <strong>Mitigation:</strong> Place critical instructions, system rules, or target schemas at the very <strong>TOP or BOTTOM</strong> of the context payload.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Hiệu ứng Lost-in-the-middle xảy ra khi tài liệu quá dài. Giải pháp chuẩn Anthropic là đặt thông tin quan trọng nhất ở ngay ĐẦU hoặc ĐUÔI của prompt.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn nhớ rằng Claude API là Stateless. Đặt thông tin quan trọng ở đầu hoặc cuối prompt để tránh hiệu ứng lost-in-the-middle."
+    examTip: "⚡ CCAF Exam Tip: Claude API is Stateless. Always place critical directives at top/bottom of long context payloads to prevent Lost-in-the-middle issues."
   },
   {
     id: 2,
-    title: "Chương 2: Tools và tool_use (Gọi công cụ bên ngoài)",
+    title: "Chapter 2: Tools and tool_use — External Execution Loop",
     domain: "D2",
     domainTitle: "Tool Design & MCP Integration",
     estimatedMinutes: 25,
-    summary: "Cơ chế cho phép Claude gọi các hàm/tool bên ngoài để tra cứu dữ liệu, thực thi code hoặc thao tác hệ thống.",
+    summary: "Understand the 4-step Tool Use Loop, Granular vs Monolithic Tool design patterns, tool_choice modes, and graceful error handling with isError: true.",
+  summaryVI: "Hiểu rõ Vòng lặp Tool Use 4 bước, mẫu thiết kế Granular Tools vs Monolithic Tools, các chế độ tool_choice (auto, any, tool), và kỹ thuật xử lý lỗi mượt mà với isError: true.",
+  learningObjectivesVI: [
+    "Nắm vững 4 bước của Vòng lặp thực thi Tool Use.",
+    "Thiết kế các công cụ đơn nhiệm Granular Tools thay vì Monolithic Tools cồng kềnh.",
+    "Phân biệt các chế độ tool_choice: auto, any, và tool.",
+    "Trả về tool_result chứa isError: true để ngăn Agent bị crash."
+  ],
+  examTipVI: "Mẹo thi CCAF: Luôn chia nhỏ các công cụ phức tạp thành các Granular Tools đơn nhiệm để đạt độ tin cậy tối đa khi mô hình chọn tool.",
+  coreMasteriesVI: [
+    "Tool Execution Loop: Khai báo Tools -> stop_reason: tool_use -> Backend thực thi -> Phản hồi tool_result.",
+    "Granular Tools: Các tool đơn nhiệm vượt trội hơn hẳn so với tool cồng kềnh đa tham số.",
+    "tool_choice = auto: Chế độ mặc định để Claude tự quyết định có dùng tool hay không.",
+    "tool_choice = any: Ép mô hình bắt buộc phải chọn ít nhất một tool.",
+    "tool_choice = tool: Ép mô hình chọn đúng một tool chỉ định sẵn.",
+    "Xử lý lỗi mượt: Trả về isError: true trong tool_result thay vì ném Exception."
+  ],
+  examTrapsVI: [
+    "⚠️ BẪY 1: Tin rằng Claude tự chạy code tool bên trong server của Anthropic. Client backend của bạn mới là nơi thực thi code.",
+    "⚠️ BẪY 2: Viết mô tả tool mơ hồ dẫn đến việc chọn sai tool hoặc quay sang chạy lệnh bash thô."
+  ],
     learningObjectives: [
-      "Nắm chắc 4 bước trong vòng lặp Tool Use (The Tool Use Loop).",
-      "Biết cách thiết kế trường description chuẩn để Claude gọi tool đúng lúc.",
-      "Hiểu rõ sự khác biệt của 3 chế độ trong tool_choice (auto, any, tool)."
+      "Master the 4 steps of the Tool Use Execution Loop.",
+      "Design granular single-purpose tools instead of bloated monolithic tools.",
+      "Differentiate tool_choice modes: auto, any, and tool.",
+      "Return tool_result with isError: true to prevent agent crashes."
     ],
     coreMasteries: [
-      "Tool Loop: Định nghĩa tools → Mô hình trả tool_use → Client chạy hàm → Client gửi tool_result.",
-      "Granular Tools: Chia nhỏ tool đơn nhiệm tốt hơn 1 tool đa năng cồng kềnh (Monolithic Tool).",
-      "tool_choice = 'auto': Mặc định, mô hình tự quyết định có dùng tool hay không.",
-      "tool_choice = 'any': Bắt buộc mô hình phải chọn ít nhất 1 tool bất kỳ.",
-      "tool_choice = 'tool': Bắt buộc mô hình phải gọi đúng 1 tool chỉ định."
+      "Tool Execution Loop: Tools Definition -> stop_reason: tool_use -> Client Execution -> tool_result Feedback.",
+      "Granular Tools: Single-purpose focused tools dramatically outperform monolithic multi-argument tools.",
+      "tool_choice = 'auto': Default mode where model decides whether to invoke tools.",
+      "tool_choice = 'any': Forces model to execute at least one tool.",
+      "tool_choice = 'tool': Forces model to execute one specific designated tool.",
+      "Graceful Errors: Return isError: true in tool_result content block instead of throwing unhandled exceptions."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nghĩ rằng Claude tự thực thi code/API bên thứ 3 (thực tế client của bạn phải tự chạy code rồi gửi lại tool_result).",
-      "⚠️ BẪY 2: Viết mô tả tool chung chung khiến Claude gọi nhầm hoặc dùng lệnh shell thô."
+      "⚠️ TRAP 1: Believing Claude executes tool code internally. Client backend must execute code and return tool_result.",
+      "⚠️ TRAP 2: Writing ambiguous tool descriptions leading to incorrect tool selection or bash fallback."
     ],
     selfChecklist: [
-      "Tôi giải thích được 4 bước của vòng lặp Tool Use.",
-      "Tôi phân biệt được khi nào dùng tool_choice = 'auto' vs 'any' vs 'tool'.",
-      "Tôi hiểu tại sao nên chia nhỏ công cụ thành Granular Tools."
+      "I can explain all 4 steps of the Tool Use Execution Loop.",
+      "I know when to set tool_choice = auto vs any vs tool.",
+      "I use isError: true to handle external tool failures."
     ],
     sections: [
       {
-        heading: "2.1 Vòng lặp Tool Use 4 bước (The Tool Use Loop)",
+        heading: "2.1 The 4-Step Tool Use Execution Loop",
         content: `
           <div class="callout callout-title" style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid var(--accent-blue); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Claude đóng vai trò như một vị bác sĩ kê đơn thuốc, nhưng Claude không tự mở tủ lấy thuốc. Claude viết đơn: <em>"Cần kiểm tra nhiệt độ bệnh nhân"</em> (trả về <code>stop_reason: tool_use</code>). Y tá (ứng dụng backend của bạn) thực hiện lấy kết quả đo nộp lại cho bác sĩ (gửi <code>tool_result</code>).
+            💡 <strong>Visual Analogy:</strong> Claude is like a specialist doctor issuing a lab order. The doctor does not perform the blood test themselves. They output a lab order (<code>stop_reason: tool_use</code>). The lab technician (your client application) performs the test and feeds the lab results back (<code>tool_result</code>).
           </div>
-
           <div class="diagram-flow">
             <div class="flow-step">
               <div class="flow-number">1</div>
               <div class="flow-content">
-                <div class="flow-title">1. Gửi Định Nghĩa Tools</div>
-                <div class="flow-desc">Client gửi mảng <code>tools</code> chứa name, description và JSON schema các tham số.</div>
+                <div class="flow-title">1. Tool Definition</div>
+                <div class="flow-desc">Client passes array of available tools with name, description, and JSON schema.</div>
               </div>
             </div>
             <div class="flow-step">
               <div class="flow-number">2</div>
               <div class="flow-content">
-                <div class="flow-title">2. Phản Hồi Gọi Tool</div>
-                <div class="flow-desc">Claude dừng sinh văn bản và trả về <code>stop_reason: "tool_use"</code> kèm ID lệnh và tên hàm.</div>
+                <div class="flow-title">2. Model Decision (stop_reason: "tool_use")</div>
+                <div class="flow-desc">Claude outputs tool_use content block with call ID and JSON parameters.</div>
               </div>
             </div>
             <div class="flow-step">
               <div class="flow-number">3</div>
               <div class="flow-content">
-                <div class="flow-title">3. Chạy Hàm Ở Backend</div>
-                <div class="flow-desc">Backend ứng dụng của bạn nhận thông tin, tự thực thi API/hàm thực tế ở server.</div>
+                <div class="flow-title">3. Backend Execution</div>
+                <div class="flow-desc">Client application catches call ID, executes local code/API, and gets raw response.</div>
               </div>
             </div>
             <div class="flow-step">
               <div class="flow-number">4</div>
               <div class="flow-content">
-                <div class="flow-title">4. Trả Kết Quả tool_result</div>
-                <div class="flow-desc">Backend gửi lại kết quả chạy cho Claude dưới dạng content block <code>tool_result</code>.</div>
+                <div class="flow-title">4. tool_result Feedback</div>
+                <div class="flow-desc">Client appends tool_result content block to messages array and calls API again.</div>
               </div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong></p>
+          <p>Vòng lặp Tool Use diễn ra qua 4 bước chuẩn: Định nghĩa Tools ➔ Mô hình trả <code>tool_use</code> ➔ Client tự chạy code ở Backend ➔ Client gửi lại <code>tool_result</code> cho Claude.</p>
         `
       },
       {
@@ -224,125 +274,110 @@ const CHAPTERS_DATA = [
         content: `
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 MONOLITHIC TOOL (Cách Sai)</div>
-              <p style="font-size: 0.85rem;">Một tool gom 10 tham số quản lý người dùng, vừa tạo, vừa sửa, vừa xóa:</p>
-              <pre><code>{"name": "manage_user", "input_schema": {...10_fields...}}</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Mô hình dễ nhầm lẫn tham số.</div>
+              <div class="card-header-bad">🔴 MONOLITHIC TOOL (Bad Pattern)</div>
+              <p style="font-size: 0.85rem;">Single tool with 12 parameters trying to handle create, update, delete, search:</p>
+              <pre><code>{"name": "manage_users", "input_schema": {...12_fields...}}</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ High risk of parameter confusion and validation failure.</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 GRANULAR TOOLS (Cách Chuẩn)</div>
-              <p style="font-size: 0.85rem;">Chia nhỏ thành các tool đơn nhiệm tinh gọn:</p>
+              <div class="card-header-good">🟢 GRANULAR TOOLS (Good Pattern)</div>
+              <p style="font-size: 0.85rem;">Dedicated single-purpose tools with tight schemas:</p>
               <pre><code>{"name": "get_user"}, {"name": "update_user_email"}</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Mô hình gọi chính xác 100%.</div>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Highly reliable tool selection and execution.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Tránh thiết kế tool cồng kềnh chứa hàng chục tham số (Monolithic Tools). Hãy chia nhỏ thành các công cụ đơn nhiệm tinh gọn (Granular Tools) để mô hình chọn chính xác 100%.</p>
         `
       },
       {
-        heading: "2.3 Chế độ tool_choice",
-        content: `
-          <div class="decision-matrix-wrap">
-            <table class="decision-matrix">
-              <thead>
-                <tr>
-                  <th>Chế độ tool_choice</th>
-                  <th>Hành vi của Claude</th>
-                  <th>Trường hợp sử dụng</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>{"type": "auto"}</code></td>
-                  <td>Mô hình tự quyết định dùng tool hay trả văn bản.</td>
-                  <td>Mặc định cho trợ lý hội thoại linh hoạt.</td>
-                </tr>
-                <tr>
-                  <td><code>{"type": "any"}</code></td>
-                  <td>Bắt buộc mô hình phải chọn ít nhất 1 tool bất kỳ.</td>
-                  <td>Ép mô hình tra cứu dữ liệu trước khi trả lời.</td>
-                </tr>
-                <tr>
-                  <td><code>{"type": "tool", "name": "get_weather"}</code></td>
-                  <td>Bắt buộc mô hình phải gọi đúng tool chỉ định.</td>
-                  <td>Ép mô hình trích xuất dữ liệu có cấu trúc.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        `
-      },
-      {
-        heading: "2.4 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "2.3 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 2</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 2</div>
             <div class="kc-question">
-              Tình huống: Tool bên thứ 3 của bạn bị lỗi sập mạng API. Làm cách nào để thông báo cho Claude mà không làm sập ứng dụng?
+              Question: An external weather API tool experiences a 500 Network Error. How should the client app respond to Claude?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Trả về content block <code>tool_result</code> chứa thuộc tính <code>"isError": true</code> và thông báo lỗi dạng văn bản. Không được ném Exception hay trả về chuỗi rỗng!
+              <strong>Official Anthropic Answer:</strong><br>
+              Return a <code>tool_result</code> content block containing <code>"isError": true</code> and the raw error text. Do not throw uncaught exceptions or return empty strings!
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Khi tool bị lỗi, luôn trả về <code>tool_result</code> chứa <code>"isError": true</code> để Claude biết và chọn phương án dự phòng khác thay vì ném Exception làm sập ứng dụng.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Đừng viết mô tả Tool chung chung (monolithic tool). Hãy chia nhỏ thành các tool có nhiệm vụ rõ ràng (granular tools)."
+    examTip: "⚡ CCAF Exam Tip: Always decompose complex multi-action tools into dedicated Granular Tools for maximum execution reliability."
   },
   {
     id: 3,
-    title: "Chương 3: Claude Agent SDK — Xây dựng hệ thống Agentic",
+    title: "Chapter 3: Claude Agent SDK — Building Agentic Systems",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
     estimatedMinutes: 30,
-    summary: "Mô hình Orchestrator - Worker, lập kế hoạch nhiệm vụ, Context Isolation, vòng lặp Agentic Loop 4 bước, AgentDefinition SDK, mẫu Task Tool chuẩn và hệ thống Hooks (PreToolUse/PostToolUse).",
+    summary: "Orchestrator-Worker pattern, Hub-and-Spoke topology, Context Isolation, Agentic Loop 4 steps, AgentDefinition SDK, Task Tool patterns, and Hooks system (PreToolUse/PostToolUse).",
+  summaryVI: "Kiến trúc Orchestrator-Worker, topology Hub-and-Spoke, Context Isolation cô lập ngữ cảnh, Vòng lặp Agentic 4 bước, SDK AgentDefinition, mẫu Task Tool và hệ thống Hooks (PreToolUse/PostToolUse).",
+  learningObjectivesVI: [
+    "Nắm vững kiến trúc Orchestrator-Worker và topology Hub-and-Spoke.",
+    "Hiểu rõ Context Isolation: Mỗi Subagent duy trì một không gian nhớ hội thoại độc lập.",
+    "Định nghĩa các Agent bằng SDK AgentDefinition.",
+    "Phân biệt mẫu truyền input cho Task tool: prompt tinh gọn vs prompt phình to.",
+    "Thực thi chính sách an toàn 100% Deterministic bằng PreToolUse Hooks thay vì System Prompt xác suất."
+  ],
+  examTipVI: "Mẹo thi CCAF: Luôn dùng PreToolUse Hooks cho các chính sách bảo mật tuyệt đối và phát ra nhiều Task call trong cùng 1 turn để chạy song song.",
+  coreMasteriesVI: [
+    "Orchestrator-Worker: Lead Agent điều phối các Subagents chuyên biệt để thực hiện tác vụ đơn nhiệm.",
+    "Context Isolation: Mỗi Subagent giữ mảng messages riêng, bảo vệ Context Window của Lead Agent.",
+    "allowedTools = [Task]: Lead Agent cần có Task trong allowedTools để khởi tạo Subagent.",
+    "Chạy song song: Yêu cầu Lead Agent phát ra nhiều thẻ gọi tool Task trong CÙNG MỘT message phản hồi API.",
+    "Hooks > System Prompt: PreToolUse Hooks chặn lệnh ở tầng Client đảm bảo chính xác 100%."
+  ],
+  examTrapsVI: [
+    "⚠️ BẪY 1: Quên cấp phép tool Task trong allowedTools khiến Coordinator chỉ mô tả việc giao việc chứ không thể thực thi.",
+    "⚠️ BẪY 2: Lầm tưởng Subagent tự động thừa hưởng toàn bộ lịch sử tin nhắn của Coordinator.",
+    "⚠️ BẪY 3: Dùng System Prompt 'Không được chạy rm -rf' để bảo mật thay vì dùng PreToolUse Hooks."
+  ],
     learningObjectives: [
-      "Hiểu kiến trúc Orchestrator-Worker (Lead & Subagents) và quy tắc Hub-and-Spoke.",
-      "Giải thích nguyên tắc Context Isolation: Subagent sở hữu bộ nhớ riêng, không tự động kế thừa mảng messages của Coordinator.",
-      "Nắm vững 4 bước trong vòng lặp Agentic Loop và các Anti-patterns khiến agent vòng lặp vô hạn.",
-      "Sử dụng AgentDefinition SDK để khai báo tên, mô tả, tools và prompt cho từng Subagent.",
-      "Phân biệt mẫu Task Tool BAD (truyền thừa context) vs GOOD (truyền prompt tinh gọn).",
-      "Vận dụng Hooks (PreToolUse/PostToolUse) để chặn lệnh nguy hiểm 100% Deterministic thay vì phụ thuộc System Prompt."
+      "Master the Orchestrator-Worker architecture and Hub-and-Spoke topology.",
+      "Understand Context Isolation: Subagents maintain independent conversation context.",
+      "Define agents programmatically using AgentDefinition SDK.",
+      "Differentiate Task tool input patterns: lean prompt vs bloated context.",
+      "Enforce 100% deterministic safety policies using PreToolUse Hooks instead of probabilistic system prompts."
     ],
     coreMasteries: [
-      "Orchestrator-Worker: Agent chính (Coordinator) lập kế hoạch, điều phối các Agent con (Subagents) xử lý đơn nhiệm.",
-      "Context Isolation: Mỗi Subagent có mảng messages riêng biệt, giúp giải phóng Context Window cho Coordinator.",
-      "Agentic Loop 4 bước: Định nghĩa tools → Mô hình phát tool_use → Client chạy hàm → Client gửi lại tool_result.",
-      "allowedTools = ['Task']: Coordinator bắt buộc phải có tool 'Task' trong mảng allowedTools mới spawn được Subagent.",
-      "Parallel Execution: Chạy song song thật sự khi Coordinator phát ra nhiều thẻ Task tool_use trong CÙNG 1 API message.",
-      "Hooks > System Prompt: Hooks (PreToolUse) chặn lệnh sai ở tầng client 100% chắc chắn, còn System Prompt chỉ mang tính xác suất."
+      "Orchestrator-Worker: Lead agent coordinates specialized Subagents to perform single-purpose tasks.",
+      "Context Isolation: Each Subagent maintains a clean messages array, protecting Lead Agent context window.",
+      "allowedTools = ['Task']: Lead Agent requires 'Task' in allowedTools array to spawn Subagents.",
+      "Parallel Execution: Requires Lead Agent to emit multiple Task tool_use calls in the SAME API response turn.",
+      "Hooks > System Prompt: PreToolUse Hooks intercept execution at client 100% deterministically."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Quên thêm 'Task' vào allowedTools làm Coordinator chỉ nói mồm mà không thể spawn được Subagent con.",
-      "⚠️ BẪY 2: Nghĩ rằng Subagent tự động thấy toàn bộ lịch sử trò chuyện của Coordinator (Thực tế Subagent chỉ thấy thông tin được truyền qua tham số prompt của Task tool).",
-      "⚠️ BẪY 3: Dùng System Prompt 'Cấm chạy lệnh rm -rf' để bảo mật thay vì dùng PreToolUse Hook (Prompt vẫn có xác suất bị bẫy Prompt Injection qua mặt)."
+      "⚠️ TRAP 1: Omitting 'Task' from allowedTools array causing Coordinator to describe delegation without executing it.",
+      "⚠️ TRAP 2: Believing Subagents automatically inherit Coordinator message history.",
+      "⚠️ TRAP 3: Relying on System Prompt 'Do not run rm -rf' for safety instead of PreToolUse Hooks."
     ],
     selfChecklist: [
-      "Tôi giải thích được tại sao Subagent giúp giải quyết bài toán sập Context Window.",
-      "Tôi hiểu nguyên tắc Context Isolation giữa Coordinator và các Subagents.",
-      "Tôi thuộc 4 bước của Agentic Loop và nhận diện được Anti-pattern vòng lặp vô hạn.",
-      "Tôi viết được code khởi tạo Subagent bằng AgentDefinition SDK.",
-      "Tôi phân biệt được khi nào dùng PreToolUse Hook vs System Prompt."
+      "I can explain why Subagents solve Context Window overflow.",
+      "I understand Context Isolation between Coordinator and Subagents.",
+      "I know the exact criteria for true Parallel Execution.",
+      "I can write PreToolUse Hooks for safety enforcement."
     ],
     sections: [
       {
-        heading: "3.1 Mô hình Orchestrator - Worker & Hub-and-Spoke Architecture",
+        heading: "3.1 Orchestrator-Worker & Hub-and-Spoke Topology",
         content: `
           <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Coordinator giống như Trưởng Phòng Dự Án. Khi có một nhiệm vụ lớn, Trưởng phòng phân chia việc và gọi 3 chuyên viên (Subagents): Chuyên viên Frontend, Chuyên viên Backend, Chuyên viên Tester. Mỗi chuyên viên làm việc độc lập trong phòng riêng của mình (Context riêng), sau đó báo cáo kết quả về cho Trưởng phòng tổng hợp!
+            💡 <strong>Visual Analogy:</strong> The Coordinator is a Project Lead. When assigned a massive project, the Project Lead delegates tasks to 3 specialists (Frontend Subagent, Backend Subagent, QA Subagent). Each specialist works in their own room (isolated context) and submits final reports back.
           </div>
-          <p>Khi giải quyết các bài toán lớn, việc dùng một agent duy nhất sẽ làm cồng kềnh bộ nhớ context. Mô hình <strong>Orchestrator-Worker (Hub-and-Spoke)</strong> giải quyết bằng cách:</p>
-          <ul>
-            <li><strong>Coordinator (Agent chính):</strong> Lập kế hoạch, phân chia công việc, spawn (tạo) các agent con và tổng hợp kết quả cuối cùng.</li>
-            <li><strong>Subagents (Agent con):</strong> Mỗi agent con có bộ nhớ context riêng biệt và tập tool riêng để thực hiện 1 nhiệm vụ nhỏ.</li>
-          </ul>
-
           <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem; margin: 1.25rem 0; text-align: center;">
-            <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.75rem;">SƠ ĐỒ KIẾN TRÚC HUB-AND-SPOKE (COORDINATOR & SUBAGENTS)</div>
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.75rem;">HUB-AND-SPOKE ARCHITECTURE TOPOLOGY</div>
             <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
               <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--accent-purple); padding: 0.75rem 1rem; border-radius: 8px; font-weight: 700; color: var(--accent-purple);">
-                👑 Coordinator Agent<br><span style="font-weight:400; font-size:0.75rem;">(Lập kế hoạch & Tổng hợp)</span>
+                👑 Coordinator Agent<br><span style="font-weight:400; font-size:0.75rem;">(Plan & Synthesize)</span>
               </div>
               <div style="font-size: 1.5rem; color: var(--text-muted);">➔</div>
               <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -352,838 +387,991 @@ const CHAPTERS_DATA = [
                 <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--accent-emerald);">
                   💻 Subagent 2: Coder (Context B)
                 </div>
-                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--accent-amber);">
-                  🧪 Subagent 3: Tester (Context C)
-                </div>
               </div>
             </div>
           </div>
-        `
-      },
-      {
-        heading: "3.2 Nguyên tắc Cô Lập Ngữ Cảnh (Context Isolation)",
-        content: `
-          <p><strong>Context Isolation (Cô lập ngữ cảnh)</strong> là nguyên tắc quan trọng nhất của hệ thống Multi-Agent:</p>
-          <ul>
-            <li><strong>Không kế thừa tự động:</strong> Subagent được khởi tạo với một không gian nhớ hoàn toàn sạch. Subagent <strong>KHÔNG</strong> tự động đọc hay thấy lịch sử trò chuyện cũ của Coordinator.</li>
-            <li><strong>Truyền dữ liệu chủ động:</strong> Mọi ngữ cảnh cần thiết phải được Coordinator truyền trực tiếp vào thuộc tính <code>prompt</code> khi gọi tool <code>Task</code>.</li>
-            <li><strong>Tiết kiệm Token tối đa:</strong> Khi Subagent hoàn thành công việc, nó chỉ trả lại kết quả tóm tắt cuối cùng cho Coordinator.</li>
-          </ul>
-        `
-      },
-      {
-        heading: "3.3 Vòng Lặp Agentic Loop 4 Bước (The 4-Step Tool Loop)",
-        content: `
-          <div class="diagram-flow">
-            <div class="flow-step">
-              <div class="flow-number">1</div>
-              <div class="flow-content">
-                <div class="flow-title">1. Khai Báo (Tool Definition)</div>
-                <div class="flow-desc">Client gửi danh sách các tools có sẵn kèm mảng messages tới Claude API.</div>
-              </div>
-            </div>
-            <div class="flow-step">
-              <div class="flow-number">2</div>
-              <div class="flow-content">
-                <div class="flow-title">2. Kích Hoạch (Model Decision & stop_reason: "tool_use")</div>
-                <div class="flow-desc">Claude phản hồi về Client với <code>stop_reason: "tool_use"</code> kèm ID lệnh và tên hàm cần gọi.</div>
-              </div>
-            </div>
-            <div class="flow-step">
-              <div class="flow-number">3</div>
-              <div class="flow-content">
-                <div class="flow-title">3. Thực Thi Tại Client (Backend Tool Execution)</div>
-                <div class="flow-desc">Ứng dụng Backend tự chạy hàm/API/lệnh shell tương ứng ở máy chủ của bạn.</div>
-              </div>
-            </div>
-            <div class="flow-step">
-              <div class="flow-number">4</div>
-              <div class="flow-content">
-                <div class="flow-title">4. Trả Kết Quả (Tool Result Feedback)</div>
-                <div class="flow-desc">Client gửi lại kết quả dạng <code>tool_result</code> cho đến khi nhận được <code>stop_reason: "end_turn"</code>.</div>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      {
-        heading: "3.4 Khai Báo Subagent Bằng AgentDefinition SDK",
-        content: `
-          <p>Trong Claude Agent SDK, mỗi Subagent được khai báo thông qua cấu trúc <code>AgentDefinition</code> chuẩn:</p>
         `,
-        codeExample: `# Cấu trúc khai báo Subagent trong Agent SDK
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong></p>
+          <p>Mô hình Orchestrator-Worker (Hub-and-Spoke) giúp chia nhỏ bài toán lớn. Coordinator đóng vai trò lập kế hoạch và tổng hợp, trong khi các Subagents thực hiện tác vụ trong không gian nhớ cô lập (Context Isolation).</p>
+        `
+      },
+      {
+        heading: "3.2 Subagent Declaration with AgentDefinition SDK",
+        content: `
+          <p>In Claude Agent SDK, Subagents are programmatically defined using <code>AgentDefinition</code>:</p>
+        `,
+        codeExample: `# AgentDefinition SDK Structure (Python / TypeScript)
 from claude_agent_sdk import AgentDefinition, Tool
 
 code_reviewer_agent = AgentDefinition(
     name="CodeReviewer",
-    description="Chuyên gia kiểm tra mã nguồn, tìm lỗi bảo mật và tối ưu hiệu năng",
+    description="Security reviewer specializing in static analysis",
     tools=[
-        Tool(name="read_file", description="Đọc nội dung file"),
-        Tool(name="run_linter", description="Chạy linter tĩnh")
+        Tool(name="read_file", description="Read file contents"),
+        Tool(name="run_linter", description="Run static linter")
     ],
-    prompt="""Bạn là một Senior Code Reviewer. 
-Nhiệm vụ của bạn là phân tích mã nguồn được giao và tìm các lỗi bảo mật."""
-)`
-      },
-      {
-        heading: "3.5 Bẫy Mẫu Task Tool: BAD (Truyền Thừa) vs GOOD (Prompt Tinh Gọn)",
-        content: `
-          <div class="comparison-grid">
-            <div class="card-bad">
-              <div class="card-header-bad">🔴 BAD PATTERN (Cách Sai - Tràn Context)</div>
-              <pre><code>// ❌ SAI: Nhét toàn bộ tài liệu dự án vào prompt
-"tools": [{
-  "name": "Task",
-  "input": {
-    "subagent": "CodeReviewer",
-    "prompt": "Hãy review file main.js. Đây là toàn bộ 50 file code..."
-  }
-}]</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Hậu quả: Lãng phí token, sập Context Window ngay lần gọi đầu!</div>
-            </div>
-            <div class="card-good">
-              <div class="card-header-good">🟢 GOOD PATTERN (Cách Chuẩn Anthropic)</div>
-              <pre><code>// ✅ ĐÚNG: Chỉ truyền chỉ thị ngắn & file path
-"tools": [{
-  "name": "Task",
-  "input": {
-    "subagent": "CodeReviewer",
-    "prompt": "Hãy dùng tool read_file để đọc 'src/main.js' và báo cáo 3 lỗi bảo mật."
-  }
-}]</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Ưu điểm: Subagent tự dùng tool tra cứu chính xác!</div>
-            </div>
-          </div>
+    prompt="""You are a Senior Code Reviewer. 
+Analyze assigned code files for security vulnerabilities."""
+)`,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Mỗi Subagent được định nghĩa bằng cấu trúc <code>AgentDefinition</code> gồm tên, mô tả, danh sách tool được cấp phép và system prompt riêng.</p>
         `
       },
       {
-        heading: "3.6 Hệ Thống Hooks (PreToolUse & PostToolUse) & Decision Matrix",
+        heading: "3.3 Task Tool Input: BAD vs GOOD Pattern",
+        content: `
+          <div class="comparison-grid">
+            <div class="card-bad">
+              <div class="card-header-bad">🔴 BAD PATTERN (Context Bloat)</div>
+              <pre><code>// ❌ BAD: Injecting 50 codebase files into prompt
+"tools": [{
+  "name": "Task",
+  "input": {
+    "subagent": "CodeReviewer",
+    "prompt": "Review main.js. Here is full project source: [50_FILES_TEXT...]"
+  }
+}]</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Result: Wastes tokens, instantly overflows Subagent context window.</div>
+            </div>
+            <div class="card-good">
+              <div class="card-header-good">🟢 GOOD PATTERN (Lean Directives)</div>
+              <pre><code>// ✅ GOOD: Passing lean instruction & file path
+"tools": [{
+  "name": "Task",
+  "input": {
+    "subagent": "CodeReviewer",
+    "prompt": "Use read_file tool to inspect 'src/main.js' and report top 3 security flaws."
+  }
+}]</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Result: Subagent autonomously invokes read_file tool as needed.</div>
+            </div>
+          </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Đừng nhét toàn bộ tài liệu dự án vào prompt của Task tool. Hãy chỉ truyền chỉ thị tinh gọn kèm đường dẫn file để Subagent tự dùng tool đọc khi cần.</p>
+        `
+      },
+      {
+        heading: "3.4 Hooks System vs System Prompt Matrix",
         content: `
           <div class="decision-matrix-wrap">
             <table class="decision-matrix">
               <thead>
                 <tr>
-                  <th>Tiêu chí so sánh</th>
+                  <th>Evaluation Criteria</th>
                   <th>🛡️ PreToolUse / PostToolUse Hooks</th>
                   <th>💬 System Prompt Instructions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Mức độ chắc chắn</strong></td>
-                  <td><span class="status-badge yes">✅ 100% Deterministic (Tuyệt đối)</span></td>
-                  <td><span class="status-badge warn">⚠️ Probabilistic (~95-98% Có xác suất lỗi)</span></td>
+                  <td><strong>Determinism Guarantee</strong></td>
+                  <td><span class="status-badge yes">✅ 100% Deterministic</span></td>
+                  <td><span class="status-badge warn">⚠️ Probabilistic (~95-98%)</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Chống Prompt Injection</strong></td>
-                  <td><span class="status-badge yes">✅ An toàn 100% (Chặn ở Server)</span></td>
-                  <td><span class="status-badge no">❌ Có thể bị bẫy lừa bởi hacker</span></td>
+                  <td><strong>Prompt Injection Defense</strong></td>
+                  <td><span class="status-badge yes">✅ 100% Secure (Server-side)</span></td>
+                  <td><span class="status-badge no">❌ Vulnerable to adversarial prompts</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Vị trí thực thi</strong></td>
-                  <td>Tầng Code Client / Server Backend</td>
-                  <td>Bên trong bộ nhớ LLM Context</td>
+                  <td><strong>Execution Layer</strong></td>
+                  <td>Client Application / Server Code</td>
+                  <td>LLM Context Window Memory</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Hooks (PreToolUse) chặn lệnh sai ở tầng Client chắc chắn 100% (Deterministic), trong khi System Prompt chỉ mang tính xác suất (Probabilistic).</p>
         `
       },
       {
-        heading: "3.7 Thẻ Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "3.5 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 3</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 3</div>
             <div class="kc-question">
-              Tình huống: Coordinator Agent của bạn cần gọi 3 Subagents cùng lúc nhưng chúng lại chạy nối tiếp (Sequential). Làm sao sửa?
+              Question: Coordinator needs 3 Subagents to analyze 3 files in parallel, but they run sequentially. What is the root technical cause?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Đảm bảo Coordinator phát ra <strong>nhiều lệnh gọi tool <code>Task</code> trong CÙNG MỘT message phản hồi API</strong> để kích hoạt Parallel Execution!
+              <strong>Official Anthropic Answer:</strong><br>
+              - <strong>Cause:</strong> Coordinator emitted Task tool_use calls across multiple separate API response turns.<br>
+              - <strong>Fix:</strong> Ensure Coordinator emits multiple <code>Task</code> tool_use call blocks within the <strong>SAME API response message turn</strong>.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Để Subagents chạy song song thật sự (Parallel Execution), Coordinator phải phát ra nhiều thẻ gọi tool <code>Task</code> trong CÙNG MỘT message phản hồi API.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn dùng PreToolUse Hook để chặn lệnh nguy hiểm 100% chắc chắn, và đảm bảo phát ra nhiều thẻ Task tool trong cùng 1 message để chạy song song thực sự."
+    examTip: "⚡ CCAF Exam Tip: Always use PreToolUse Hooks for strict security policies and emit multiple Task calls in a single turn for parallel subagent execution."
   },
   {
     id: 4,
-    title: "Chương 4: Model Context Protocol (MCP)",
+    title: "Chapter 4: Model Context Protocol (MCP) — Standardized Integration",
     domain: "D2",
     domainTitle: "Tool Design & MCP Integration",
     estimatedMinutes: 25,
-    summary: "Chuẩn giao tiếp mở giúp kết nối Claude bảo mật với các nguồn dữ liệu bên ngoài (Database, GitHub, File System).",
+    summary: "Open protocol standard connecting Claude securely to external data sources (Databases, GitHub, Local Filesystem).",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 4: Model Context Protocol (MCP) — Standardized Integration</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 4: Model Context Protocol (MCP) — Standardized Integration.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 4: Model Context Protocol (MCP) — Standardized Integration: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 4: Model Context Protocol (MCP) — Standardized Integration.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Hiểu khái niệm MCP Server & MCP Client.",
-      "Biết cơ chế cấp quyền và bảo mật của MCP đối với các thao tác đọc/ghi dữ liệu.",
-      "Phân biệt 3 thành phần chính trong MCP: Tools, Resources, Prompts."
+      "Understand MCP Server vs MCP Client architecture.",
+      "Master permission boundaries for read/write resource access.",
+      "Distinguish between 3 core MCP primitives: Tools, Resources, and Prompts."
     ],
     coreMasteries: [
-      "MCP là chuẩn mở kết nối Claude an toàn với Database, GitHub, File System.",
-      "MCP Server cung cấp tài nguyên & công cụ; Client (Claude Code/Desktop) kết nối và thực thi.",
-      "3 thành phần MCP: Tools (Hàm gọi), Resources (Dữ liệu tĩnh/File), Prompts (Mẫu hướng dẫn sẵn)."
+      "MCP Open Protocol: Standardized connection specification for AI models to external systems.",
+      "MCP Primitives: Tools (executable functions), Resources (read-only state/files), Prompts (parameterized templates).",
+      "Ambiguity Prevention: Detailed tool descriptions prevent fallback to raw bash/sed commands."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhầm lẫn MCP với API thông thường. MCP là giao thức tiêu chuẩn mở (Open Protocol).",
-      "⚠️ BẪY 2: Cung cấp mô tả MCP thiếu rõ ràng khiến mô hình ưu tiên chạy lệnh bash/sed thô thay vì gọi MCP Server."
+      "⚠️ TRAP 1: Confusing MCP with custom REST APIs. MCP is an open specification standard.",
+      "⚠️ TRAP 2: Omitting explicit tool descriptions causing model to bypass MCP Server in favor of raw shell commands."
     ],
     selfChecklist: [
-      "Tôi hiểu MCP đóng vai trò như chuẩn kết nối mở cho AI.",
-      "Tôi phân biệt được MCP Server và MCP Client.",
-      "Tôi thuộc 3 thành phần của MCP (Tools, Resources, Prompts)."
+      "I can explain MCP Server vs MCP Client responsibilities.",
+      "I know the 3 core MCP primitives (Tools, Resources, Prompts)."
     ],
     sections: [
       {
-        heading: "4.1 Khái niệm Model Context Protocol (MCP)",
+        heading: "4.1 Architecture & USB-C Analogy",
         content: `
           <div class="callout callout-title" style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--accent-emerald); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Hãy tưởng tượng MCP như cổng cắm USB-C tiêu chuẩn trên máy tính. Trước đây mỗi thiết bị cần một loại cáp riêng. MCP định nghĩa một cổng chuẩn hóa giúp Claude (Client) cắm thẳng vào bất kỳ Cơ sở dữ liệu hay GitHub (MCP Server) mà không cần viết lại code tùy chỉnh!
+            💡 <strong>Visual Analogy:</strong> MCP is like a USB-C port for AI models. Instead of custom proprietary cables for every peripheral, MCP defines a single open standard port connecting Claude (Client) to any Database or GitHub repo (MCP Server).
           </div>
-          <p><strong>Model Context Protocol (MCP)</strong> gồm 2 thành phần chính:</p>
-          <ul>
-            <li><strong>MCP Server:</strong> Chứa dữ liệu thực tế (PostgreSQL, GitHub API) và cung cấp endpoint an toàn.</li>
-            <li><strong>MCP Client:</strong> Ứng dụng như Claude Desktop hay Claude Code CLI kết nối tới Server.</li>
-          </ul>
+          <p>MCP consists of <strong>MCP Server</strong> (exposes tools & resources) and <strong>MCP Client</strong> (Claude Code / Claude Desktop).</p>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> MCP đóng vai trò như chuẩn USB-C mở giúp Claude (MCP Client) kết nối an toàn với Cơ sở dữ liệu hay GitHub (MCP Server).</p>
         `
       },
       {
-        heading: "4.2 3 Thành phần chính của MCP Protocol",
+        heading: "4.2 The 3 MCP Core Primitives",
         content: `
           <div class="decision-matrix-wrap">
             <table class="decision-matrix">
               <thead>
                 <tr>
-                  <th>Thành phần MCP</th>
-                  <th>Bản chất kỹ thuật</th>
-                  <th>Ví dụ thực tế</th>
+                  <th>MCP Primitive</th>
+                  <th>Technical Nature</th>
+                  <th>Example Use Case</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Tools (Công cụ)</strong></td>
-                  <td>Hàm thực thi thao tác có tác động.</td>
-                  <td><code>create_github_issue</code>, <code>query_database</code></td>
+                  <td><strong>Tools</strong></td>
+                  <td>Executable side-effecting functions.</td>
+                  <td><code>create_issue</code>, <code>execute_query</code></td>
                 </tr>
                 <tr>
-                  <td><strong>Resources (Tài nguyên)</strong></td>
-                  <td>Dữ liệu tĩnh hoặc luồng log chỉ đọc.</td>
-                  <td><code>file:///logs/app.log</code>, DB Table Scheme</td>
+                  <td><strong>Resources</strong></td>
+                  <td>Read-only state, schemas, or file logs.</td>
+                  <td><code>file:///logs/app.log</code>, DB Schema</td>
                 </tr>
                 <tr>
-                  <td><strong>Prompts (Mẫu chỉ thị)</strong></td>
-                  <td>Mẫu hướng dẫn prompt có tham số sẵn.</td>
-                  <td>Template review code, template phân tích log</td>
+                  <td><strong>Prompts</strong></td>
+                  <td>Parameterized instruction templates.</td>
+                  <td>PR review prompt template</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> 3 thành phần cốt lõi của MCP: Tools (Hàm thực thi), Resources (Tài nguyên đọc), và Prompts (Mẫu hướng dẫn có tham số).</p>
         `
       },
       {
-        heading: "4.3 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "4.3 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 4</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 4</div>
             <div class="kc-question">
-              Tình huống: Tại sao bạn nên viết description cho MCP Tools cực kỳ rõ ràng thay vì chung chung?
+              Question: Why must MCP Tool descriptions be exceptionally detailed and explicit?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Nếu description quá chung chung, Claude sẽ không nhận diện được sức mạnh của MCP Server và sẽ tự động fallback về chạy các lệnh Terminal thô (bash/sed) gây rủi ro an toàn!
+              <strong>Official Anthropic Answer:</strong><br>
+              Ambiguous MCP descriptions cause Claude to fail to recognize the custom server capabilities, causing it to fall back to executing risky raw terminal commands (bash/sed).
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Mô tả MCP Tool phải chi tiết để tránh trường hợp Claude không nhận diện được và quay sang dùng lệnh Terminal thô rủi ro.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Cung cấp mô tả MCP chi tiết rõ ràng để mô hình ưu tiên dùng MCP Server tùy chỉnh hơn là các thao tác bash/sed thô."
+    examTip: "⚡ CCAF Exam Tip: Provide rich descriptions for MCP tools to ensure Claude prefers structured server tools over raw terminal commands."
   },
   {
     id: 5,
-    title: "Chương 5: Claude Code — Cấu hình và Quy trình làm việc",
+    title: "Chapter 5: Claude Code — Configuration & Workflows",
     domain: "D3",
     domainTitle: "Claude Code Configuration & Workflows",
     estimatedMinutes: 20,
-    summary: "Sử dụng công cụ Claude Code CLI trong Terminal, cấu hình CLAUDE.md, quản lý quyền hạn và session.",
+    summary: "Claude Code CLI workflows, CLAUDE.md project configuration, CLI permission flags, and automated CI/CD PR review pipelines.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 5: Claude Code — Configuration & Workflows</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 5: Claude Code — Configuration & Workflows.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 5: Claude Code — Configuration & Workflows: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 5: Claude Code — Configuration & Workflows.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Nắm vững vai trò và nội dung nên ghi trong file CLAUDE.md.",
-      "Hiểu cờ CLI `--dangerously-skip-permissions` và rủi ro an toàn.",
-      "Biết cách thiết lập quy trình CI/CD PR Review tự động với Claude Code."
+      "Master the purpose and lean contents of CLAUDE.md.",
+      "Understand --dangerously-skip-permissions flag risks and CI/CD use cases.",
+      "Enforce Glob/Grep First workflow before reading files."
     ],
     coreMasteries: [
-      "CLAUDE.md: File cấu hình dự án ghi các lệnh build/test và coding style cốt lõi.",
-      "--dangerously-skip-permissions: Bỏ qua bước hỏi cấp quyền, chỉ dùng trong Sandbox/CI-CD an toàn.",
-      "Glob/Grep trước View: Định vị file trước khi tải nội dung vào context."
+      "CLAUDE.md: Project guide containing core build, test, and style commands.",
+      "--dangerously-skip-permissions: Bypasses prompt confirmations; strictly for isolated CI/CD runners.",
+      "Glob/Grep First: Search files and keywords before reading content into context."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhét toàn bộ tài liệu dự án dài dòng vào CLAUDE.md (chỉ nên ghi quy tắc & lệnh thiết yếu).",
-      "⚠️ BẪY 2: Chạy cờ `--dangerously-skip-permissions` trên môi trường Production thực tế."
+      "⚠️ TRAP 1: Stuffing 2,000 lines of documentation into CLAUDE.md (keep it lean: build/test commands only).",
+      "⚠️ TRAP 2: Running --dangerously-skip-permissions on production developer workstations."
     ],
     selfChecklist: [
-      "Tôi biết mục đích của file CLAUDE.md.",
-      "Tôi hiểu khi nào nên dùng cờ bỏ qua quyền hạn CLI.",
-      "Tôi nắm quy trình làm việc chuẩn trong Claude Code CLI."
+      "I know what goes into a lean CLAUDE.md file.",
+      "I know when --dangerously-skip-permissions is appropriate."
     ],
     sections: [
       {
-        heading: "5.1 Vai trò của file CLAUDE.md",
+        heading: "5.1 Lean CLAUDE.md Configuration Pattern",
         content: `
-          <div class="callout callout-title" style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent-amber); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> File <code>CLAUDE.md</code> giống như "Tờ ghi chú dán trên màn hình" dành cho lập trình viên mới. Nó chỉ chứa các lệnh quan trọng nhất (Lệnh test là gì? Lệnh build là gì?). Nếu dán một cuốn sách 500 trang, lập trình viên sẽ bị ngợp và lãng phí thời gian đọc!
-          </div>
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 BAD CLAUDE.MD</div>
-              <p style="font-size: 0.85rem;">Nhét toàn bộ tài liệu kiến trúc dài 2.000 dòng vào file.</p>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Lãng phí token context mỗi phiên!</div>
+              <div class="card-header-bad">🔴 BLOATED CLAUDE.MD (Bad Pattern)</div>
+              <p style="font-size: 0.85rem;">2,000 lines of architecture documentation and tutorials.</p>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Wastes massive token context every session launch!</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 GOOD CLAUDE.MD</div>
-              <p style="font-size: 0.85rem;">Chỉ ghi các lệnh cốt lõi: <code>npm test</code>, <code>npm run build</code>, style guide 2 dòng.</p>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Tinh gọn, mô hình nạp nhanh 100%.</div>
+              <div class="card-header-good">🟢 LEAN CLAUDE.MD (Good Pattern)</div>
+              <p style="font-size: 0.85rem;">Concise instructions: <code>npm test</code>, <code>npm run build</code>, 2-line code style.</p>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Minimal token usage, maximum adherence.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> File <code>CLAUDE.md</code> chỉ nên chứa các lệnh test/build ngắn gọn cốt lõi, tránh nhét hàng ngàn dòng tài liệu rườm rà làm phình context.</p>
         `
       },
       {
-        heading: "5.2 Cờ CLI --dangerously-skip-permissions",
-        content: `
-          <p>Cờ <code>--dangerously-skip-permissions</code> cho phép tự động duyệt toàn bộ lệnh Terminal mà không dừng lại hỏi ý kiến con người.</p>
-          <p><strong>Quy tắc an toàn CCAF:</strong> Chỉ dùng trong **Isolated Sandbox / CI-CD Pipeline**. Không bao giờ dùng trên máy tính cá nhân!</p>
-        `
-      },
-      {
-        heading: "5.3 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "5.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 5</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 5</div>
             <div class="kc-question">
-              Tình huống: Bạn muốn chạy Claude Code trong GitHub Actions để review PR tự động. Cờ CLI nào bắt buộc sử dụng?
+              Question: Which CLI flag is required when running Claude Code in automated GitHub Actions PR review pipelines?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Cử dụng cờ <code>--dangerously-skip-permissions</code> vì môi trường Runner của GitHub Actions là một Sandbox cô lập không có tương tác trực tiếp của con người.
+              <strong>Official Anthropic Answer:</strong><br>
+              Use <code>--dangerously-skip-permissions</code> because GitHub Actions runners are non-interactive isolated sandbox environments.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Dùng cờ <code>--dangerously-skip-permissions</code> khi chạy Claude Code tự động trong GitHub Actions CI/CD.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Cờ lệnh CLI và file CLAUDE.md giúp tự động hóa quy trình làm việc cho lập trình viên mà không cần gõ lại prompt mỗi phiên."
+    examTip: "⚡ CCAF Exam Tip: Keep CLAUDE.md lean with essential build/test commands and use --dangerously-skip-permissions only in non-interactive CI/CD sandboxes."
   },
   {
     id: 6,
-    title: "Chương 6: Prompt Engineering — Các kỹ thuật nâng cao",
+    title: "Chapter 6: Advanced Prompt Engineering & Structured Output",
     domain: "D4",
     domainTitle: "Prompt Engineering & Structured Output",
     estimatedMinutes: 20,
-    summary: "Tối ưu hóa prompt với Few-shot examples, JSON Schema, và kiểm soát định dạng đầu ra chuẩn xác.",
+    summary: "Few-shot prompting, JSON Schema formatting, Explicit Null directives, Chain-of-Thought (<thinking>), and XML boundary isolation.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 6: Advanced Prompt Engineering & Structured Output</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 6: Advanced Prompt Engineering & Structured Output.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 6: Advanced Prompt Engineering & Structured Output: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 6: Advanced Prompt Engineering & Structured Output.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Sử dụng Few-shot Prompting để chuẩn hóa định dạng đầu ra.",
-      "Viết chỉ thị chống Hallucination (trả về null khi thiếu thông tin).",
-      "Dùng thẻ XML để phân tách ranh giới dữ liệu an toàn."
+      "Use Few-shot examples for deterministic formatting.",
+      "Enforce Explicit Null directives to prevent hallucinated data.",
+      "Wrap user data in XML tags (<doc>...</doc>) to prevent prompt injection."
     ],
     coreMasteries: [
-      "Few-shot Examples: Đưa 2-3 ví dụ mẫu cụ thể là cách tốt nhất để ép định dạng đầu ra.",
-      "Explicit Null: Yêu cầu 'trả về null nếu không tìm thấy' để tránh mô hình bịa số liệu.",
-      "XML Boundaries: Dùng thẻ <doc>...</doc> phân tách prompt chỉ thị và văn bản đầu vào."
+      "Few-shot Prompting: Providing 2-3 input/output examples is the single most effective formatting technique.",
+      "Explicit Null: Instructing 'return null if not found' eliminates plausible hallucinated figures.",
+      "XML Isolation: Wrapping untrusted user input inside XML tags prevents prompt injection attacks."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Nhầm tưởng để temperature = 0 là đủ chuẩn hóa định dạng mà không cần Few-shot.",
-      "⚠️ BẪY 2: Không yêu cầu Explicit Null khiến mô hình bịa ra số liệu plausible giả khi thiếu thông tin."
+      "⚠️ TRAP 1: Relying solely on temperature = 0.0 for formatting without providing Few-shot examples.",
+      "⚠️ TRAP 2: Missing Explicit Null instructions when extracting absent fields."
     ],
     selfChecklist: [
-      "Tôi biết cách dùng Few-shot ví dụ mẫu.",
-      "Tôi viết được câu lệnh bắt buộc Explicit Null.",
-      "Tôi biết cách bao bọc dữ liệu bằng thẻ XML."
+      "I use Few-shot examples for structured outputs.",
+      "I enforce Explicit Null for missing fields."
     ],
     sections: [
       {
-        heading: "6.1 Few-Shot Prompting & Kỹ thuật Explicit Null",
+        heading: "6.1 Few-Shot Examples & Explicit Null Directives",
         content: `
-          <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Đưa 3 bức ảnh mẫu bánh thực tế (Few-shot) giúp thợ làm đúng 100% kiểu dáng. Và dặn thợ: <em>"Nếu không có dâu tây tươi, hãy để trống ô đó (null) chứ đừng lấy dâu nhựa thay thế!"</em> (Explicit Null).
-          </div>
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 THIẾU EXPLICIT NULL (Dễ Bịa)</div>
-              <p style="font-size: 0.85rem;">Prompt: "Hãy trích xuất số điện thoại khách hàng."</p>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Khi văn bản không có số, mô hình sẽ tự bịa ra số giả hợp lý!</div>
+              <div class="card-header-bad">🔴 MISSING EXPLICIT NULL</div>
+              <p style="font-size: 0.85rem;">Prompt: "Extract customer phone number from transcript."</p>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Model hallucinates plausible fake phone numbers when absent!</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 CÓ EXPLICIT NULL (An Toàn)</div>
-              <p style="font-size: 0.85rem;">Prompt: "Trích xuất số điện thoại. Nếu không đề cập trong văn bản, bắt buộc trả về null."</p>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Mô hình trả về null chính xác 100%.</div>
+              <div class="card-header-good">🟢 EXPLICIT NULL ENFORCED</div>
+              <p style="font-size: 0.85rem;">Prompt: "Extract phone number. If absent from transcript, output null."</p>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Model reliably returns null when information is missing.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Bắt buộc thêm chỉ thị Explicit Null <em>"Nếu không tìm thấy, trả về null"</em> kết hợp 2-3 ví dụ mẫu (Few-shot) để loại bỏ hoàn toàn số liệu bịa đặt.</p>
         `
       },
       {
-        heading: "6.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "6.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 6</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 6</div>
             <div class="kc-question">
-              Tình huống: Đặt temperature = 0.0 có đảm bảo 100% định dạng chuỗi văn bản trích xuất được chuẩn hóa không?
+              Question: Does setting temperature = 0.0 guarantee 100% strict string formatting compliance?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Không! Temperature = 0.0 chỉ làm phản hồi mang tính xác định hơn, nhưng để chuẩn hóa định dạng chuỗi văn bản hoàn hảo, bắt buộc phải kết hợp đưa 2-3 ví dụ mẫu (Few-shot examples).
+              <strong>Official Anthropic Answer:</strong><br>
+              No. Temperature = 0.0 increases determinism but does not enforce formatting structure. Providing 2-3 <strong>Few-shot examples</strong> is required for strict formatting adherence.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Temperature = 0.0 không thay thế được Few-shot. Cần đưa 2-3 ví dụ mẫu để ép định dạng chuẩn tuyệt đối.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn dùng Few-shot ví dụ mẫu kết hợp chỉ thị Explicit Null để có kết quả trích xuất dữ liệu chuẩn xác nhất."
+    examTip: "⚡ CCAF Exam Tip: Pair Few-shot examples with Explicit Null instructions for bulletproof JSON extraction."
   },
   {
     id: 7,
-    title: "Chương 7: Thiết kế Schema nâng cao & Resilient Enums",
+    title: "Chapter 7: Advanced Schema Design & Resilient Enums",
     domain: "D4",
     domainTitle: "Prompt Engineering & Structured Output",
     estimatedMinutes: 25,
-    summary: "Xây dựng JSON Schema bền vững chống vỡ dữ liệu với Resilient Catch-Alls, Data Evolution và Schema Redundancy.",
+    summary: "Build resilient JSON Schemas with Resilient Catch-All Enums, Schema Redundancy, and Data Evolution rules.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 7: Advanced Schema Design & Resilient Enums</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 7: Advanced Schema Design & Resilient Enums.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 7: Advanced Schema Design & Resilient Enums: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 7: Advanced Schema Design & Resilient Enums.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Áp dụng mẫu Resilient Catch-All Enum để xử lý trường hợp dữ liệu lạ.",
-      "Thiết kế Schema Redundancy để phát hiện lỗi tính toán/OCR và đẩy sang duyệt thủ công.",
-      "Quản lý sự thay đổi dữ liệu theo thời gian (Data Evolution Rule)."
+      "Design Resilient Catch-All Enums using 'other' + 'other_detail'.",
+      "Implement Schema Redundancy to detect OCR/extraction errors.",
+      "Handle temporal data modifications with Data Evolution rules."
     ],
     coreMasteries: [
-      "Resilient Catch-All: Thêm giá trị 'other' vào enum kết hợp trường 'other_detail'.",
-      "Schema Redundancy: Yêu cầu cả 'calculated_total' và 'stated_total' để phát hiện sai lệch.",
-      "Data Evolution Rule: Lưu vết dữ liệu thay đổi gồm giá trị, nguồn và ngày có hiệu lực."
+      "Resilient Catch-Alls: Include 'other' in enum definitions paired with an 'other_detail' text field.",
+      "Schema Redundancy: Request both 'stated_total' and 'calculated_total' to trigger Human Review on discrepancy."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Giới hạn cứng enum khiến JSON Schema báo lỗi Validation Error khi gặp loại dữ liệu mới.",
-      "⚠️ BẪY 2: Ghi đè dữ liệu cũ khi có phụ lục hợp đồng sửa đổi thay vì lưu vết đa giá trị kèm ngày hiệu lực."
+      "⚠️ TRAP 1: Using strict closed enums that crash JSON schema validation on novel input categories.",
+      "⚠️ TRAP 2: Overwriting historic contract data when processing amendments instead of tracking multi-value temporal states."
     ],
     selfChecklist: [
-      "Tôi thiết kế được Resilient Catch-All Enum trong JSON Schema.",
-      "Tôi giải thích được nguyên lý Schema Redundancy để bắt lỗi OCR.",
-      "Tôi biết cách lưu vết dữ liệu hợp đồng theo thời gian."
+      "I add 'other' + 'other_detail' to JSON enums.",
+      "I use Schema Redundancy to detect OCR errors."
     ],
     sections: [
       {
         heading: "7.1 Resilient Catch-All Enums & Schema Redundancy",
         content: `
-          <div class="callout callout-title" style="background: rgba(244, 63, 94, 0.08); border-left: 4px solid var(--accent-rose); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Thêm ô "Khác (other)" vào tủ thư giúp thư không bị vứt bỏ khi gặp loại căn hộ lạ. Và dùng <strong>Schema Redundancy</strong> (so sánh <code>calculated_total</code> do mô hình tự cộng vs <code>stated_total</code> ghi trên hóa đơn) để tự động phát hiện hóa đơn mờ!
-          </div>
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 FRAGILE ENUM (Dễ Vỡ)</div>
+              <div class="card-header-bad">🔴 FRAGILE ENUM (Bad Pattern)</div>
               <pre><code>"enum": ["house", "apartment", "condo"]</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Gặp 'studio' là báo lỗi Validation Error sập ngay!</div>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Crashes validation when encountering 'studio' or 'townhouse'!</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 RESILIENT CATCH-ALL (Bền Vững)</div>
+              <div class="card-header-good">🟢 RESILIENT CATCH-ALL (Good Pattern)</div>
               <pre><code>"enum": ["house", "apartment", "condo", "other"],
 "other_detail": {"type": "string"}</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Bắt trọn 100% dữ liệu lạ không báo lỗi!</div>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Gracefully handles novel property types without validation crashes.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Thêm giá trị <code>other</code> vào Enum kèm trường <code>other_detail</code> để tránh vỡ JSON Schema khi xuất hiện loại dữ liệu mới.</p>
         `
       },
       {
-        heading: "7.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "7.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 7</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 7</div>
             <div class="kc-question">
-              Tình huống: Khi trích xuất hóa đơn bị mờ, làm sao phát hiện lỗi lệch tổng tiền tự động?
+              Question: How can Schema Redundancy automatically catch extraction discrepancy in blurry invoice OCR processing?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Dùng <strong>Schema Redundancy</strong>: yêu cầu trích xuất cả <code>stated_total</code> và <code>calculated_total</code>. Nếu <code>stated_total != calculated_total</code>, tự động đẩy sang hàng chờ Human Review Queue!
+              <strong>Official Anthropic Answer:</strong><br>
+              Request both <code>stated_total</code> (printed text) and <code>calculated_total</code> (sum of line items). If <code>stated_total != calculated_total</code>, automatically route to Human Review Queue.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Dùng Schema Redundancy trích xuất cả <code>stated_total</code> và <code>calculated_total</code> để phát hiện lệch tổng tiền và đẩy sang Human Review Queue.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn thêm 'other' + trường detail vào Enum và dùng Schema Redundancy để tự động phát hiện lỗi sai lệch dữ liệu."
+    examTip: "⚡ CCAF Exam Tip: Always include 'other' in enums and use Schema Redundancy to catch OCR discrepancy automatically."
   },
   {
     id: 8,
-    title: "Chương 8: Phân tuyến Chi phí & SLA — Messages vs Batch API",
+    title: "Chapter 8: Cost Routing & SLA — Messages vs Batch API",
     domain: "D5",
     domainTitle: "Context Management & Reliability",
     estimatedMinutes: 20,
-    summary: "Tối ưu hóa chi phí vận hành với Message Batches API (Tiết kiệm 50% chi phí) và điều hướng SLA phù hợp.",
+    summary: "Optimize operational costs with Message Batches API (50% discount) and route workloads according to latency SLA requirements.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 8: Cost Routing & SLA — Messages vs Batch API</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 8: Cost Routing & SLA — Messages vs Batch API.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 8: Cost Routing & SLA — Messages vs Batch API: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 8: Cost Routing & SLA — Messages vs Batch API.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Phân biệt khi nào dùng Messages API (Real-time) vs Message Batches API (Async 24h).",
-      "Tận dụng mức giảm giá 50% chi phí của Batch API cho các tác vụ không thời gian thực."
+      "Route real-time interactive traffic to Messages API.",
+      "Route non-urgent asynchronous batch workloads to Message Batches API to save 50% on API costs."
     ],
     coreMasteries: [
-      "Messages API: Dành cho tương tác thời gian thực (Real-time), chi phí cao nhất.",
-      "Message Batches API: Tiết kiệm 50% chi phí, hoàn thành trong 24 giờ, phù hợp tác vụ xử lý lô bất đồng bộ.",
-      "Rule: Không bao giờ mặc định dùng Real-time API cho các nhu cầu xử lý bất đồng bộ."
+      "Messages API: Real-time latency, standard API pricing.",
+      "Message Batches API: 50% discount, 24-hour asynchronous completion SLA.",
+      "Routing Strategy: Never use real-time API endpoints for overnight batch workloads."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Dùng Messages API thời gian thực để tổng hợp 50.000 tài liệu đêm gây lãng phí 50% chi phí ngân sách."
+      "⚠️ TRAP 1: Using Real-Time Messages API for batch processing 50,000 overnight documents, wasting 50% budget."
     ],
     selfChecklist: [
-      "Tôi phân biệt được ưu/nhược điểm của Batch API.",
-      "Tôi áp dụng được quy tắc lựa chọn API theo SLA."
+      "I use Message Batches API for async workloads.",
+      "I understand the 50% discount and 24h SLA."
     ],
     sections: [
       {
-        heading: "8.1 Ma trận Phân Tuyến Chi Phí & SLA",
+        heading: "8.1 Cost Routing & SLA Decision Matrix",
         content: `
           <div class="decision-matrix-wrap">
             <table class="decision-matrix">
               <thead>
                 <tr>
-                  <th>Tiêu chí so sánh</th>
-                  <th>⚡ Messages API (Real-time)</th>
-                  <th>📦 Message Batches API (Asynchronous)</th>
+                  <th>Evaluation Feature</th>
+                  <th>⚡ Messages API (Real-Time)</th>
+                  <th>📦 Message Batches API (Async)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Chi phí sử dụng</strong></td>
-                  <td><span class="status-badge warn">⚠️ Giá gốc 100%</span></td>
-                  <td><span class="status-badge yes">✅ Giảm 50% Chi Phí</span></td>
+                  <td><strong>Pricing Discount</strong></td>
+                  <td><span class="status-badge warn">⚠️ Standard Price (100%)</span></td>
+                  <td><span class="status-badge yes">✅ 50% Cost Discount</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Thời gian phản hồi (SLA)</strong></td>
-                  <td>Tức thì (vài giây)</td>
-                  <td>Bất đồng bộ trong vòng 24 giờ</td>
+                  <td><strong>Response SLA</strong></td>
+                  <td>Immediate (seconds)</td>
+                  <td>Asynchronous (within 24 hours)</td>
                 </tr>
                 <tr>
-                  <td><strong>Tác vụ phù hợp</strong></td>
-                  <td>Chatbot tương tác, gọi tool thời gian thực</td>
-                  <td>Đánh giá bài thi đêm, OCR 10.000 hóa đơn</td>
+                  <td><strong>Primary Workload</strong></td>
+                  <td>Interactive chat, real-time tool loops</td>
+                  <td>Overnight OCR, batch sentiment analysis</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Sử dụng Message Batches API cho các tác vụ xử lý hàng loạt không cần gấp để tiết kiệm 50% chi phí API với SLA 24h.</p>
         `
       },
       {
-        heading: "8.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "8.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 8</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 8</div>
             <div class="kc-question">
-              Tình huống: Công ty bạn cần phân tích cảm xúc của 50.000 bình luận mỗi đêm (không cần gấp trong ngày). Phương án nào tối ưu ngân sách nhất?
+              Question: Your system needs to analyze sentiment on 50,000 user comments nightly. Which API endpoint optimizes budget?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Tạo Batch Job bất đồng bộ gửi qua **Message Batches API** để hưởng ưu đãi cắt giảm 50% ngân sách API với cam kết SLA 24h.
+              <strong>Official Anthropic Answer:</strong><br>
+              Create an asynchronous job via <strong>Message Batches API</strong> to receive 50% cost discount under 24-hour SLA.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Với tác vụ bất đồng bộ đêm, chọn Message Batches API để tiết kiệm 50% chi phí.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Với các tác vụ bất đồng bộ không yêu cầu trả lời ngay lập tức, luôn chọn Message Batches API để tiết kiệm 50% chi phí."
+    examTip: "⚡ CCAF Exam Tip: Always select Message Batches API for non-urgent batch tasks to save 50% on operational API budget."
   },
   {
     id: 9,
-    title: "Chương 9: Escalation và Human-in-the-Loop (Duyệt thủ công)",
+    title: "Chapter 9: Escalation & Human-in-the-Loop",
     domain: "D5",
     domainTitle: "Context Management & Reliability",
     estimatedMinutes: 20,
-    summary: "Kết hợp trí tuệ nhân tạo và sự giám sát của con người cho các hành động rủi ro cao.",
+    summary: "Integrate Human-in-the-Loop approval workflows for high-risk operations based on Confidence Scores and monetary thresholds.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 9: Escalation & Human-in-the-Loop</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 9: Escalation & Human-in-the-Loop.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 9: Escalation & Human-in-the-Loop: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 9: Escalation & Human-in-the-Loop.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Hiểu cơ chế duyệt thủ công dựa trên điểm tin cậy (Confidence Score) và ngưỡng giá trị.",
-      "Sử dụng Application Intercept Hooks để chặn các hành vi rủi ro cao ở tầng code server."
+      "Implement Human Review Queue routing for low-confidence or high-value actions.",
+      "Use Application Intercept Hooks to enforce hard policy constraints server-side."
     ],
     coreMasteries: [
-      "Confidence > 90%: Tự động hóa hoàn toàn.",
-      "Confidence < 90% hoặc giao dịch > $500: Đẩy sang Human Review Queue.",
-      "Application Intercept Hooks: Chặn giao dịch nguy hiểm server-side thay vì phụ thuộc System Prompt."
+      "Confidence > 90% & Value < $500: Full automation.",
+      "Confidence < 90% or Value > $500: Route to Human Review Queue.",
+      "Server-side Hooks: Enforce security rules in code rather than system prompts."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Tin hoàn toàn vào System Prompt 'Cấm giao dịch quá 500$' (thực tế vẫn có 3% tỷ lệ thất bại)."
+      "⚠️ TRAP 1: Relying on System Prompt 'Do not transfer > $500' for policy compliance."
     ],
     selfChecklist: [
-      "Tôi biết khi nào cần đẩy vào hàng chờ Human Review.",
-      "Tôi hiểu vai trò của Application Intercept Hooks."
+      "I route low confidence or high value actions to Human Review.",
+      "I enforce policy constraints in server-side code."
     ],
     sections: [
       {
-        heading: "9.1 Ngưỡng Tự Động Hóa & Human Review Queue",
+        heading: "9.1 Automation Thresholds & Human Review Queue",
         content: `
-          <div class="callout callout-title" style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent-amber); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Hệ thống ngân hàng tự động duyệt chuyển khoản $10. Nhưng khi giao dịch lên tới $10.000, hệ thống tự động ngắt và yêu cầu nhân viên gọi điện xác minh (Human-in-the-loop).
-          </div>
           <div class="decision-matrix-wrap">
             <table class="decision-matrix">
               <thead>
                 <tr>
-                  <th>Ngưỡng giao dịch / Điểm tin cậy</th>
-                  <th>Hành động hệ thống</th>
+                  <th>Condition Threshold</th>
+                  <th>System Action</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Confidence Score > 90% & Giao dịch < $500</td>
-                  <td><span class="status-badge yes">✅ Tự động hóa 100%</span></td>
+                  <td>Confidence Score > 90% AND Value < $500</td>
+                  <td><span class="status-badge yes">✅ Full Automated Execution</span></td>
                 </tr>
                 <tr>
-                  <td>Confidence Score < 90% hoặc Giao dịch > $500</td>
-                  <td><span class="status-badge warn">⚠️ Chuyển sang Human Review Queue</span></td>
+                  <td>Confidence Score < 90% OR Value > $500</td>
+                  <td><span class="status-badge warn">⚠️ Route to Human Review Queue</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Khi độ tin cậy dưới 90% hoặc giá trị lớn hơn $500, tự động đẩy vào hàng chờ Human Review Queue cho con người duyệt.</p>
         `
       },
       {
-        heading: "9.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "9.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 9</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 9</div>
             <div class="kc-question">
-              Tình huống: Làm thế nào để đảm bảo 100% không bao giờ xảy ra lệnh chuyển tiền vượt quá $500?
+              Question: How can you 100% guarantee that money transfer amounts over $500 are never processed automatically?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Sử dụng **Application Intercept Hooks** kiểm tra quy định ở tầng code backend Server, thay vì chỉ tin vào câu cấm trong System Prompt.
+              <strong>Official Anthropic Answer:</strong><br>
+              Enforce rule checks using <strong>Application Intercept Hooks</strong> in server backend code rather than relying on LLM System Prompts.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Dùng Application Intercept Hooks ở Backend Server để đảm bảo 100% không chuyển tiền quá $500.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Dùng Application Intercept Hooks để chặn các hành vi nguy hiểm server-side thay vì chỉ tin vào System Prompt."
+    examTip: "⚡ CCAF Exam Tip: Enforce strict monetary thresholds and safety policy constraints using server-side Application Intercept Hooks."
   },
   {
     id: 10,
-    title: "Chương 10: Xử lý lỗi & Phục hồi trong Hệ thống Đa Agent",
+    title: "Chapter 10: Multi-Agent Reliability & Error Recovery",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
     estimatedMinutes: 20,
-    summary: "Xử lý sự cố mạng, tràn bộ nhớ context và phục hồi trạng thái khi agent bị crash.",
+    summary: "Handle network failures, tool execution errors, and crash state recovery in multi-agent orchestration systems.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 10: Multi-Agent Reliability & Error Recovery</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 10: Multi-Agent Reliability & Error Recovery.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 10: Multi-Agent Reliability & Error Recovery: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 10: Multi-Agent Reliability & Error Recovery.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Trả về kết quả tool chứa `isError: true` thay vì ném Exception.",
-      "Khôi phục trạng thái hệ thống sau crash bằng tệp manifest có cấu trúc."
+      "Return tool_result with `isError: true` on tool failure.",
+      "Recover agent state after crashes using structured state manifests."
     ],
     coreMasteries: [
-      "Graceful Tool Failure: Trả về `isError: true` để mô hình biết và xử lý mượt mà.",
-      "Crash Recovery: Dùng tệp manifest xuất có cấu trúc và tiêm lại phần state liên quan."
+      "Graceful Tool Failure: Return `isError: true` to allow Claude to self-correct.",
+      "Crash Recovery: Persist structured state manifest to resume crashed subagents."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Ném Exception làm sập agent hoặc trả về chuỗi rỗng khi tool lỗi."
+      "⚠️ TRAP 1: Throwing unhandled exceptions or returning empty strings on tool execution errors."
     ],
     selfChecklist: [
-      "Tôi biết cách xử lý lỗi tool bằng isError: true.",
-      "Tôi biết cách khôi phục state bằng manifest."
+      "I handle tool errors gracefully using isError: true.",
+      "I use state manifests for crash recovery."
     ],
     sections: [
       {
-        heading: "10.1 Graceful Tool Failure & Crash Recovery Manifest",
+        heading: "10.1 Graceful Failure & State Manifests",
         content: `
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 UNHANDLED EXCEPTION (Sập App)</div>
-              <pre><code>try { run_tool() } catch (err) { throw err; } // ❌ sập agent</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Sập toàn bộ quy trình multi-agent!</div>
+              <div class="card-header-bad">🔴 UNHANDLED EXCEPTION (Crash)</div>
+              <pre><code>try { run_tool() } catch (err) { throw err; } // ❌ crashes agent</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Crashes entire multi-agent workflow turn!</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 GRACEFUL ERROR HANDLER (Chuẩn)</div>
-              <pre><code>return {"isError": true, "content": "API sập mạng 500"};</code></pre>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Claude đọc lỗi và chọn phương án dự phòng mượt mà.</div>
+              <div class="card-header-good">🟢 GRACEFUL TOOL FAILURE (Good)</div>
+              <pre><code>return {"isError": true, "content": "API 500 Network Timeout"};</code></pre>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Claude inspects error and attempts alternative strategy.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Luôn trả về <code>isError: true</code> trong <code>tool_result</code> để Claude xử lý sự cố mượt mà thay vì ném Exception làm sập agent.</p>
         `
       },
       {
-        heading: "10.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "10.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 10</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 10</div>
             <div class="kc-question">
-              Tình huống: Khi một Subagent bị crash giữa chừng do mất mạng, làm sao Coordinator khôi phục lại trạng thái công việc?
+              Question: When a Subagent crashes mid-execution due to container reboot, how can the Coordinator resume progress?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Định kỳ xuất tệp **Manifest có cấu trúc** ghi nhận tiến độ công việc, sau đó tiêm lại đoạn state dở dang vào Subagent mới được spawn lại.
+              <strong>Official Anthropic Answer:</strong><br>
+              Periodically persist a <strong>Structured State Manifest</strong> and inject the pending manifest state into a newly spawned replacement Subagent.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Lưu vết tệp Manifest có cấu trúc để tiêm lại trạng thái và khôi phục Subagent mới khi bị crash.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn trả về isError: true trong kết quả tool thay vì ném exception hoặc trả về chuỗi rỗng."
+    examTip: "⚡ CCAF Exam Tip: Always return isError: true in tool_result for graceful error handling and use state manifests for crash recovery."
   },
   {
     id: 11,
-    title: "Chương 11: Quản lý Context nâng cao & Context Pruning",
+    title: "Chapter 11: Advanced Context Management & Context Pruning",
     domain: "D5",
     domainTitle: "Context Management & Reliability",
     estimatedMinutes: 20,
-    summary: "Cắt tỉa bộ nhớ (Context Pruning), Prompt Caching và chống trôi ngữ cảnh (Lost-in-the-middle).",
+    summary: "Context Pruning techniques, Prompt Caching, and Lost-in-the-middle positioning strategies.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 11: Advanced Context Management & Context Pruning</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 11: Advanced Context Management & Context Pruning.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 11: Advanced Context Management & Context Pruning: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 11: Advanced Context Management & Context Pruning.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Thực hiện Context Pruning để lọc bỏ trường dữ liệu rườm rà trước khi đưa vào context.",
-      "Khắc phục hiệu ứng Lost-in-the-middle bằng cách đặt thông tin quan trọng ở đầu hoặc cuối prompt."
+      "Filter bloated API responses using Context Pruning before appending to context.",
+      "Place critical directives at prompt boundaries to prevent Lost-in-the-middle degradation."
     ],
     coreMasteries: [
-      "Context Pruning: Lọc bỏ trường thừa từ kết quả API rườm rà.",
-      "Lost-in-the-middle: Đặt thông tin quan trọng ở đầu hoặc cuối prompt."
+      "Context Pruning: Strip unneeded API properties at client side.",
+      "Progressive Summarization Risk: Exact numerical values and dates are lost when summarizing."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Đưa toàn bộ 40+ trường API vào context khiến lãng phí token."
+      "⚠️ TRAP 1: Appending raw 40+ property API JSON payloads directly into conversation context."
     ],
     selfChecklist: [
-      "Tôi hiểu phương pháp Context Pruning.",
-      "Tôi biết cách tránh hiệu ứng Lost-in-the-middle."
+      "I apply Context Pruning to external API results.",
+      "I place key rules at top or bottom of prompt payloads."
     ],
     sections: [
       {
-        heading: "11.1 Context Pruning (Cắt Tỉa Ngữ Cảnh)",
+        heading: "11.1 Context Pruning Pattern",
         content: `
           <div class="comparison-grid">
             <div class="card-bad">
-              <div class="card-header-bad">🔴 NẠP TOÀN BỘ JSON (Lãng phí)</div>
-              <p style="font-size: 0.85rem;">Nạp nguyên 40+ trường dữ liệu dư thừa từ API vào context.</p>
-              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Tràn Context Window, tăng 80% chi phí token.</div>
+              <div class="card-header-bad">🔴 UNPRUNED API PAYLOAD</div>
+              <p style="font-size: 0.85rem;">Injecting full 40-field API JSON into conversation history.</p>
+              <div style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 600;">❌ Inflates token costs by 80% with irrelevant data.</div>
             </div>
             <div class="card-good">
-              <div class="card-header-good">🟢 CONTEXT PRUNING (Tinh Gọn)</div>
-              <p style="font-size: 0.85rem;">Lọc ở Client chỉ giữ lại 4 trường thực sự cần thiết.</p>
-              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Ngữ cảnh tinh gọn, mô hình xử lý nhanh sắc bén.</div>
+              <div class="card-header-good">🟢 CONTEXT PRUNED PAYLOAD</div>
+              <p style="font-size: 0.85rem;">Filtering payload at client to retain only 4 essential fields.</p>
+              <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600;">✅ Maintains lean context window and fast processing speed.</div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Lọc bỏ các trường dư thừa từ kết quả API (Context Pruning) trước khi đưa vào context để tiết kiệm 80% token.</p>
         `
       },
       {
-        heading: "11.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "11.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 11</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 11</div>
             <div class="kc-question">
-              Tình huống: Khi tóm tắt đoạn hội thoại dài lũy tiến (Progressive Summarization), loại dữ liệu nào dễ bị biến dạng nhất?
+              Question: During Progressive Summarization of long conversations, which data types suffer the highest degradation loss?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Các **con số chính xác, ngày tháng năm và tỷ lệ %** thường bị biến dạng thành các từ ước lệ ("khoảng", "xấp xỉ").
+              <strong>Official Anthropic Answer:</strong><br>
+              <strong>Exact numerical figures, specific dates, and percentage metrics</strong> are frequently degraded into approximate qualitative phrases ("around", "approx").
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Khi tóm tắt lũy tiến, các con số chính xác và ngày tháng dễ bị suy giảm thành các từ ước lệ.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Đặt thông tin quan trọng nhất ở đầu hoặc cuối prompt để tránh hiệu ứng 'lost-in-the-middle'."
+    examTip: "⚡ CCAF Exam Tip: Always prune external API responses down to essential fields before adding them to messages history."
   },
   {
     id: 12,
-    title: "Chương 12: Bảo toàn Provenance (Nguồn gốc Trích dẫn)",
+    title: "Chapter 12: Provenance Preservation & Source Citation",
     domain: "D1",
     domainTitle: "Agent Architecture & Orchestration",
     estimatedMinutes: 20,
-    summary: "Giữ nguyên nguồn gốc tài liệu và trích dẫn qua các tầng tổng hợp đa agent.",
+    summary: "Preserve source citations and document provenance across multi-agent synthesis pipelines.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 12: Provenance Preservation & Source Citation</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 12: Provenance Preservation & Source Citation.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 12: Provenance Preservation & Source Citation: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 12: Provenance Preservation & Source Citation.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Sử dụng Structured Claim-Source Mapping để giữ nguồn trích dẫn khi tổng hợp báo cáo."
+      "Use Structured Claim-Source Mapping to preserve source references across agent layers."
     ],
     coreMasteries: [
-      "Structured Claim-Source Mapping: Yêu cầu Subagent xuất dữ liệu có cấu trúc ánh xạ Claim-Source."
+      "Structured Claim-Source Mapping: Requiring subagents to output structured JSON mapping claims to sources."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Dùng văn bản tự do khiến agent tổng hợp làm mất trích dẫn nguồn."
+      "⚠️ TRAP 1: Using unstructured free-form text causing downstream synthesis agents to drop citations."
     ],
     selfChecklist: [
-      "Tôi biết cách bảo toàn trích dẫn nguồn bằng dữ liệu có cấu trúc."
+      "I use structured Claim-Source mapping for citation preservation."
     ],
     sections: [
       {
         heading: "12.1 Structured Claim-Source Mapping",
         content: `
           <div class="callout callout-title" style="background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--accent-purple); padding: 1rem; margin-bottom: 1rem;">
-            💡 <strong>Ẩn dụ trực quan:</strong> Khi viết luận văn pháp lý, mỗi khẳng định đưa ra bắt buộc phải ghi kèm mã trích dẫn nguồn sách (Claim ➔ Source). Nếu chỉ viết văn bản thô, khi tổng hợp nhiều trang sẽ bị mất dấu trích dẫn gốc!
+            💡 <strong>Visual Analogy:</strong> When writing a legal brief, every claim must carry an explicit footnote reference ID (Claim ➔ Source). If written as raw unformatted text, subsequent editors will lose track of citation sources!
           </div>
-          <p>Yêu cầu Subagent xuất dữ liệu dưới dạng JSON ánh xạ rõ ràng giữa thuộc tính <code>claim</code> và <code>source_url</code>.</p>
+          <p>Require Subagents to output structured JSON mapping <code>claim</code> properties directly to <code>source_url</code> properties.</p>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Yêu cầu Subagents xuất dữ liệu JSON có cấu trúc ánh xạ giữa <code>claim</code> và <code>source_url</code> để không làm rơi trích dẫn nguồn khi tổng hợp báo cáo.</p>
         `
       },
       {
-        heading: "12.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "12.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 12</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 12</div>
             <div class="kc-question">
-              Tình huống: Làm sao để báo cáo cuối cùng của hệ thống Multi-Agent không bao giờ bị rụng mất nguồn trích dẫn?
+              Question: How can a Multi-Agent synthesis system guarantee that source citations are never lost during final report generation?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Sử dụng **Structured Claim-Source Mapping** truyền dữ liệu có cấu trúc end-to-end giữa các Subagents thay vì văn bản tự do.
+              <strong>Official Anthropic Answer:</strong><br>
+              Enforce <strong>Structured Claim-Source Mapping</strong> data structures end-to-end between subagent communication turns instead of free-form text.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Truyền dữ liệu có cấu trúc ánh xạ Claim-Source end-to-end để bảo toàn trích dẫn nguồn tuyệt đối.</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Dùng dữ liệu có cấu trúc ánh xạ Claim-Source end-to-end thay vì thêm prefix thủ công trong văn bản."
+    examTip: "⚡ CCAF Exam Tip: Enforce end-to-end Structured Claim-Source Mapping data structures to preserve source citations in multi-agent pipelines."
   },
   {
     id: 13,
-    title: "Chương 13: Các công cụ tích hợp trong Claude Code",
+    title: "Chapter 13: Claude Code Built-in Tools & Efficient Codebase Search",
     domain: "D3",
     domainTitle: "Claude Code Configuration & Workflows",
     estimatedMinutes: 20,
-    summary: "Hiểu sâu các công cụ tích hợp như Grep, Glob, View, Edit, Bash trong Claude Code CLI.",
+    summary: "Master built-in tools (Glob, Grep, View, Edit, Bash) and enforce Glob/Grep First search workflow.",
+  summaryVI: "Bản dịch Tiếng Việt: Tóm tắt nội dung bài học <em>Chapter 13: Claude Code Built-in Tools & Efficient Codebase Search</em> hướng dẫn phân tích chuyên sâu các nguyên tắc kỹ thuật cốt lõi theo tiêu chuẩn Anthropic CCAF.",
+  learningObjectivesVI: [
+    "Hiểu rõ các khái niệm kỹ thuật cốt lõi trong Chapter 13: Claude Code Built-in Tools & Efficient Codebase Search.",
+    "Áp dụng các mẫu thiết kế kiến trúc chuẩn Anthropic vào ứng dụng thực tế.",
+    "Phòng tránh các bẫy câu hỏi tình huống trong bài thi CCAF."
+  ],
+  examTipVI: "Mẹo thi CCAF cho Chapter 13: Claude Code Built-in Tools & Efficient Codebase Search: Luôn tuân thủ các nguyên tắc thiết kế tối giản, kiểm soát context window và xử lý lỗi an toàn.",
+  coreMasteriesVI: [
+    "Nắm vững bản chất kỹ thuật của Chapter 13: Claude Code Built-in Tools & Efficient Codebase Search.",
+    "Kiểm soát luồng dữ liệu và tối ưu chi phí vận hành."
+  ],
+  examTrapsVI: [
+    "⚠️ Tránh các thiết kế rủi ro không có cơ chế xử lý lỗi dự phòng.",
+    "⚠️ Không nhồi nhét quá nhiều dữ liệu thô vào context window."
+  ],
     learningObjectives: [
-      "Dùng Glob và Grep để định vị code trước khi nạp file vào context."
+      "Use Glob and Grep to locate target files before reading contents into context window."
     ],
     coreMasteries: [
-      "Glob/Grep First: Tìm kiếm cấu trúc và từ khóa trước khi tải nội dung file vào context."
+      "Glob/Grep First Workflow: Search file paths and symbols first before loading file contents."
     ],
     examTraps: [
-      "⚠️ BẪY 1: Đọc tuần tự hàng trăm file code gây quá tải context."
+      "⚠️ TRAP 1: Sequential file reading (View) across hundreds of codebase files, rapidly overflowing context window."
     ],
     selfChecklist: [
-      "Tôi biết tại sao nên dùng Glob/Grep trước khi đọc nội dung file."
+      "I use Glob/Grep first before reading file contents."
     ],
     sections: [
       {
-        heading: "13.1 Quy tắc Glob/Grep First Workflow",
+        heading: "13.1 Glob/Grep First Search Workflow",
         content: `
           <div class="diagram-flow">
             <div class="flow-step">
               <div class="flow-number">1</div>
               <div class="flow-content">
-                <div class="flow-title">1. Dùng Glob Tìm Cấu Trúc</div>
-                <div class="flow-desc">Tìm danh sách file khớp pattern (vd: <code>Glob("src/**/*.js")</code>).</div>
+                <div class="flow-title">1. Glob File Pattern Search</div>
+                <div class="flow-desc">Find matching file paths (e.g. <code>Glob("src/**/*.js")</code>).</div>
               </div>
             </div>
             <div class="flow-step">
               <div class="flow-number">2</div>
               <div class="flow-content">
-                <div class="flow-title">2. Dùng Grep Định Vị Ký Tự</div>
-                <div class="flow-desc">Tìm chính xác dòng chứa hàm (vd: <code>Grep("calculateTotal")</code>).</div>
+                <div class="flow-title">2. Grep Symbol Search</div>
+                <div class="flow-desc">Locate exact line numbers containing target function (e.g. <code>Grep("calculateTotal")</code>).</div>
               </div>
             </div>
             <div class="flow-step">
               <div class="flow-number">3</div>
               <div class="flow-content">
-                <div class="flow-title">3. Dùng View Đọc Đúng File Cần Sửa</div>
-                <div class="flow-desc">Chỉ tải đúng file đích vào Context Window giúp tiết kiệm 95% token!</div>
+                <div class="flow-title">3. View Target File Range</div>
+                <div class="flow-desc">Load only the specific target file lines into context, saving 95% token budget!</div>
               </div>
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Luôn tuân theo quy trình Glob/Grep First: Dùng Glob tìm file, Grep tìm từ khóa trước rồi mới dùng View để đọc đúng file cần sửa, tiết kiệm 95% token.</p>
         `
       },
       {
-        heading: "13.2 Thử Tài Kiến Thức Nhanh (Knowledge Check)",
+        heading: "13.2 Knowledge Check",
         content: `
           <div class="knowledge-check">
-            <div class="kc-title">🧠 THỬ TÀI KIỂM TRA KIẾN THỨC BÀI 13</div>
+            <div class="kc-title">🧠 KNOWLEDGE CHECK — CHAPTER 13</div>
             <div class="kc-question">
-              Tình huống: Khi khám phá codebase lớn 200 files, thói quen nào của Agent sẽ làm sập bộ nhớ Context nhanh nhất?
+              Question: When exploring a 200-file codebase, which agent behavior causes immediate context window overflow?
             </div>
-            <button class="kc-toggle-btn">💡 Bấm để xem giải thích & đáp án chuẩn</button>
+            <button class="kc-toggle-btn">💡 Click to reveal official Anthropic answer</button>
             <div class="kc-answer">
-              <strong>Đáp án chuẩn Anthropic:</strong><br>
-              Thói quen đọc lần lượt từng file một (Sequential View). Hãy dùng **Glob và Grep trước** để định vị chính xác vị trí cần đọc!
+              <strong>Official Anthropic Answer:</strong><br>
+              Sequential file reading (invoking View tool on file after file). Always adopt <strong>Glob and Grep First</strong> workflow to target exact files.
             </div>
           </div>
+        `,
+        contentVI: `
+          <p><strong>Bản dịch Tiếng Việt:</strong> Đọc lần lượt từng file (Sequential View) sẽ làm sập context. Hãy luôn dùng Glob và Grep trước để định vị chính xác file!</p>
         `
       }
     ],
-    examTip: "⚡ Mẹo thi CCAF: Luôn ưu tiên dùng Glob/Grep để định vị code quan trọng trước khi đọc nội dung file."
+    examTip: "⚡ CCAF Exam Tip: Always use Glob and Grep to locate relevant code before using View to read file contents."
   }
 ];

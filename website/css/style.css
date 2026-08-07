@@ -821,4 +821,52 @@ html, body {
   display: block;
 }
 
+/* 5. Hidden Vietnamese Translation Accordion Box */
+.vi-translation-box {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px dashed var(--accent-blue);
+  border-radius: 10px;
+  background: rgba(14, 165, 233, 0.06);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.vi-toggle-btn {
+  width: 100%;
+  text-align: left;
+  background: rgba(14, 165, 233, 0.12);
+  border: none;
+  padding: 0.65rem 1.1rem;
+  color: var(--accent-blue);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.vi-toggle-btn:hover {
+  background: var(--accent-blue);
+  color: #ffffff;
+}
+
+.vi-translation-body {
+  display: none;
+  padding: 1.1rem 1.25rem;
+  border-top: 1px solid rgba(14, 165, 233, 0.2);
+  background: var(--bg-card);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.vi-translation-body.open {
+  display: block;
+}
+
+
+
 

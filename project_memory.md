@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-07 10:51 (Local Time)*  
+> *Last Updated: 2026-08-07 12:49 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -62,24 +62,24 @@ d:\AI\CCAF\
 │   └── The Architect's Playbook.md
 └── website/                         # Web Application Root (Python HTTP server on 3000)
     ├── index.html                   # Homepage (5 Domain Sprints & Resource hub)
-    ├── learn.html                   # 13 Unabridged Theory Chapters reading module
+    ├── learn.html                   # 13 Unabridged Theory Chapters reading module (English-First + Hidden VI Accordions)
     ├── principles.html              # 67 Core Architectural Principles module (IDs 1-67 + Anti-pattern filter)
     ├── quiz.html                    # 10-Question Custom Checkbox Quiz module + History Log + Review
     ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system & visual pedagogy UI components
+    │   └── style.css                # Dark/Light CSS design system & visual pedagogy UI components (.vi-translation-box)
     └── js/
-        ├── app.js                   # AppStore state management, XP, Streak, Global Lang Switcher
-        ├── learn.js                 # Chapter reader logic & Flash QA reveal handler
+        ├── app.js                   # AppStore state management, XP, Streak
+        ├── learn.js                 # Chapter reader logic, VI accordion toggles, Flash QA reveal handler
         ├── principles.js            # Principles filter & Anti-pattern mode logic
         ├── quiz.js                  # 10-Question Quiz Engine & Attempt Review Modal
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
         ├── plan.js                  # 15-day roadmap progress renderer
         └── data/
-            ├── chapters.js          # 13 Complete visual theory modules (Analogies, Flow diagrams, BAD vs GOOD, Decision matrices, QA Flash)
+            ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── quiz-data.js        # 77 Official sample questions bilingual EN+VI + Explanations
             └── mock-exam-data.js    # ~1,000 Scenario questions pool bilingual EN+VI
@@ -88,7 +88,7 @@ d:\AI\CCAF\
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **100% Unabridged Theory Overhaul:** All 13 chapters in `website/js/data/chapters.js` upgraded with real-world analogies, step-by-step CSS flow diagrams (`.diagram-flow`), side-by-side BAD vs GOOD comparison cards (`.comparison-grid`), decision matrix tables (`.decision-matrix`), and interactive Knowledge Check QA cards (`.knowledge-check`).
+- **English-First Pedagogy + VI Accordions:** All 13 theory chapters in `website/js/data/chapters.js` updated to 100% official English text by default, with collapsible `[ 🇻🇳 Xem giải thích & bản dịch Tiếng Việt ]` toggle buttons under 100% of content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps).
 - **Responsive System & Zero Overflow:** Optimized header nav flex-wrap, table card stacking, `pre` line wrapping, and `min-width: 0` grid container fixes across PC, Tablet, iPhone X (375px), and iPhone 15 (393px).
 - **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng (Kho 1,000 Câu)`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync only executed when explicitly requested by user.
@@ -101,4 +101,5 @@ d:\AI\CCAF\
 2. **Always present an `Implementation Plan` first** before making file edits.
 3. **Always summarize accomplishments briefly** upon task completion.
 4. **Manual Git Push & Memory Sync Only**: Never auto-push or edit `project_memory.md` unless explicitly requested by the user.
+
 

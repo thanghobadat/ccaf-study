@@ -63,7 +63,7 @@ function loadChapter(index) {
   const isAlreadyCompleted = AppStore.getCompletedChapters().includes(ch.id);
 
   contentEl.innerHTML = `
-    <!-- Header Area -->
+    <!-- Header Area & Summary -->
     <div style="margin-bottom: 1.5rem;">
       <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
         <span class="badge badge-${ch.domain.toLowerCase()}">${ch.domain} — ${ch.domainTitle}</span>
@@ -71,37 +71,77 @@ function loadChapter(index) {
       </div>
       <h1 style="font-size: 2rem; margin-bottom: 0.75rem;">${ch.title}</h1>
       <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6;">${ch.summary}</p>
+      
+      <div class="vi-translation-box" style="margin-top: 0.75rem;">
+        <button class="vi-toggle-btn">
+          <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Tóm tắt bài học)</span>
+          <span class="vi-arrow">▼</span>
+        </button>
+        <div class="vi-translation-body">
+          ${ch.summaryVI ? ch.summaryVI : `<p><strong>Bản dịch Tiếng Việt:</strong> Tóm tắt bài học <em>${ch.title}</em> giúp hệ thống hóa toàn bộ kiến thức kỹ thuật quan trọng của chương.</p>`}
+        </div>
+      </div>
     </div>
 
     <!-- Pedagogy Box 1: Learning Objectives -->
     ${ch.learningObjectives ? `
       <div style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid var(--accent-blue); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
         <h3 style="font-size: 1.05rem; color: var(--accent-blue); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-          🎯 MỤC TIÊU BẠN CẦN NẮM ĐƯỢC SAU BÀI NÀY
+          🎯 MỤC TIÊU BẠN CẦN NẮM ĐƯỢC SAU BÀI NÀY (LEARNING OBJECTIVES)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.95rem; color: var(--text-primary); line-height: 1.6;">
           ${ch.learningObjectives.map(obj => `<li style="margin-bottom: 0.35rem;">${obj}</li>`).join('')}
         </ul>
+        <div class="vi-translation-box" style="margin-top: 0.85rem;">
+          <button class="vi-toggle-btn">
+            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Mục tiêu bài học)</span>
+            <span class="vi-arrow">▼</span>
+          </button>
+          <div class="vi-translation-body">
+            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
+              ${(ch.learningObjectivesVI || ch.learningObjectives).map(obj => `<li style="margin-bottom: 0.35rem;">${obj}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
       </div>
     ` : ''}
 
     <!-- Exam Tip -->
     ${ch.examTip ? `
       <div class="callout callout-exam">
-        <div class="callout-title">⚡ MẸO THI CCAF QUAN TRỌNG</div>
+        <div class="callout-title">⚡ MẸO THI CCAF QUAN TRỌNG (EXAM TIP)</div>
         <div>${ch.examTip}</div>
+        <div class="vi-translation-box" style="margin-top: 0.85rem;">
+          <button class="vi-toggle-btn">
+            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Mẹo thi)</span>
+            <span class="vi-arrow">▼</span>
+          </button>
+          <div class="vi-translation-body">
+            <div>${ch.examTipVI || ch.examTip}</div>
+          </div>
+        </div>
       </div>
     ` : ''}
 
     <!-- Content Sections -->
     ${ch.sections.map((sec) => `
-      <section style="margin: 2rem 0;">
+      <section style="margin: 2.25rem 0;">
         <h2 style="font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent-purple);">${sec.heading}</h2>
         <div style="font-size: 1rem; line-height: 1.7; color: var(--text-primary);">${sec.content}</div>
 
         ${sec.codeExample ? `
           <pre><code>${sec.codeExample.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
         ` : ''}
+
+        <div class="vi-translation-box">
+          <button class="vi-toggle-btn">
+            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt</span>
+            <span class="vi-arrow">▼</span>
+          </button>
+          <div class="vi-translation-body">
+            ${sec.contentVI ? sec.contentVI : `<p><strong>Bản dịch Tiếng Việt:</strong> Nội dung chi tiết phần <em>${sec.heading}</em> hướng dẫn phân tích bản chất kỹ thuật theo tiêu chuẩn Anthropic CCAF.</p>`}
+          </div>
+        </div>
       </section>
     `).join('')}
 
@@ -109,11 +149,22 @@ function loadChapter(index) {
     ${ch.coreMasteries ? `
       <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); padding: 1.25rem; border-radius: var(--radius-md); margin: 2rem 0;">
         <h3 style="font-size: 1.05rem; color: var(--accent-purple); margin-bottom: 0.75rem;">
-          🔑 KIẾN THỨC CỐT LÕI BẮT BUỘC THUỘC
+          🔑 KIẾN THỨC CỐT LÕI BẮT BUỘC THUỘC (CORE MASTERIES)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: var(--text-primary); line-height: 1.6;">
           ${ch.coreMasteries.map(m => `<li style="margin-bottom: 0.4rem;">${m}</li>`).join('')}
         </ul>
+        <div class="vi-translation-box" style="margin-top: 0.85rem;">
+          <button class="vi-toggle-btn">
+            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Kiến thức cốt lõi)</span>
+            <span class="vi-arrow">▼</span>
+          </button>
+          <div class="vi-translation-body">
+            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
+              ${(ch.coreMasteriesVI || ch.coreMasteries).map(m => `<li style="margin-bottom: 0.4rem;">${m}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
       </div>
     ` : ''}
 
@@ -121,11 +172,22 @@ function loadChapter(index) {
     ${ch.examTraps ? `
       <div style="background: rgba(244, 63, 94, 0.08); border-left: 4px solid var(--accent-rose); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
         <h3 style="font-size: 1.05rem; color: var(--accent-rose); margin-bottom: 0.5rem;">
-          ⚠️ CÁC BẪY ĐỀ THI HAY GẶP (ANTI-PATTERNS)
+          ⚠️ CÁC BẪY ĐỀ THI HAY GẶP (ANTI-PATTERNS / EXAM TRAPS)
         </h3>
         <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: var(--text-primary); line-height: 1.6;">
           ${ch.examTraps.map(trap => `<li style="margin-bottom: 0.4rem;">${trap}</li>`).join('')}
         </ul>
+        <div class="vi-translation-box" style="margin-top: 0.85rem;">
+          <button class="vi-toggle-btn">
+            <span>🇻🇳 Xem giải thích & bản dịch Tiếng Việt (Bẫy đề thi)</span>
+            <span class="vi-arrow">▼</span>
+          </button>
+          <div class="vi-translation-body">
+            <ul style="padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.6;">
+              ${(ch.examTrapsVI || ch.examTraps).map(trap => `<li style="margin-bottom: 0.4rem;">${trap}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
       </div>
     ` : ''}
 
@@ -237,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadChapter(currentChapterIndex);
 });
 
-// Interactive Knowledge Check QA Reveal Handler
+// Interactive Knowledge Check QA Reveal Handler & VI Translation Toggle Handler
 document.addEventListener('click', (e) => {
   if (e.target && e.target.classList.contains('kc-toggle-btn')) {
     const card = e.target.closest('.knowledge-check');
@@ -254,5 +316,23 @@ document.addEventListener('click', (e) => {
       e.target.textContent = '🙈 Ẩn đáp án';
     }
   }
-});
 
+  // Toggle Vietnamese Translation Box
+  const viBtn = e.target.closest ? e.target.closest('.vi-toggle-btn') : null;
+  if (viBtn) {
+    const box = viBtn.closest('.vi-translation-box');
+    if (!box) return;
+    const body = box.querySelector('.vi-translation-body');
+    const arrow = viBtn.querySelector('.vi-arrow');
+    if (!body) return;
+
+    const isOpen = body.classList.contains('open');
+    if (isOpen) {
+      body.classList.remove('open');
+      if (arrow) arrow.textContent = '▼';
+    } else {
+      body.classList.add('open');
+      if (arrow) arrow.textContent = '▲';
+    }
+  }
+});
