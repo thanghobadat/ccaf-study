@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-07 23:35 (Local Time)*  
+> *Last Updated: 2026-08-09 22:33 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -62,23 +62,26 @@ d:\AI\CCAF\
 │   └── The Architect's Playbook.md
 └── website/                         # Web Application Root (Python HTTP server on 3000)
     ├── index.html                   # Homepage (5 Domain Sprints & Resource hub)
-    ├── learn.html                   # 13 Unabridged Theory Chapters reading module (English-First + Hidden VI Accordions)
+    ├── domains.html                 # [NEW] 5 Domain Comprehensive Overview & Technical Specs module
+    ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (IDs 1-67 + Anti-pattern filter)
     ├── quiz.html                    # 10-Question Custom Checkbox Quiz module + History Log + Review
     ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system & visual pedagogy UI components (.vi-translation-box)
+    │   └── style.css                # Dark/Light CSS design system, accordion components & modal popup styles
     └── js/
-        ├── app.js                   # AppStore state management, XP, Streak
-        ├── learn.js                 # Chapter reader logic, VI accordion toggles, Flash QA reveal handler
+        ├── app.js                   # AppStore crash-proof state management, XP, Streak
+        ├── domains.js               # [NEW] Domain overview renderer & specs filter
+        ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles filter & Anti-pattern mode logic
         ├── quiz.js                  # 10-Question Quiz Engine & Attempt Review Modal
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
         ├── plan.js                  # 15-day roadmap progress renderer
         └── data/
+            ├── domains-overview.js  # [NEW] Complete technical overview data for 5 CCAF Exam Domains
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── quiz-data.js        # 77 Official sample questions bilingual EN+VI + Explanations
@@ -88,10 +91,11 @@ d:\AI\CCAF\
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **100% Technical Depth Overhaul across All 13 Theory Chapters:** Fully upgraded `website/js/data/chapters.js` with complete, unabridged technical depth for Chapters 1-13 (Request/Response API structs, `stop_reason` state machine, System Prompt XML rules, Context Window token math/Lost-in-the-middle, MCP Primitives, Resilient Enums, Message Batches API cost routing, Hooks, and Claim-Source Mapping).
-- **VI-First Pedagogy + EN Collapsible Details:** Upgraded 100% of theory chapters & learning modules (`website/js/learn.js`) to display Vietnamese translations directly by default across all content blocks (Summary, Objectives, Exam Tips, Sections, Core Masteries, Exam Traps), with original English exam text neatly accessible inside collapsible details for quick reference.
-- **Responsive System & Zero Overflow:** Optimized header nav flex-wrap, table card stacking, `pre` line wrapping, and `min-width: 0` grid container fixes across PC, Tablet, iPhone X (375px), and iPhone 15 (393px).
-- **Header Menu Standardization:** 7 items (`Trang Chủ`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng (Kho 1,000 Câu)`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
+- **New Domain Overview Page (`domains.html`):** Built a dedicated 5-domain overview module with technical specs, API schemas, good vs bad patterns, common exam traps, and production archetype mappings.
+- **Collapsible Theory Page Redesign (`learn.html`):** Upgraded 13 theory chapters to a clean single-column layout with collapsible Part 2 technical explanations underneath each section, and a Part 3 Summary Modal Popup ("💡 Tóm Tắt Tổng Kết Bài Học").
+- **100% Technical Depth Overhaul across All 13 Theory Chapters:** Fully upgraded `website/js/data/chapters.js` with complete technical depth for Chapters 1-13.
+- **Crash-Proof LocalStorage:** Wrapped all `AppStore` JSON parsing methods in `try...catch` blocks to prevent browser storage corruption crashes.
+- **Header Navigation Standardization:** 8 items (`Trang Chủ`, `🌐 Tổng Quan Domain`, `Lý Thuyết`, `67 Nguyên Tắc`, `Thi Thử 10 Câu`, `Thi Mô Phỏng`, `Flashcards`, `Lịch 15 Ngày`) hardcoded across 100% of HTML files.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

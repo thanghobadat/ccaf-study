@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng Quan Kiến Thức 5 Domain CCAF — CCAF Learning Hub</title>
+  <link rel="stylesheet" href="css/style.css?v=7.0">
+  <style>
+    .domain-overview-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .weights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .weight-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .weight-card:hover {
+      border-color: var(--accent-purple);
+      transform: translateY(-2px);
+    }
+
+    .weight-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent-purple);
+    }
+
+    .domain-overview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .domain-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .domain-weight-tag {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent-purple);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .domain-section-box {
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .domain-section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo-badge">CCAF</div>
+      <div>
+        <span class="logo-text">Pass in 15 Days</span>
+        <span class="logo-sub">Claude Certified Architect Hub</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="index.html" class="nav-item">🏠 Trang Chủ</a>
+      <a href="domains.html" class="nav-item active">🌐 Tổng Quan Domain</a>
+      <a href="learn.html" class="nav-item">📚 Lý Thuyết (13 Chương)</a>
+      <a href="principles.html" class="nav-item">💡 67 Nguyên Tắc</a>
+      <a href="quiz.html" class="nav-item">🎯 Thi Thử (10 Câu)</a>
+      <a href="mock-exam.html" class="nav-item">🏆 Thi Mô Phỏng (Kho 1,000 Câu)</a>
+      <a href="flashcards.html" class="nav-item">🎴 Flashcards</a>
+      <a href="plan.html" class="nav-item">📅 Lịch 15 Ngày</a>
+    </nav>
+
+    <div class="user-status">
+      <div class="streak-badge">🔥 <span id="user-streak-val">1</span> ngày</div>
+      <div class="xp-badge">⚡ <span id="user-xp-val">0</span> XP</div>
+      <button class="theme-toggle" id="theme-toggle-btn" title="Đổi giao diện Dark/Light">🌙</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Top Summary Banner -->
+    <section class="domain-overview-header">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">
+            🌐 Tổng Quan Kiến Thức Các Domain CCAF
+          </h1>
+          <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 800px; line-height: 1.6;">
+            Phân tích cắt lớp vừa toàn cảnh (Big Picture), vừa chi tiết kỹ thuật chuyên sâu (Deep Specs) cho cả 5 Lĩnh vực thi của Anthropic. Học đâu chắc đó, nắm trọn cấu trúc đề thi!
+          </p>
+        </div>
+      </div>
+
+      <!-- Domain Weight Grid -->
+      <div class="weights-grid">
+        <div class="weight-card" onclick="filterOverviewDomain('D1')" style="cursor: pointer;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">DOMAIN 1</div>
+          <div class="weight-num">27%</div>
+          <div style="font-size: 0.85rem; font-weight: 600;">Agentic Architecture</div>
+        </div>
+        <div class="weight-card" onclick="filterOverviewDomain('D2')" style="cursor: pointer;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">DOMAIN 2</div>
+          <div class="weight-num" style="color: var(--accent-blue);">18%</div>
+          <div style="font-size: 0.85rem; font-weight: 600;">Tool Design & MCP</div>
+        </div>
+        <div class="weight-card" onclick="filterOverviewDomain('D3')" style="cursor: pointer;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">DOMAIN 3</div>
+          <div class="weight-num" style="color: var(--accent-emerald);">20%</div>
+          <div style="font-size: 0.85rem; font-weight: 600;">Claude Code Workflows</div>
+        </div>
+        <div class="weight-card" onclick="filterOverviewDomain('D4')" style="cursor: pointer;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">DOMAIN 4</div>
+          <div class="weight-num" style="color: var(--accent-amber);">20%</div>
+          <div style="font-size: 0.85rem; font-weight: 600;">Prompt Engineering</div>
+        </div>
+        <div class="weight-card" onclick="filterOverviewDomain('D5')" style="cursor: pointer;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">DOMAIN 5</div>
+          <div class="weight-num" style="color: var(--accent-rose);">15%</div>
+          <div style="font-size: 0.85rem; font-weight: 600;">Context & Reliability</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Buttons -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+      <button class="domain-filter-btn active" data-domain="ALL" onclick="filterOverviewDomain('ALL')">Tất cả Domain (5)</button>
+      <button class="domain-filter-btn" data-domain="D1" onclick="filterOverviewDomain('D1')">Domain 1 (27%)</button>
+      <button class="domain-filter-btn" data-domain="D2" onclick="filterOverviewDomain('D2')">Domain 2 (18%)</button>
+      <button class="domain-filter-btn" data-domain="D3" onclick="filterOverviewDomain('D3')">Domain 3 (20%)</button>
+      <button class="domain-filter-btn" data-domain="D4" onclick="filterOverviewDomain('D4')">Domain 4 (20%)</button>
+      <button class="domain-filter-btn" data-domain="D5" onclick="filterOverviewDomain('D5')">Domain 5 (15%)</button>
+    </div>
+
+    <!-- Domain Cards Container -->
+    <div id="domains-overview-container">
+      <!-- Dynamically rendered -->
+    </div>
+  </main>
+
+  <script src="js/app.js?v=7.0"></script>
+  <script src="js/data/domains-overview.js?v=7.0"></script>
+  <script src="js/domains.js?v=7.0"></script>
+</body>
+</html>

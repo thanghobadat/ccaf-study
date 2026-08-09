@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lý Thuyết CCAF (13 Chương) — CCAF Learning Hub</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=7.0">
   <style>
     .learn-layout {
       display: grid;
@@ -114,6 +114,7 @@
 
     <nav class="nav-links">
       <a href="index.html" class="nav-item">🏠 Trang Chủ</a>
+      <a href="domains.html" class="nav-item">🌐 Tổng Quan Domain</a>
       <a href="learn.html" class="nav-item active">📚 Lý Thuyết (13 Chương)</a>
       <a href="principles.html" class="nav-item">💡 67 Nguyên Tắc</a>
       <a href="quiz.html" class="nav-item">🎯 Thi Thử (10 Câu)</a>
@@ -158,8 +159,26 @@
     </div>
   </main>
 
-  <script src="js/app.js"></script>
-  <script src="js/data/chapters.js"></script>
-  <script src="js/learn.js"></script>
+  <!-- Part 3 Summary Modal Popup Container -->
+  <div class="summary-modal-overlay" id="summary-modal-overlay" onclick="closeSummaryModal(event)">
+    <div class="summary-modal-card" onclick="event.stopPropagation()">
+      <div class="summary-modal-header">
+        <div class="summary-modal-title" id="summary-modal-title">
+          💡 Tóm Tắt Tổng Kết Bài Học
+        </div>
+        <button class="summary-modal-close-btn" onclick="closeSummaryModalForce()" title="Đóng modal">✖</button>
+      </div>
+      <div class="summary-modal-body" id="summary-modal-body">
+        <!-- Dynamically rendered summary content -->
+      </div>
+      <div class="summary-modal-footer">
+        <button class="btn btn-primary" onclick="closeSummaryModalForce()">Đã Hiểu Chi Tiết ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js?v=7.0"></script>
+  <script src="js/data/chapters.js?v=7.0"></script>
+  <script src="js/learn.js?v=7.0"></script>
 </body>
 </html>

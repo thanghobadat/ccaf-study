@@ -22,19 +22,35 @@ const AppStore = {
   },
 
   getCompletedChapters() {
-    return JSON.parse(localStorage.getItem(this.KEYS.COMPLETED_CHAPTERS) || '[]');
+    try {
+      return JSON.parse(localStorage.getItem(this.KEYS.COMPLETED_CHAPTERS) || '[]');
+    } catch (e) {
+      return [];
+    }
   },
 
   getCompletedPrinciples() {
-    return JSON.parse(localStorage.getItem(this.KEYS.COMPLETED_PRINCIPLES) || '[]');
+    try {
+      return JSON.parse(localStorage.getItem(this.KEYS.COMPLETED_PRINCIPLES) || '[]');
+    } catch (e) {
+      return [];
+    }
   },
 
   getPlanProgress() {
-    return JSON.parse(localStorage.getItem(this.KEYS.PLAN_PROGRESS) || '{}');
+    try {
+      return JSON.parse(localStorage.getItem(this.KEYS.PLAN_PROGRESS) || '{}');
+    } catch (e) {
+      return {};
+    }
   },
 
   getQuizResults() {
-    return JSON.parse(localStorage.getItem(this.KEYS.QUIZ_RESULTS) || '[]');
+    try {
+      return JSON.parse(localStorage.getItem(this.KEYS.QUIZ_RESULTS) || '[]');
+    } catch (e) {
+      return [];
+    }
   },
 
   getTheme() {
