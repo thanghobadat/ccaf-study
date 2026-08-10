@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 11:02 (Local Time)*  
+> *Last Updated: 2026-08-10 15:55 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -88,16 +88,19 @@ d:\AI\CCAF\
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary (Intuitive explanations, code examples, gotchas)
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── principles-practice-data.js # 3,350+ Concise natural scenario questions pool across 10 enterprise domains (50 questions/principle)
-            └── mock-exam-data.js    # 2,000+ Clean scenario questions pool bilingual 100% EN+VI
+            └── mock-exam-data.js    # 1,000 Unique CCAF-aligned questions pool v4.0 (38% T1, 27% T2, 22% T3, 13% T4, 125 templates)
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
+- **1,000 Unique CCAF Mock Exam Dataset v4.0 (`mock-exam-data.js`):** Built 1,000 unique questions using 125 specialized templates distributed in exact CCAF exam probability ratios (38% Type 1 Architectural Selection, 27% Type 2 Failure Diagnosis, 22% Type 3 API Behavior Specs, 13% Type 4 Trade-off Reasoning). Correct option positions strictly randomized to 25% A / 25% B / 25% C / 25% D. Sanitized all tool names (`scan_code`, `parse_invoice`, `process_payment`, etc.).
+- **Submission Error Fix & Responsive Score Report Modal (`mock-exam.js` & `mock-exam.html`):** Resolved DOM ID mismatch, added `try-catch` wrapper around `AppStore` saves to prevent UI crashes, and styled the report modal overlay with domain breakdowns (`D1`-`D5`).
 - **Concise Natural Question Stems (`principles-practice-data.js` & `principles-practice.js`):** Stripped all redundant `Requirement: ...` / `Yêu cầu kiến trúc: ...` text from question stems across 3,350 practice scenario questions, making them natural, concise, and direct.
 - **3,350 Unique Diverse Scenario Questions (`principles-practice-data.js`):** Built 50 distinct real-world production scenario questions per principle across 10 enterprise domains (E-Commerce, FinTech, HealthCare, CI/CD, React UI, Multi-Agent System, DevOps, C++ Engine, OCR, CSAT Support Desk).
 - **Disabled Auto-Advance & Active Question Indicator (`principles-practice.js` & `style.css`):** Removed 350ms auto-advance so users manually navigate questions via Next/Prev buttons, and styled `.practice-question-grid .active-q` with a glowing purple active ring.
 - **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Added a `💡 Giải Thích Chi Tiết` button at the top header of each principle card triggering a 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
+
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

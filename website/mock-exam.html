@@ -300,11 +300,34 @@
     </div>
 
     <!-- Comprehensive Score Report Modal -->
-    <div id="mock-score-report-modal" class="report-modal-overlay" style="display: none;">
-      <div class="report-modal-card">
-        <div id="mock-report-content">
-          <!-- Dynamically loaded score breakdown -->
+    <div id="mock-report-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 1rem;">
+      <div class="card" style="max-width: 540px; width: 100%; padding: 2.5rem; text-align: center; border: 2px solid var(--accent-purple); box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); max-height: 90vh; overflow-y: auto;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">📊 KẾT QUẢ BÀI THI MÔ PHỎNG</h2>
+        
+        <div id="mock-report-score" style="font-size: 3.5rem; font-weight: 900; color: var(--accent-purple); margin: 1rem 0; text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);">
+          0%
         </div>
+
+        <div id="mock-report-status" style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">
+          --
+        </div>
+
+        <div id="mock-report-details" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+          --
+        </div>
+
+        <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left;">
+          <h4 style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            🎯 Báo Cáo Chi Tiết Theo 5 Domain
+          </h4>
+          <div id="mock-domain-breakdown">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;" onclick="window.closeReportModal()">
+          ✓ Xem Lại Chi Tiết Các Câu Hỏi
+        </button>
       </div>
     </div>
 
@@ -324,7 +347,7 @@
   </main>
 
   <script src="js/app.js"></script>
-  <script src="js/data/mock-exam-data.js"></script>
-  <script src="js/mock-exam.js?v=9.0"></script>
+  <script src="js/data/mock-exam-data.js?v=130.0"></script>
+  <script src="js/mock-exam.js?v=130.0"></script>
 </body>
 </html>
