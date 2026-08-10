@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 09:27 (Local Time)*  
+> *Last Updated: 2026-08-10 09:55 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -61,21 +61,22 @@ d:\AI\CCAF\
 │   ├── CCA_Foundations_Study_Guide.md
 │   └── The Architect's Playbook.md
 └── website/                         # Web Application Root (Python HTTP server on 3000)
+    ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Homepage (5 Domain Sprints & Resource hub)
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
-    ├── principles.html              # 67 Core Architectural Principles module (English-First + Keyword Glossary Modal)
+    ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── principles-practice.html     # Dedicated 67 Principles Practice module (Single/Multi/All selection + presets)
     ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system, keyword highlight badges & modal popup styles
+    │   └── style.css                # Dark/Light CSS design system, keyword highlight badges & modal popup overlay styles
     └── js/
         ├── app.js                   # AppStore crash-proof state management, XP, Streak
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
-        ├── principles.js            # Principles English-First filter & interactive keyword click handler
+        ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── principles-practice.js   # 67 Principles Practice engine & random question selector
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
@@ -85,6 +86,7 @@ d:\AI\CCAF\
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary (Intuitive explanations, code examples, gotchas)
+            ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── principles-practice-data.js # 3,350+ Scenario questions pool for 67 Principles (50 questions/principle)
             └── mock-exam-data.js    # 2,000+ Clean scenario questions pool bilingual 100% EN+VI
 ```
@@ -92,11 +94,10 @@ d:\AI\CCAF\
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
+- **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Added a `💡 Giải Thích Chi Tiết` button at the top header of each principle card triggering a 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
+- **Intuitive Developer Keyword Definitions (`keyword-glossary.js`):** Rewrote 35+ technical terms into direct, practical developer explanations with 1-line real-world code examples and CCAF exam gotchas.
+- **Fixed Modal Display CSS & Multi-Res Favicon (`style.css` & `favicon.ico`):** Enforced `.report-modal-overlay.active` class-based modal display rules and generated multi-resolution `favicon.ico` injected across 100% of website HTML files to eliminate 404 console errors.
 - **English-First 67 Principles Layout (`principles.html` & `principles.js`):** Displayed English Title (`p.title`) and English Body (`p.body`) as the primary prominent card text, with Vietnamese translation collapsible inside an expandable toggle.
-- **Technical Keyword Highlighting Engine (`principles.js` & `style.css`):** Built an automatic keyword highlighter styling key tools, flags, APIs, and architectural terms with purple `.kw-badge` and amber `.kw-highlight` badge styles.
-- **Interactive Technical Keyword Glossary Popup (`keyword-glossary.js` & `principles.html`):** Built an interactive keyword dictionary for 35+ core terms. Clicking any highlighted keyword badge pops up a modal explaining what the term is in plain developer language, 1-line real-world code examples, and CCAF exam gotchas.
-- **New 67 Principles Practice Module (`principles-practice.html`):** Built dedicated practice page allowing single, multi, or all principle selection across 67 Principles (IDs 1-67), with 3,350+ scenario questions (50 questions/principle), preset count buttons (10, 20, 30, 50) and custom input.
-- **Fixed Quiz Option Card Selection & Radio Input (`style.css` & `mock-exam.js`):** Enforced `display: flex !important` and explicit 20px purple radio buttons `<input type="radio">` with direct inline CSS overrides, guaranteeing interactive box selection regardless of browser cache.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

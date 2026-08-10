@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>67 Nguyên Tắc Kiến Trúc — CCAF Learning Hub</title>
-  <link rel="stylesheet" href="css/style.css?v=10.0">
+  <link rel="stylesheet" href="css/style.css?v=25.0">
   <style>
     .filter-bar {
       display: flex;
@@ -55,6 +55,7 @@
       background: rgba(16, 185, 129, 0.03);
     }
   </style>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -171,9 +172,64 @@
     </div>
   </div>
 
+  <!-- PRINCIPLE DEEP EXPLANATION MODAL POPUP -->
+  <div class="report-modal-overlay" id="principle-deep-modal" style="display: none; z-index: 9999;" onclick="if(event.target===this) closePrincipleDeepModal();">
+    <div class="card" style="max-width: 720px; width: 100%; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <div>
+          <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); font-weight: 700; margin-bottom: 0.3rem; display: inline-block;" id="p-modal-title">
+            Principle Header
+          </span>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1.35;" id="p-modal-subtitle">
+            Principle EN Title
+          </h2>
+        </div>
+        <button class="btn btn-secondary" style="font-size: 1rem; padding: 0.3rem 0.7rem;" onclick="closePrincipleDeepModal()">✕</button>
+      </div>
+
+      <!-- 1. Problem Scenario -->
+      <div style="margin-bottom: 1.25rem; background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 700; margin-bottom: 0.3rem;">❓ 1. TÌNH HUỐNG BÀI TOÁN THỰC TẾ (PROBLEM SCENARIO):</div>
+        <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);" id="p-modal-scenario"></div>
+      </div>
+
+      <!-- 2. Anti-Pattern Analysis -->
+      <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--accent-rose); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <strong style="color: var(--accent-rose); font-size: 0.92rem; display: block; margin-bottom: 0.3rem;">
+          ❌ 2. TẠI SAO CÁCH LÀM CŨ LẠI SAI / BẪY THI CCAF (ANTI-PATTERN):
+        </strong>
+        <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line;" id="p-modal-antipattern"></div>
+      </div>
+
+      <!-- 3. Correct Pattern Breakdown -->
+      <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--accent-emerald); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <strong style="color: var(--accent-emerald); font-size: 0.92rem; display: block; margin-bottom: 0.3rem;">
+          ✅ 3. GIẢI PHÁP KIẾN TRÚC CHUẨN ANTHROPIC (CORRECT PATTERN):
+        </strong>
+        <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line;" id="p-modal-correct"></div>
+      </div>
+
+      <!-- 4. Exam Mnemonics -->
+      <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--accent-amber); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <strong style="color: var(--accent-amber); font-size: 0.92rem; display: block; margin-bottom: 0.3rem;">
+          🎯 4. MẸO LÀM BÀI THI TRẮC NGHIỆM CCAF (EXAM GOTCHA):
+        </strong>
+        <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line;" id="p-modal-mnemonic"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <a href="principles-practice.html" id="p-modal-practice-btn" class="btn btn-primary" style="font-size: 0.9rem;">
+          🎯 Ôn Bài Tập Tình Huống Nguyên Tắc Này →
+        </a>
+        <button class="btn btn-secondary" onclick="closePrincipleDeepModal()">Đóng ✕</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
   <script src="js/data/principles.js"></script>
   <script src="js/data/keyword-glossary.js"></script>
-  <script src="js/principles.js?v=11.0"></script>
+  <script src="js/data/principles-deep-explanations.js?v=15.0"></script>
+  <script src="js/principles.js?v=15.0"></script>
 </body>
 </html>

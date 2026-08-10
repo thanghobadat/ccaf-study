@@ -21,7 +21,7 @@ function highlightKeywordsEN(text) {
   codeBadges.forEach(kw => {
     const escKw = kw.replace(/[-[\]{}()*+?|<>\\]/g, '\\$&');
     const regex = new RegExp(`\\b(${escKw})\\b`, 'g');
-    highlighted = highlighted.replace(regex, `<code class="kw-badge" onclick="showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</code>`);
+    highlighted = highlighted.replace(regex, `<code class="kw-badge" onclick="window.showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</code>`);
   });
 
   // Architectural Concepts (amber marks)
@@ -36,13 +36,13 @@ function highlightKeywordsEN(text) {
   concepts.forEach(kw => {
     const escKw = kw.replace(/[-[\]{}()*+?|<>\\]/g, '\\$&');
     const regex = new RegExp(`\\b(${escKw})\\b`, 'g');
-    highlighted = highlighted.replace(regex, `<mark class="kw-highlight" onclick="showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</mark>`);
+    highlighted = highlighted.replace(regex, `<mark class="kw-highlight" onclick="window.showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</mark>`);
   });
 
   return highlighted;
 }
 
-function showKeywordDetail(kw) {
+window.showKeywordDetail = function(kw) {
   if (typeof KEYWORD_GLOSSARY_DATA === 'undefined') return;
 
   // Find matching keyword in dictionary
@@ -70,13 +70,72 @@ function showKeywordDetail(kw) {
   document.getElementById('kw-modal-gotcha').textContent = entry.examGotcha;
   document.getElementById('kw-modal-tip').textContent = entry.tip;
 
+  modalEl.classList.add('active');
   modalEl.style.display = 'flex';
-}
+};
 
-function closeKeywordModal() {
+window.closeKeywordModal = function() {
   const modalEl = document.getElementById('keyword-explain-modal');
-  if (modalEl) modalEl.style.display = 'none';
-}
+  if (modalEl) {
+    modalEl.classList.remove('active');
+    modalEl.style.display = 'none';
+  }
+};
+
+window.showPrincipleDeepExplanation = function(id) {
+  id = parseInt(id, 10);
+
+  let entry = (typeof PRINCIPLES_DEEP_DATA !== 'undefined') ? PRINCIPLES_DEEP_DATA[id] : null;
+
+  if (!entry && typeof PRINCIPLES_DATA !== 'undefined') {
+    const rawP = PRINCIPLES_DATA.find(p => p.id === id);
+    if (rawP) {
+      entry = {
+        id: rawP.id,
+        domain: rawP.domain,
+        domainTitle: rawP.domainTitle,
+        titleEN: rawP.title,
+        titleVI: rawP.titleVI,
+        problemScenario: `Giả sử ứng dụng của bạn gặp tình huống thực tế liên quan đến '${rawP.titleVI}'. Khi xây dựng hệ thống Agentic phức tạp, nếu không áp dụng đúng nguyên tắc ${rawP.domainTitle}, hệ thống sẽ gặp các lỗi vận hành đáng tiếc.`,
+        antiPatternAnalysis: `❌ SAU LẦM PHỔ BIẾN (ANTI-PATTERN):\n${rawP.antiPattern || 'Không áp dụng đúng nguyên tắc này.'}\n\n👉 Hậu quả: Làm suy giảm độ chính xác của Agent, gây lãng phí bộ nhớ Context Window hoặc bùng nổ chi phí API vô ích.`,
+        correctPatternBreakdown: `✅ GIẢI PHÁP KIẾN TRÚC CHUẨN ANTHROPIC:\n${rawP.correctPattern || 'Tuân thủ nguyên tắc thiết kế chuẩn.'}\n\n👉 Chi tiết kỹ thuật: ${rawP.bodyVI}`,
+        examMnemonic: `🎯 MẸO LÀM BÀI THI CCAF:\n- Chọn phương án: Tuân thủ pattern '${rawP.correctPattern}'\n- Tránh phương án bẫy: '${rawP.antiPattern}'`
+      };
+    }
+  }
+
+  if (!entry) {
+    AppStore.showToast(`📌 Chưa có dữ liệu phân tích cho Nguyên tắc #${id}`);
+    return;
+  }
+
+  const modalEl = document.getElementById('principle-deep-modal');
+  if (!modalEl) {
+    console.error('Modal #principle-deep-modal not found');
+    return;
+  }
+
+  document.getElementById('p-modal-title').textContent = `#${entry.id} • ${entry.domain} (${entry.domainTitle})`;
+  document.getElementById('p-modal-subtitle').textContent = `🇬🇧 ${entry.titleEN}`;
+  document.getElementById('p-modal-scenario').textContent = entry.problemScenario;
+  document.getElementById('p-modal-antipattern').textContent = entry.antiPatternAnalysis;
+  document.getElementById('p-modal-correct').textContent = entry.correctPatternBreakdown;
+  document.getElementById('p-modal-mnemonic').textContent = entry.examMnemonic;
+
+  const practiceLink = document.getElementById('p-modal-practice-btn');
+  if (practiceLink) practiceLink.href = `principles-practice.html?principle=${entry.id}`;
+
+  modalEl.classList.add('active');
+  modalEl.style.display = 'flex';
+};
+
+window.closePrincipleDeepModal = function() {
+  const modalEl = document.getElementById('principle-deep-modal');
+  if (modalEl) {
+    modalEl.classList.remove('active');
+    modalEl.style.display = 'none';
+  }
+};
 
 function renderPrinciples() {
   const container = document.getElementById('principles-container');
@@ -149,6 +208,11 @@ function renderPrinciples() {
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
             <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
               <span class="badge badge-${p.domain.toLowerCase()}">#${p.id} • ${p.domain}</span>
+              
+              <button type="button" class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.25rem 0.65rem; background: rgba(139, 92, 246, 0.18); color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.4); font-weight: 700; cursor: pointer;" onclick="window.showPrincipleDeepExplanation(${p.id})">
+                💡 Giải Thích Chi Tiết
+              </button>
+
               <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">${p.domainTitle}</span>
             </div>
 
@@ -261,5 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Close modal on ESC key
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeKeywordModal();
+  if (e.key === 'Escape') {
+    window.closeKeywordModal();
+    window.closePrincipleDeepModal();
+  }
 });
