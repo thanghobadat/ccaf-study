@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 08:44 (Local Time)*  
+> *Last Updated: 2026-08-10 09:04 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -65,7 +65,7 @@ d:\AI\CCAF\
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (IDs 1-67 + Anti-pattern filter)
-    ├── quiz.html                    # 10-Question Custom Checkbox Quiz module + History Log + Review
+    ├── principles-practice.html     # Dedicated 67 Principles Practice module (Single/Multi/All selection + presets)
     ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
@@ -76,7 +76,7 @@ d:\AI\CCAF\
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles filter & Anti-pattern mode logic
-        ├── quiz.js                  # 10-Question Quiz Engine & Attempt Review Modal
+        ├── principles-practice.js   # 67 Principles Practice engine & random question selector
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
         ├── plan.js                  # 15-day roadmap progress renderer
@@ -84,18 +84,17 @@ d:\AI\CCAF\
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
-            ├── quiz-data.js        # 77 Official sample questions bilingual EN+VI + Explanations
-            └── mock-exam-data.js    # 2,000+ Scenario questions pool bilingual 100% EN+VI
+            ├── principles-practice-data.js # 3,350+ Scenario questions pool for 67 Principles (50 questions/principle)
+            └── mock-exam-data.js    # 2,000+ Clean scenario questions pool bilingual 100% EN+VI
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **Unabridged 5-Domain Overview Overhaul (`domains-overview.js`):** Upgraded technical depth across all 5 CCAF domains with Messages API `stop_reason` state machine, `AgentDefinition` SDK, `PreToolUse` Hooks, MCP Protocols (`stdio`/`SSE`), `CLAUDE.md` hierarchy, `Glob/Grep` first workflows, XML tag boundaries, Message Batches API, Lost-in-the-Middle mechanics, and CCAF Exam Traps.
-- **2,000+ Mock Exam Questions Pool Expansion (`mock-exam-data.js`):** Doubled the scenario question bank to 2,000+ distinct bilingual questions (100% EN+VI) mapped across 5 domains and 6 production archetypes with dynamic random shuffle engine.
-- **Interactive Quiz Option Visual Feedback (`style.css`):** Added `.quiz-option.selected`, `.correct-option`, and `.wrong-option` CSS rules providing instant highlight glow feedback when users select quiz/exam options.
-- **Collapsible Theory Page Redesign (`learn.html`):** Upgraded 13 theory chapters to a clean single-column layout with collapsible Part 2 technical explanations underneath each section, and a Part 3 Summary Modal Popup.
-- **Crash-Proof LocalStorage:** Wrapped all `AppStore` JSON parsing methods in `try...catch` blocks to prevent browser storage corruption crashes.
+- **New 67 Principles Practice Module (`principles-practice.html`):** Built dedicated practice page allowing single, multi, or all principle selection across 67 Principles (IDs 1-67), with 3,350+ scenario questions (50 questions/principle), preset count buttons (10, 20, 30, 50) and custom input.
+- **Fixed Quiz Option Card Selection & Radio Input (`style.css` & `mock-exam.js`):** Enforced `display: flex !important` and explicit 20px purple radio buttons `<input type="radio">` with direct inline CSS overrides, guaranteeing interactive box selection regardless of browser cache.
+- **Clean Direct Question Stems (`mock-exam-data.js` & `principles-practice-data.js`):** Stripped all verbose `[Kịch bản ... #229]` prefix labels for a clean, official-grade Anthropic exam presentation.
+- **Removed Legacy 10-Question Quiz (`quiz.html`):** Deleted `quiz.html`, `js/quiz.js`, `js/data/quiz-data.js` and standardized an 8-item header navigation bar across 100% of HTML files.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

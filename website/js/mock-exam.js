@@ -174,10 +174,36 @@ function renderCurrentQuestion() {
             else if (isSelected === oIdx && isSelected !== q.correct) optClass += ' wrong-option';
           }
 
+          let cardBg = 'var(--bg-tertiary)';
+          let cardBorder = '1px solid var(--border-color)';
+          let cardShadow = '0 2px 4px rgba(0,0,0,0.1)';
+          let cardColor = 'var(--text-primary)';
+
+          if (isSelected === oIdx) {
+            cardBg = 'rgba(139, 92, 246, 0.18)';
+            cardBorder = '2px solid var(--accent-purple)';
+            cardShadow = '0 0 14px rgba(139, 92, 246, 0.35)';
+          }
+
+          if (isMockSubmitted) {
+            if (oIdx === q.correct) {
+              cardBg = 'rgba(16, 185, 129, 0.18)';
+              cardBorder = '2px solid var(--accent-emerald)';
+              cardColor = 'var(--accent-emerald)';
+            } else if (isSelected === oIdx && isSelected !== q.correct) {
+              cardBg = 'rgba(244, 63, 94, 0.18)';
+              cardBorder = '2px solid var(--accent-rose)';
+              cardColor = 'var(--accent-rose)';
+            }
+          }
+
+          const cardStyle = `display: flex !important; align-items: center !important; gap: 0.85rem !important; background: ${cardBg} !important; border: ${cardBorder} !important; padding: 1rem 1.25rem !important; border-radius: 12px !important; cursor: pointer !important; font-size: 0.95rem !important; color: ${cardColor} !important; margin-bottom: 0.75rem !important; box-shadow: ${cardShadow} !important; transition: all 0.2s ease !important;`;
+
           return `
-            <div class="${optClass}" onclick="selectMockOption(${q.id}, ${oIdx})">
-              ${opt}
-            </div>
+            <label style="${cardStyle}" class="${optClass}" onclick="selectMockOption(${q.id}, ${oIdx})">
+              <input type="radio" name="mock_q_${q.id}" ${isSelected === oIdx ? 'checked' : ''} style="width: 20px !important; height: 20px !important; min-width: 20px !important; accent-color: var(--accent-purple) !important; cursor: pointer !important; pointer-events: none !important; margin: 0 !important;">
+              <span style="line-height: 1.55; color: inherit;">${opt}</span>
+            </label>
           `;
         }).join('')}
       </div>

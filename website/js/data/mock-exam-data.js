@@ -548,7 +548,7 @@ function generateMockQuestionsPool() {
     }
   ];
 
-  // Populate dynamic variations up to 2,000+ items
+  // Populate dynamic variations up to 2,000+ items (Clean direct question text)
   const doms = [
     { code: "D1", title: "Agent Architecture & Orchestration", templates: d1Templates, target: 540 },
     { code: "D2", title: "Tool Design & MCP Integration", templates: d2Templates, target: 360 },
@@ -567,8 +567,8 @@ function generateMockQuestionsPool() {
         domain: dom.code,
         domainTitle: dom.title,
         archetype: baseTpl.archetype,
-        question: `[Kịch bản ${baseTpl.archetype} #${i + 1}] ${baseTpl.qVI}`,
-        questionEN: `[Scenario ${baseTpl.archetype} #${i + 1}] ${baseTpl.qEN}`,
+        question: baseTpl.qVI,
+        questionEN: baseTpl.qEN,
         options: baseTpl.optsVI,
         optionsEN: baseTpl.optsEN,
         correct: baseTpl.correct,

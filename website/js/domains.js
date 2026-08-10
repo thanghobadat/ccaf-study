@@ -102,7 +102,7 @@ function renderDomainOverviewList() {
             <a href="principles.html?domain=${d.id}" class="btn btn-secondary" style="font-size: 0.85rem;">
               💡 67 Nguyên tắc ${d.id} →
             </a>
-            <a href="quiz.html?domain=${d.id}" class="btn btn-primary" style="font-size: 0.85rem;">
+            <a href="mock-exam.html?domain=${d.id}" class="btn btn-primary" style="font-size: 0.85rem;">
               🎯 Thi thử ${d.id} →
             </a>
           </div>

@@ -57,7 +57,7 @@ function renderPrinciples() {
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           Bạn đang xem trọn bộ các Nguyên tắc cốt lõi của ${activeDomainFilter}. Sau khi học xong, hãy chuyển sang Luyện Quiz của ${activeDomainFilter}!
         </p>
-        <a href="quiz.html?domain=${activeDomainFilter}" class="btn btn-primary" style="font-size: 0.9rem;">
+        <a href="principles-practice.html?principle=${p.id}" class="btn btn-primary" style="font-size: 0.9rem;">
           🎯 Chuyển Sang Luyện Quiz Của ${activeDomainFilter} (Bước 3/3) →
         </a>
       </div>
