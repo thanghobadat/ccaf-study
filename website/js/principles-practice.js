@@ -1,4 +1,4 @@
-/* CCAF Learning Hub - 67 Core Principles Practice Module Logic */
+/* CCAF Learning Hub - 67 Core Principles Practice Module Logic (Global Scope & Auto-Advance) */
 
 let practiceQuestions = [];
 let practiceAnswers = {}; // qId -> selectedIndex
@@ -8,8 +8,9 @@ let practiceSecondsRemaining = 30 * 60;
 let isPracticeSubmitted = false;
 let currentPracticeIndex = 0;
 let currentPracticeDomainFilter = 'ALL';
+let autoAdvanceTimeout = null;
 
-function filterPrincipleChecklistByDomain(dom) {
+window.filterPrincipleChecklistByDomain = function(dom) {
   currentPracticeDomainFilter = dom;
   document.querySelectorAll('.domain-filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.domain === dom);
@@ -24,9 +25,9 @@ function filterPrincipleChecklistByDomain(dom) {
       card.style.display = 'none';
     }
   });
-}
+};
 
-function selectAllPrinciples(selectState) {
+window.selectAllPrinciples = function(selectState) {
   const cards = document.querySelectorAll('.principle-cb-card');
   cards.forEach(card => {
     if (card.style.display !== 'none') {
@@ -34,9 +35,9 @@ function selectAllPrinciples(selectState) {
       if (cb) cb.checked = selectState;
     }
   });
-}
+};
 
-function setPresetCount(count) {
+window.setPresetCount = function(count) {
   const countInput = document.getElementById('practice-count-input');
   if (countInput) countInput.value = count;
   
@@ -44,7 +45,7 @@ function setPresetCount(count) {
     btn.classList.toggle('btn-primary', parseInt(btn.dataset.count, 10) === count);
     btn.classList.toggle('btn-secondary', parseInt(btn.dataset.count, 10) !== count);
   });
-}
+};
 
 function renderPrincipleChecklist() {
   const container = document.getElementById('principles-checklist-container');
@@ -79,7 +80,7 @@ function renderPrincipleChecklist() {
   }
 }
 
-function startPrinciplesPracticeSession() {
+window.startPrinciplesPracticeSession = function() {
   const checkedCbs = Array.from(document.querySelectorAll('.principle-cb:checked')).map(cb => parseInt(cb.value, 10));
   const countInput = document.getElementById('practice-count-input');
   let qCount = parseInt(countInput ? countInput.value : '10', 10);
@@ -92,6 +93,11 @@ function startPrinciplesPracticeSession() {
   }
 
   // Filter pool questions matching checked principles
+  if (typeof PRINCIPLES_PRACTICE_POOL === 'undefined') {
+    AppStore.showToast("⚠️ Chưa tải được bộ câu hỏi luyện tập!");
+    return;
+  }
+
   let pool = PRINCIPLES_PRACTICE_POOL.filter(q => checkedCbs.includes(q.principleId));
 
   if (pool.length === 0) {
@@ -116,7 +122,7 @@ function startPrinciplesPracticeSession() {
   startPracticeTimer();
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-}
+};
 
 function startPracticeTimer() {
   if (practiceTimer) clearInterval(practiceTimer);
@@ -126,7 +132,7 @@ function startPracticeTimer() {
     practiceSecondsRemaining--;
     if (practiceSecondsRemaining <= 0) {
       clearInterval(practiceTimer);
-      submitPracticeSession();
+      window.submitPracticeSession();
       AppStore.showToast("⏰ Đã hết thời gian làm bài!");
     } else {
       const mins = Math.floor(practiceSecondsRemaining / 60);
@@ -153,7 +159,7 @@ function renderPracticeQuestionGrid() {
     if (isCurrent) btnClass += ' active-q';
 
     return `
-      <button class="${btnClass}" style="padding: 0.4rem; font-size: 0.8rem; width: 100%; min-height: 36px;" onclick="jumpToPracticeQuestion(${idx})">
+      <button type="button" class="${btnClass}" style="padding: 0.4rem; font-size: 0.8rem; width: 100%; min-height: 36px;" onclick="window.jumpToPracticeQuestion(${idx})">
         ${idx + 1} ${isFlagged ? '🚩' : ''}
       </button>
     `;
@@ -168,18 +174,24 @@ function renderPracticeQuestionGrid() {
   }
 }
 
-function jumpToPracticeQuestion(idx) {
-  if (idx < 0 || idx >= practiceQuestions.length) return;
+window.jumpToPracticeQuestion = function(idx) {
+  idx = parseInt(idx, 10);
+  if (isNaN(idx) || idx < 0 || idx >= practiceQuestions.length) return;
+
+  if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+
   currentPracticeIndex = idx;
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-}
+};
 
 function renderCurrentPracticeQuestion() {
   const container = document.getElementById('current-practice-question-container');
   if (!container) return;
 
   const q = practiceQuestions[currentPracticeIndex];
+  if (!q) return;
+
   const isEn = AppStore.getLang() === 'EN';
 
   const qText = (isEn && q.questionEN) ? q.questionEN : q.question;
@@ -198,7 +210,7 @@ function renderCurrentPracticeQuestion() {
           </span>
         </div>
 
-        <button class="btn btn-secondary" style="font-size: 0.82rem; ${isFlagged ? 'background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber); color: var(--accent-amber);' : ''}" onclick="toggleFlagCurrentPracticeQuestion()">
+        <button type="button" class="btn btn-secondary" style="font-size: 0.82rem; ${isFlagged ? 'background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber); color: var(--accent-amber);' : ''}" onclick="window.toggleFlagCurrentPracticeQuestion()">
           ${isFlagged ? '🚩 Đã Cắm Cờ' : '🏁 Cắm Cờ Xem Lại'}
         </button>
       </div>
@@ -220,7 +232,7 @@ function renderCurrentPracticeQuestion() {
           }
 
           return `
-            <label class="${optClass}" onclick="selectPracticeOption(${q.id}, ${oIdx})">
+            <label class="${optClass}" onclick="window.selectPracticeOption(${q.id}, ${oIdx})">
               <input type="radio" name="practice_q_${q.id}" ${isSelected === oIdx ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
               <span>${opt}</span>
             </label>
@@ -245,11 +257,11 @@ function renderCurrentPracticeQuestion() {
       ` : ''}
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
-        <button class="btn btn-secondary" onclick="jumpToPracticeQuestion(${currentPracticeIndex - 1})" ${currentPracticeIndex === 0 ? 'disabled style="opacity:0.5;"' : ''}>
+        <button type="button" class="btn btn-secondary" onclick="window.jumpToPracticeQuestion(${currentPracticeIndex - 1})" ${currentPracticeIndex === 0 ? 'disabled style="opacity:0.5;"' : ''}>
           ← Câu Trước
         </button>
 
-        <button class="btn btn-primary" onclick="jumpToPracticeQuestion(${currentPracticeIndex + 1})" ${currentPracticeIndex === practiceQuestions.length - 1 ? 'disabled style="opacity:0.5;"' : ''}>
+        <button type="button" class="btn btn-primary" onclick="window.jumpToPracticeQuestion(${currentPracticeIndex + 1})" ${currentPracticeIndex === practiceQuestions.length - 1 ? 'disabled style="opacity:0.5;"' : ''}>
           Câu Tiếp Theo →
         </button>
       </div>
@@ -257,15 +269,26 @@ function renderCurrentPracticeQuestion() {
   `;
 }
 
-function selectPracticeOption(qId, oIdx) {
+window.selectPracticeOption = function(qId, oIdx) {
   if (isPracticeSubmitted) return;
+  
   practiceAnswers[qId] = oIdx;
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-}
 
-function toggleFlagCurrentPracticeQuestion() {
+  // Smooth Auto-Advance to next question after 350ms if not submitted and not last question
+  if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+  if (currentPracticeIndex < practiceQuestions.length - 1) {
+    autoAdvanceTimeout = setTimeout(() => {
+      window.jumpToPracticeQuestion(currentPracticeIndex + 1);
+    }, 350);
+  }
+};
+
+window.toggleFlagCurrentPracticeQuestion = function() {
   const q = practiceQuestions[currentPracticeIndex];
+  if (!q) return;
+
   if (practiceFlags.has(q.id)) {
     practiceFlags.delete(q.id);
   } else {
@@ -273,9 +296,9 @@ function toggleFlagCurrentPracticeQuestion() {
   }
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-}
+};
 
-function submitPracticeSession() {
+window.submitPracticeSession = function() {
   if (isPracticeSubmitted) return;
   isPracticeSubmitted = true;
   if (practiceTimer) clearInterval(practiceTimer);
@@ -298,12 +321,12 @@ function submitPracticeSession() {
 
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-}
+};
 
-function closePracticeReportModal() {
+window.closePracticeReportModal = function() {
   const reportBox = document.getElementById('practice-report-modal');
   if (reportBox) reportBox.style.display = 'none';
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   renderPrincipleChecklist();
