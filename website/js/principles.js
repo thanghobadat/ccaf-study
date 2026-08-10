@@ -123,7 +123,7 @@ window.showPrincipleDeepExplanation = function(id) {
   document.getElementById('p-modal-mnemonic').textContent = entry.examMnemonic;
 
   const practiceLink = document.getElementById('p-modal-practice-btn');
-  if (practiceLink) practiceLink.href = `principles-practice.html?principle=${entry.id}`;
+  if (practiceLink) practiceLink.href = `mock-exam.html`;
 
   modalEl.classList.add('active');
   modalEl.style.display = 'flex';
@@ -191,8 +191,8 @@ function renderPrinciples() {
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           Bạn đang xem trọn bộ các Nguyên tắc cốt lõi của ${activeDomainFilter}. Sau khi học xong, hãy chuyển sang Luyện Quiz của ${activeDomainFilter}!
         </p>
-        <a href="principles-practice.html?domain=${activeDomainFilter}" class="btn btn-primary" style="font-size: 0.9rem;">
-          🎯 Chuyển Sang Luyện Quiz Của ${activeDomainFilter} (Bước 3/3) →
+        <a href="mock-exam.html" class="btn btn-primary" style="font-size: 0.9rem;">
+          🏆 Chuyển Sang Thi Mô Phỏng Của ${activeDomainFilter} (Bước 3/3) →
         </a>
       </div>
     ` : ''}
@@ -277,8 +277,8 @@ function renderPrinciples() {
 
           <!-- Action Button -->
           <div style="margin-top: 1rem; text-align: right;">
-            <a href="principles-practice.html?principle=${p.id}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
-              🎯 Ôn Tập Tình Huống Nguyên Tắc Này (#${p.id}) →
+            <a href="mock-exam.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+              🏆 Luyện Thi Mô Phỏng (#${p.id}) →
             </a>
           </div>
 

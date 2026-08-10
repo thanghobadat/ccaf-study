@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 15:55 (Local Time)*  
+> *Last Updated: 2026-08-10 17:13 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -25,7 +25,7 @@
 - **Phase 1 (Days 1 - 10): 🇻🇳 Vietnamese Foundation Sprint**  
   Nạp 100% bản chất kỹ thuật bằng Tiếng Việt qua 5 Domain Sprints (D1: Ngày 1-3, D2 & D3: Ngày 4-7, D4 & D5: Ngày 8-10).
 - **Phase 2 (Days 11 - 15): 🇬🇧 English Exam Intensive Sprint**  
-  Bật **English Mode** toàn bộ hệ thống để luyện đọc 13 bài EN, 67 Nguyên tắc EN, Flashcards EN và Thi thử/Thi mô phỏng 100% Tiếng Anh gốc từ Anthropic.
+  Bật **English Mode** toàn bộ hệ thống để luyện đọc 13 bài EN, 67 Nguyên tắc EN và Thi thật/Thi mô phỏng 100% Tiếng Anh gốc từ Anthropic.
 
 ---
 
@@ -62,44 +62,36 @@ d:\AI\CCAF\
 │   └── The Architect's Playbook.md
 └── website/                         # Web Application Root (Python HTTP server on 3000)
     ├── favicon.ico                  # High resolution multi-size website icon
-    ├── index.html                   # Homepage (5 Domain Sprints & Resource hub)
+    ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
-    ├── principles-practice.html     # Dedicated 67 Principles Practice module (Single/Multi/All selection + presets)
-    ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
-    ├── flashcards.html              # 3D Flip Flashcards module
-    ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
+    ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + Compact Grid
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system, keyword highlight badges & modal popup overlay styles
+    │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
     └── js/
         ├── app.js                   # AppStore crash-proof state management, XP, Streak
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
-        ├── principles-practice.js   # 67 Principles Practice engine with concise question stem renderer & active grid indicator
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
-        ├── flashcards.js            # 3D Flashcard flip & rating engine
-        ├── plan.js                  # 15-day roadmap progress renderer
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary (Intuitive explanations, code examples, gotchas)
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            ├── principles-practice-data.js # 3,350+ Concise natural scenario questions pool across 10 enterprise domains (50 questions/principle)
-            └── mock-exam-data.js    # 1,000 Unique CCAF-aligned questions pool v4.0 (38% T1, 27% T2, 22% T3, 13% T4, 125 templates)
+            └── mock-exam-data.js    # 500 100% Unique CCAF-aligned questions pool v5.0 (27% D1, 18% D2, 20% D3, 20% D4, 15% D5, 0% duplicates)
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **1,000 Unique CCAF Mock Exam Dataset v4.0 (`mock-exam-data.js`):** Built 1,000 unique questions using 125 specialized templates distributed in exact CCAF exam probability ratios (38% Type 1 Architectural Selection, 27% Type 2 Failure Diagnosis, 22% Type 3 API Behavior Specs, 13% Type 4 Trade-off Reasoning). Correct option positions strictly randomized to 25% A / 25% B / 25% C / 25% D. Sanitized all tool names (`scan_code`, `parse_invoice`, `process_payment`, etc.).
-- **Submission Error Fix & Responsive Score Report Modal (`mock-exam.js` & `mock-exam.html`):** Resolved DOM ID mismatch, added `try-catch` wrapper around `AppStore` saves to prevent UI crashes, and styled the report modal overlay with domain breakdowns (`D1`-`D5`).
-- **Concise Natural Question Stems (`principles-practice-data.js` & `principles-practice.js`):** Stripped all redundant `Requirement: ...` / `Yêu cầu kiến trúc: ...` text from question stems across 3,350 practice scenario questions, making them natural, concise, and direct.
-- **3,350 Unique Diverse Scenario Questions (`principles-practice-data.js`):** Built 50 distinct real-world production scenario questions per principle across 10 enterprise domains (E-Commerce, FinTech, HealthCare, CI/CD, React UI, Multi-Agent System, DevOps, C++ Engine, OCR, CSAT Support Desk).
-- **Disabled Auto-Advance & Active Question Indicator (`principles-practice.js` & `style.css`):** Removed 350ms auto-advance so users manually navigate questions via Next/Prev buttons, and styled `.practice-question-grid .active-q` with a glowing purple active ring.
-- **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Added a `💡 Giải Thích Chi Tiết` button at the top header of each principle card triggering a 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
+
+- **Page Cleanup & Navigation Consolidation:** Removed obsolete/duplicate pages (`principles-practice.html`, `flashcards.html`, `plan.html` and scripts). Consolidated platform into 4 main core modules (`domains.html`, `learn.html`, `principles.html`, `mock-exam.html`) with synchronized navigation bars and an auto-redirecting `index.html`.
+- **500 100% Unique CCAF Mock Exam Dataset v5.0 (`mock-exam-data.js`):** Overhauled dataset to eliminate template repetition (0.0% duplicate stems/options). Constructed 500 distinct real-world technical scenario questions mapped strictly to Anthropic exam domain weights (27% D1, 18% D2, 20% D3, 20% D4, 15% D5) and randomized 25.0% option position balance (A/B/C/D).
+- **Compact & Styled Mock Exam Question Grid (`mock-exam.html` & `style.css`):** Designed sleek CSS styling for `.grid-nav-btn` with state indicators (active purple glow ring, answered green, flagged yellow). Arranged grid into a compact 10-column layout for professional exam proctor experience.
+- **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Integrated 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
 
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
