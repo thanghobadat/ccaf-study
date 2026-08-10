@@ -1066,7 +1066,46 @@ html, body {
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
+/* ==========================================================================
+   8. Quiz & Mock Exam Option Cards Selection Styling
+   ========================================================================== */
+.quiz-option {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 0.9rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
 
+.quiz-option:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-purple);
+  transform: translateX(4px);
+}
 
+.quiz-option.selected {
+  background: rgba(139, 92, 246, 0.16) !important;
+  border: 2px solid var(--accent-purple) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600;
+  box-shadow: 0 0 12px var(--accent-purple-glow);
+}
 
+.quiz-option.correct-option {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 2px solid var(--accent-emerald) !important;
+  color: var(--accent-emerald) !important;
+  font-weight: 700;
+}
 
+.quiz-option.wrong-option {
+  background: rgba(244, 63, 94, 0.16) !important;
+  border: 2px solid var(--accent-rose) !important;
+  color: var(--accent-rose) !important;
+  font-weight: 700;
+}
