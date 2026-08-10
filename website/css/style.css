@@ -1127,3 +1127,44 @@ html, body {
   color: var(--accent-rose) !important;
   font-weight: 700 !important;
 }
+
+/* ==========================================================================
+   9. Keyword Highlight Styles for 67 Principles (English-First Mode)
+   ========================================================================== */
+.kw-badge {
+  background: rgba(139, 92, 246, 0.18);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85em;
+  font-weight: 700;
+  display: inline-block;
+  vertical-align: baseline;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kw-badge:hover {
+  background: rgba(139, 92, 246, 0.35);
+  border-color: var(--accent-purple);
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+}
+
+.kw-highlight {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-bottom: 2px solid #f59e0b;
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kw-highlight:hover {
+  background: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}

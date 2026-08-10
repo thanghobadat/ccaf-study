@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>67 Nguyên Tắc Kiến Trúc — CCAF Learning Hub</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=10.0">
   <style>
     .filter-bar {
       display: flex;
@@ -121,8 +121,59 @@
     </div>
   </main>
 
+  <!-- KEYWORD EXPLANATION MODAL POPUP -->
+  <div class="report-modal-overlay" id="keyword-explain-modal" style="display: none; z-index: 9999;" onclick="if(event.target===this) closeKeywordModal();">
+    <div class="card" style="max-width: 650px; width: 100%; padding: 2rem; position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem;">
+        <div>
+          <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); font-weight: 700; margin-bottom: 0.3rem; display: inline-block;" id="kw-modal-category">
+            Category
+          </span>
+          <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary);" id="kw-modal-title">
+            Keyword Name
+          </h2>
+        </div>
+        <button class="btn btn-secondary" style="font-size: 1rem; padding: 0.3rem 0.7rem;" onclick="closeKeywordModal()">✕</button>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; margin-bottom: 0.2rem;">🇬🇧 ENGLISH CONCEPT:</div>
+        <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);" id="kw-modal-desc-en"></div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.82rem; color: var(--accent-purple); font-weight: 700; margin-bottom: 0.2rem;">🇻🇳 GIẢI THÍCH BÌNH DÂN (NÓ LÀ GÌ?):</div>
+        <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);" id="kw-modal-desc-vi"></div>
+      </div>
+
+      <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 0.85rem 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <div style="font-size: 0.82rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 0.25rem;">💻 VÍ DỤ THỰC TẾ:</div>
+        <code style="font-size: 0.88rem; color: var(--text-primary); font-family: monospace; display: block;" id="kw-modal-example"></code>
+      </div>
+
+      <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--accent-rose); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <strong style="color: var(--accent-rose); font-size: 0.92rem; display: block; margin-bottom: 0.3rem;">
+          🚨 BẪY THI CCAF (EXAM GOTCHA):
+        </strong>
+        <div style="font-size: 0.9rem; line-height: 1.55; color: var(--text-primary);" id="kw-modal-gotcha"></div>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--accent-emerald); padding: 0.85rem 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <strong style="color: var(--accent-emerald); font-size: 0.9rem; display: block; margin-bottom: 0.2rem;">
+          💡 MẸO GHI NHỚ THI ĐỐ:
+        </strong>
+        <div style="font-size: 0.88rem; line-height: 1.5; color: var(--text-primary);" id="kw-modal-tip"></div>
+      </div>
+
+      <div style="text-align: right;">
+        <button class="btn btn-primary" onclick="closeKeywordModal()">Đã Đọc & Hiểu Từ Khóa ✓</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
   <script src="js/data/principles.js"></script>
-  <script src="js/principles.js"></script>
+  <script src="js/data/keyword-glossary.js"></script>
+  <script src="js/principles.js?v=11.0"></script>
 </body>
 </html>

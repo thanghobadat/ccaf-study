@@ -1,7 +1,82 @@
-/* CCAF Learning Hub - 67 Core Principles Module Logic with Interactive Anti-Pattern Filter */
+/* CCAF Learning Hub - 67 Core Principles Module Logic (English-First & Interactive Keyword Glossary) */
 
 let activeDomainFilter = 'ALL';
 let showAntiPatternsOnly = false;
+
+// Keyword Highlight Engine with Interactive Click Handler
+function highlightKeywordsEN(text) {
+  if (!text) return '';
+
+  let highlighted = text;
+
+  // Code & Tool Badges (purple badges)
+  const codeBadges = [
+    '--dangerously-skip-permissions', 'allowedTools', 'PreToolUse', 'PostToolUse',
+    'GlobTool', 'GrepTool', 'FileReadTool', 'FileEditTool', 'FileWriteTool', 'BashTool',
+    'stop_reason', 'max_tokens', 'end_turn', 'tool_choice', 'tool_result', 'tool_use',
+    'CLAUDE.md', '~/.claude/CLAUDE.md', 'Message Batches API', 'Messages API', 'JSON Schema',
+    'Glob', 'Grep', 'View', 'Task'
+  ];
+
+  codeBadges.forEach(kw => {
+    const escKw = kw.replace(/[-[\]{}()*+?|<>\\]/g, '\\$&');
+    const regex = new RegExp(`\\b(${escKw})\\b`, 'g');
+    highlighted = highlighted.replace(regex, `<code class="kw-badge" onclick="showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</code>`);
+  });
+
+  // Architectural Concepts (amber marks)
+  const concepts = [
+    'Coordinator-workers', 'Orchestrator-workers', 'Coordinator-Worker', 'Orchestrator-Workers',
+    'Prompt chaining', 'Routing', 'Context Isolation', 'Context Window', 'Context Pruning',
+    'Lost-in-the-middle', 'Lost-in-the-Middle', 'Scratchpad', 'Preserving Provenance',
+    'State Manifest', 'Human-in-the-Loop', 'Exponential Backoff', 'Permission Error',
+    'Chain-of-Thought', '<thinking>', 'few-shot', 'Few-Shot'
+  ];
+
+  concepts.forEach(kw => {
+    const escKw = kw.replace(/[-[\]{}()*+?|<>\\]/g, '\\$&');
+    const regex = new RegExp(`\\b(${escKw})\\b`, 'g');
+    highlighted = highlighted.replace(regex, `<mark class="kw-highlight" onclick="showKeywordDetail('$1')" title="Click xem giải thích từ khóa">$1</mark>`);
+  });
+
+  return highlighted;
+}
+
+function showKeywordDetail(kw) {
+  if (typeof KEYWORD_GLOSSARY_DATA === 'undefined') return;
+
+  // Find matching keyword in dictionary
+  let entry = KEYWORD_GLOSSARY_DATA[kw];
+  if (!entry) {
+    // Fallback search case-insensitive
+    const lowerKw = kw.toLowerCase();
+    const foundKey = Object.keys(KEYWORD_GLOSSARY_DATA).find(k => k.toLowerCase() === lowerKw);
+    if (foundKey) entry = KEYWORD_GLOSSARY_DATA[foundKey];
+  }
+
+  if (!entry) {
+    AppStore.showToast(`📌 Thuật ngữ '${kw}' đại diện cho một khái niệm kỹ thuật trọng tâm trong bài thi CCAF.`);
+    return;
+  }
+
+  const modalEl = document.getElementById('keyword-explain-modal');
+  if (!modalEl) return;
+
+  document.getElementById('kw-modal-title').textContent = entry.name;
+  document.getElementById('kw-modal-category').textContent = entry.category;
+  document.getElementById('kw-modal-desc-en').textContent = entry.descEN;
+  document.getElementById('kw-modal-desc-vi').textContent = entry.descVI;
+  document.getElementById('kw-modal-example').textContent = entry.example || 'N/A';
+  document.getElementById('kw-modal-gotcha').textContent = entry.examGotcha;
+  document.getElementById('kw-modal-tip').textContent = entry.tip;
+
+  modalEl.style.display = 'flex';
+}
+
+function closeKeywordModal() {
+  const modalEl = document.getElementById('keyword-explain-modal');
+  if (modalEl) modalEl.style.display = 'none';
+}
 
 function renderPrinciples() {
   const container = document.getElementById('principles-container');
@@ -57,7 +132,7 @@ function renderPrinciples() {
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
           Bạn đang xem trọn bộ các Nguyên tắc cốt lõi của ${activeDomainFilter}. Sau khi học xong, hãy chuyển sang Luyện Quiz của ${activeDomainFilter}!
         </p>
-        <a href="principles-practice.html?principle=${p.id}" class="btn btn-primary" style="font-size: 0.9rem;">
+        <a href="principles-practice.html?domain=${activeDomainFilter}" class="btn btn-primary" style="font-size: 0.9rem;">
           🎯 Chuyển Sang Luyện Quiz Của ${activeDomainFilter} (Bước 3/3) →
         </a>
       </div>
@@ -65,14 +140,16 @@ function renderPrinciples() {
 
     ${filtered.map(p => {
       const isCompleted = completedIds.includes(p.id);
+      const highlightedEN = highlightKeywordsEN(p.body);
 
       return `
         <div class="card principle-card ${isCompleted ? 'completed-card' : ''} ${showAntiPatternsOnly ? 'antipattern-highlight' : ''}" id="principle-${p.id}">
           
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <!-- Top Header Meta -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
               <span class="badge badge-${p.domain.toLowerCase()}">#${p.id} • ${p.domain}</span>
-              <span style="font-size: 0.8rem; color: var(--text-muted);">${p.domainTitle}</span>
+              <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">${p.domainTitle}</span>
             </div>
 
             <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: ${isCompleted ? 'var(--accent-emerald)' : 'var(--text-muted)'}">
@@ -95,31 +172,52 @@ function renderPrinciples() {
             </div>
           ` : ''}
 
-          <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--text-primary);">${p.titleVI}</h3>
-          <div style="font-size: 0.88rem; color: var(--accent-purple); font-style: italic; margin-bottom: 0.75rem;">🇬🇧 EN: ${p.title}</div>
+          <!-- PRIMARY ENGLISH TITLE & KEYWORD HIGHLIGHTED BODY -->
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.6rem; color: var(--text-primary); line-height: 1.4;">
+            🇬🇧 ${p.title}
+          </h3>
 
-          <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
-            ${p.bodyVI}
+          <p style="font-size: 0.98rem; line-height: 1.65; color: var(--text-primary); margin-bottom: 1.25rem; background: var(--bg-tertiary); padding: 1rem 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            ${highlightedEN}
           </p>
 
-          <details style="margin-bottom: 1rem; font-size: 0.88rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md);">
-            <summary style="cursor: pointer; font-weight: 600;">Xem văn bản Tiếng Anh gốc (đề thi)</summary>
-            <p style="margin-top: 0.5rem; line-height: 1.5; color: var(--text-secondary);">${p.body}</p>
+          <!-- COLLAPSIBLE VIETNAMESE TRANSLATION -->
+          <details style="margin-bottom: 1rem; font-size: 0.9rem; background: var(--bg-card-hover); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <summary style="cursor: pointer; font-weight: 700; color: var(--accent-purple); user-select: none;">
+              🇻🇳 Xem bản dịch Tiếng Việt (Vietnamese Translation)
+            </summary>
+            
+            <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">
+                📌 ${p.titleVI}
+              </h4>
+              <p style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 0.85rem;">
+                ${p.bodyVI}
+              </p>
+
+              ${(p.antiPattern) ? `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
+                  <div style="background: rgba(244, 63, 94, 0.08); border-left: 3px solid var(--accent-rose); padding: 0.6rem 0.8rem; border-radius: 4px;">
+                    <strong style="color: var(--accent-rose); display: block; margin-bottom: 0.2rem;">❌ Sai lầm (Anti-Pattern):</strong>
+                    ${p.antiPattern}
+                  </div>
+
+                  <div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--accent-emerald); padding: 0.6rem 0.8rem; border-radius: 4px;">
+                    <strong style="color: var(--accent-emerald); display: block; margin-bottom: 0.2rem;">✅ Giải pháp đúng (Correct Pattern):</strong>
+                    ${p.correctPattern}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
           </details>
 
-          ${(!showAntiPatternsOnly && p.antiPattern) ? `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
-              <div style="background: rgba(244, 63, 94, 0.08); border-left: 3px solid var(--accent-rose); padding: 0.6rem 0.8rem; border-radius: 4px;">
-                <strong style="color: var(--accent-rose); display: block; margin-bottom: 0.2rem;">❌ Sai lầm (Anti-Pattern):</strong>
-                ${p.antiPattern}
-              </div>
+          <!-- Action Button -->
+          <div style="margin-top: 1rem; text-align: right;">
+            <a href="principles-practice.html?principle=${p.id}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+              🎯 Ôn Tập Tình Huống Nguyên Tắc Này (#${p.id}) →
+            </a>
+          </div>
 
-              <div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--accent-emerald); padding: 0.6rem 0.8rem; border-radius: 4px;">
-                <strong style="color: var(--accent-emerald); display: block; margin-bottom: 0.2rem;">✅ Giải pháp đúng (Correct Pattern):</strong>
-                ${p.correctPattern}
-              </div>
-            </div>
-          ` : ''}
         </div>
       `;
     }).join('')}
@@ -159,4 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   renderPrinciples();
+});
+
+// Close modal on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeKeywordModal();
 });
