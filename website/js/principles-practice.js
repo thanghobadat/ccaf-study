@@ -193,8 +193,8 @@ function renderCurrentPracticeQuestion() {
   if (!q) return;
 
   const isEn = AppStore.getLang() === 'EN';
-
-  const qText = (isEn && q.questionEN) ? q.questionEN : q.question;
+  const rawQText = (isEn && q.questionEN) ? q.questionEN : q.question;
+  const qText = rawQText.replace(/^\[.*?\]\s*/, '');
   const optsText = (isEn && q.optionsEN) ? q.optionsEN : q.options;
 
   const isSelected = practiceAnswers[q.id];
@@ -275,14 +275,6 @@ window.selectPracticeOption = function(qId, oIdx) {
   practiceAnswers[qId] = oIdx;
   renderPracticeQuestionGrid();
   renderCurrentPracticeQuestion();
-
-  // Smooth Auto-Advance to next question after 350ms if not submitted and not last question
-  if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
-  if (currentPracticeIndex < practiceQuestions.length - 1) {
-    autoAdvanceTimeout = setTimeout(() => {
-      window.jumpToPracticeQuestion(currentPracticeIndex + 1);
-    }, 350);
-  }
 };
 
 window.toggleFlagCurrentPracticeQuestion = function() {

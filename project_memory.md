@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 10:23 (Local Time)*  
+> *Last Updated: 2026-08-10 10:45 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -66,7 +66,7 @@ d:\AI\CCAF\
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
-    ├── principles-practice.html     # Dedicated 67 Principles Practice module (Single/Multi/All selection + presets + auto-advance)
+    ├── principles-practice.html     # Dedicated 67 Principles Practice module (Single/Multi/All selection + presets)
     ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + History Log
     ├── flashcards.html              # 3D Flip Flashcards module
     ├── plan.html                    # Interactive 15-Day Roadmap Progress Tracker
@@ -77,7 +77,7 @@ d:\AI\CCAF\
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
-        ├── principles-practice.js   # 67 Principles Practice engine with global window scope & 350ms smooth auto-advance
+        ├── principles-practice.js   # 67 Principles Practice engine with global window scope & clean question stem renderer
         ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
         ├── flashcards.js            # 3D Flashcard flip & rating engine
         ├── plan.js                  # 15-day roadmap progress renderer
@@ -87,18 +87,17 @@ d:\AI\CCAF\
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary (Intuitive explanations, code examples, gotchas)
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            ├── principles-practice-data.js # 3,350+ Scenario questions pool for 67 Principles with randomized option choices (A, B, C, D)
+            ├── principles-practice-data.js # 3,350+ Unique scenario questions pool across 10 enterprise domains (50 questions/principle)
             └── mock-exam-data.js    # 2,000+ Clean scenario questions pool bilingual 100% EN+VI
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
-- **Fixed 67 Principles Practice Navigation & Auto-Advance (`principles-practice.js` & `principles-practice.html`):** Attached all event handlers to `window` global scope, implemented 350ms smooth auto-advance upon selecting an option, and fixed Next/Prev button handlers.
-- **Randomized Option Shuffling (`principles-practice-data.js`):** Dynamically shuffled options A, B, C, D per question scenario so correct answers vary across option choices.
+- **3,350 Unique Diverse Scenario Questions (`principles-practice-data.js`):** Built 50 distinct real-world production scenario questions per principle across 10 enterprise domains (E-Commerce, FinTech, HealthCare, CI/CD, React UI, Multi-Agent System, DevOps, C++ Engine, OCR, CSAT Support Desk).
+- **Clean Direct Question Stems (`principles-practice.js` & `principles-practice-data.js`):** Stripped all bracketed prefix labels (`[Tình huống #...]`) from question prompts for clean, official-grade Anthropic CCAF exam presentation.
+- **Disabled Auto-Advance & Active Question Indicator (`principles-practice.js` & `style.css`):** Removed 350ms auto-advance so users manually navigate questions via Next/Prev buttons, and styled `.practice-question-grid .active-q` with a glowing purple active ring.
 - **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Added a `💡 Giải Thích Chi Tiết` button at the top header of each principle card triggering a 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
-- **Intuitive Developer Keyword Definitions (`keyword-glossary.js`):** Rewrote 35+ technical terms into direct, practical developer explanations with 1-line real-world code examples and CCAF exam gotchas.
-- **Fixed Modal Display CSS & Multi-Res Favicon (`style.css` & `favicon.ico`):** Enforced `.report-modal-overlay.active` class-based modal display rules and generated multi-resolution `favicon.ico` injected across 100% of website HTML files to eliminate 404 console errors.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
