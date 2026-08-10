@@ -180,31 +180,37 @@
           <div class="domain-cb-grid">
             <label class="domain-cb-card">
               <input type="checkbox" class="mock-domain-cb" value="D1" checked>
-              <span><strong>D1 (27%)</strong> Agentic</span>
+              <span><strong>D1 (135 câu)</strong> Architecture</span>
             </label>
             <label class="domain-cb-card">
               <input type="checkbox" class="mock-domain-cb" value="D2" checked>
-              <span><strong>D2 (18%)</strong> Tool/MCP</span>
+              <span><strong>D2 (90 câu)</strong> Tool/MCP</span>
             </label>
             <label class="domain-cb-card">
-              <input type="checkbox" class="mock-domain-cb" value="D3">
-              <span><strong>D3 (20%)</strong> Workflows</span>
+              <input type="checkbox" class="mock-domain-cb" value="D3" checked>
+              <span><strong>D3 (100 câu)</strong> Workflows</span>
             </label>
             <label class="domain-cb-card">
-              <input type="checkbox" class="mock-domain-cb" value="D4">
-              <span><strong>D4 (20%)</strong> Prompting</span>
+              <input type="checkbox" class="mock-domain-cb" value="D4" checked>
+              <span><strong>D4 (100 câu)</strong> Prompting</span>
             </label>
             <label class="domain-cb-card">
-              <input type="checkbox" class="mock-domain-cb" value="D5">
-              <span><strong>D5 (15%)</strong> Context</span>
+              <input type="checkbox" class="mock-domain-cb" value="D5" checked>
+              <span><strong>D5 (75 câu)</strong> Context</span>
             </label>
           </div>
 
           <!-- Question Count Input -->
-          <div style="margin: 1.25rem 0; display: flex; align-items: center; gap: 0.75rem;">
+          <div style="margin: 1.25rem 0; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
             <label style="font-size: 0.9rem; font-weight: 600;">🔢 Số lượng câu hỏi muốn ôn:</label>
-            <input type="number" id="practice-count-input" value="10" min="5" max="100" style="width: 90px; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-highlight); background: var(--bg-tertiary); color: var(--text-primary); font-weight: 700; font-size: 1rem;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">(Nhập 5 - 100 câu)</span>
+            <input type="number" id="practice-count-input" value="25" min="5" max="500" style="width: 90px; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-highlight); background: var(--bg-tertiary); color: var(--text-primary); font-weight: 700; font-size: 1rem;">
+            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="document.getElementById('practice-count-input').value = 10">10</button>
+              <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="document.getElementById('practice-count-input').value = 25">25</button>
+              <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="document.getElementById('practice-count-input').value = 50">50</button>
+              <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="document.getElementById('practice-count-input').value = 100">100</button>
+              <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="document.getElementById('practice-count-input').value = 500">Tất cả (500)</button>
+            </div>
           </div>
 
           <button class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" onclick="startCustomPracticeExam()">
@@ -266,9 +272,15 @@
           </div>
         </div>
 
-        <button class="btn btn-success" onclick="submitMockExam()">
-          ✓ Nộp Bài Thi & Xem Kết Quả
-        </button>
+        <div style="display: flex; gap: 0.75rem; align-items: center; position: relative; z-index: 100;">
+          <button type="button" class="btn btn-secondary" style="border-color: var(--accent-rose); color: var(--accent-rose); position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.cancelMockExam()">
+            🛑 Dừng Thi / Hủy Bài
+          </button>
+
+          <button type="button" class="btn btn-success" style="position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.submitMockExam()">
+            ✓ Nộp Bài Thi & Xem Kết Quả
+          </button>
+        </div>
       </div>
 
       <!-- Main Layout: Question Card (Left) + Navigator Grid (Right) -->
@@ -317,6 +329,15 @@
             🎯 Báo Cáo Chi Tiết Theo 5 Domain
           </h4>
           <div id="mock-domain-breakdown">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left;">
+          <h4 style="font-size: 0.95rem; color: var(--accent-purple); margin-bottom: 0.85rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+            📌 Chẩn Đoán Điểm Yếu Theo Tiểu Mục (TaskStatement)
+          </h4>
+          <div id="mock-subtopic-breakdown" style="font-size: 0.85rem; max-height: 180px; overflow-y: auto;">
             <!-- Rendered dynamically -->
           </div>
         </div>

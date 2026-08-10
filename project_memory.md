@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-10 17:13 (Local Time)*  
+> *Last Updated: 2026-08-10 22:22 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -10,7 +10,7 @@
 
 ### 🌐 Web Links
 - **Reference Web:** `https://ccaflearning.vercel.app/` (Original 5-domain community reference site).
-- **Active Local Web:** `http://localhost:3000` (Current live platform running locally at `d:\AI\CCAF\website` via `python -m http.server 3000`).
+- **Active Local Web:** `http://localhost:8080` (Current live platform running locally at `d:\AI\CCAF\website` via `python -m http.server 8080`).
 - **GitHub Repository:** `https://github.com/thanghobadat/ccaf-study.git` (Remote origin repo).
 
 ### 📄 Documentation Files (Root Knowledge)
@@ -18,6 +18,10 @@
   *Contains official Anthropic exam structure (60 questions / 120 mins, 720/1000 pass score), 5 domain weightings, 6 production archetypes, and 77 official scenario sample questions with Anthropic explanations.*
 - **Doc 2:** `d:\AI\CCAF\tài liệu\The Architect's Playbook.md`  
   *Contains unabridged technical theory: System Prompt design, Context Window management, Message Roles (system, user, assistant, tool_use, tool_result), Agent loops, MCP protocols, and architectural tradeoffs.*
+- **Doc 3:** `d:\AI\CCAF\tài liệu\CCAF_Question_Generation_Guide.md`  
+  *Version 2.0 Gold Standard question generation guide: 5 domain breakdowns, 10 batches allocation, 14-field JSON schema, and 3 Gold Standard Principles.*
+- **Doc 4:** `d:\AI\CCAF\tài liệu\CCAF_254_Official_Mock_Exam_Bank.md`  
+  *254 unabridged scenario questions from Claude Certification Guide.*
 
 ---
 
@@ -32,11 +36,11 @@
 ## 🎯 3. EXAM WEIGHTINGS & 6 PRODUCTION ARCHETYPES
 
 ### 5 Exam Domains & Weights
-1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits.
-2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client, Redundancy schemas.
-3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`), `CLAUDE.md`, Glob/Grep before View, CI/CD pipelines.
-4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples, JSON Schemas, Explicit Null, CoT `<thinking>`, XML boundaries.
-5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Escalation hooks.
+1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits. (135 Questions)
+2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Redundancy schemas. (90 Questions)
+3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`), `CLAUDE.md` hierarchy, Glob/Grep before View, CI/CD pipelines. (100 Questions)
+4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples, JSON Schemas, Explicit Null, CoT `<thinking>`, XML boundaries `<context>`. (100 Questions)
+5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Escalation hooks. (75 Questions)
 
 ### 6 Production Archetypes
 1. Customer Support Resolution Agent
@@ -59,40 +63,40 @@ d:\AI\CCAF\
 ├── .gitignore                       # Git ignore configuration
 ├── tài liệu/
 │   ├── CCA_Foundations_Study_Guide.md
-│   └── The Architect's Playbook.md
-└── website/                         # Web Application Root (Python HTTP server on 3000)
+│   ├── The Architect's Playbook.md
+│   ├── CCAF_Question_Generation_Guide.md
+│   └── CCAF_254_Official_Mock_Exam_Bank.md
+└── website/                         # Web Application Root (Python HTTP server on 8080)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
-    ├── mock-exam.html               # 60Q / 120M Official Proctored Exam Simulator + 2 Modes + Compact Grid
+    ├── mock-exam.html               # 500Q Gold Standard Exam Simulator + Custom Practice + Instant Stop Exam Button
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
     └── js/
-        ├── app.js                   # AppStore crash-proof state management, XP, Streak
+        ├── app.js                   # AppStore crash-proof state management, XP, Streak, Language state
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine & Domain Score Breakdown
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, 500 Pool Custom Practice, Instant cancelMockExam
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
-            ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary (Intuitive explanations, code examples, gotchas)
+            ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            └── mock-exam-data.js    # 500 100% Unique CCAF-aligned questions pool v5.0 (27% D1, 18% D2, 20% D3, 20% D4, 15% D5, 0% duplicates)
+            └── mock-exam-data.js    # 500 Gold Standard Questions Pool v7.0 (100% bilingual VI/EN, 25% balanced A/B/C/D correct options)
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
-- **Page Cleanup & Navigation Consolidation:** Removed obsolete/duplicate pages (`principles-practice.html`, `flashcards.html`, `plan.html` and scripts). Consolidated platform into 4 main core modules (`domains.html`, `learn.html`, `principles.html`, `mock-exam.html`) with synchronized navigation bars and an auto-redirecting `index.html`.
-- **500 100% Unique CCAF Mock Exam Dataset v5.0 (`mock-exam-data.js`):** Overhauled dataset to eliminate template repetition (0.0% duplicate stems/options). Constructed 500 distinct real-world technical scenario questions mapped strictly to Anthropic exam domain weights (27% D1, 18% D2, 20% D3, 20% D4, 15% D5) and randomized 25.0% option position balance (A/B/C/D).
-- **Compact & Styled Mock Exam Question Grid (`mock-exam.html` & `style.css`):** Designed sleek CSS styling for `.grid-nav-btn` with state indicators (active purple glow ring, answered green, flagged yellow). Arranged grid into a compact 10-column layout for professional exam proctor experience.
-- **Deep 67 Principles Breakdown Modal (`principles-deep-explanations.js` & `principles.html`):** Integrated 4-part deep analysis modal (Problem Scenario ➔ Anti-Pattern Analysis ➔ Correct Pattern Breakdown ➔ CCAF Exam Gotchas).
-
+- **500 100% Unique CCAF Gold Standard Questions Pool (`mock-exam-data.js`):** Built 500 questions across 10 Batches (B01-B10). Verified 100% PASS with 14-field JSON schema, full bilingual support (VI/EN), and balanced correct answer position distribution (125 A, 125 B, 125 C, 125 D).
+- **Interactive Practice Arena & Preset Selectors (`mock-exam.html` & `mock-exam.js`):** Added domain breakdown counters (D1: 135, D2: 90, D3: 100, D4: 100, D5: 75) and preset count buttons (10, 25, 50, 100, 500).
+- **Instant Stop Exam Mechanism (`cancelMockExam`):** Added `🛑 Dừng Thi / Hủy Bài` button in header bar with smooth reset and state recovery, eliminating native `confirm()` blocking.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

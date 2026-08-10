@@ -195,10 +195,17 @@ function renderCurrentQuestion() {
   const isSelected = mockExamAnswers[q.id];
   const isFlagged = mockExamFlags.has(q.id);
 
+  const taskTag = q.taskStatement ? `<span class="badge badge-d3" style="font-family: monospace; font-size: 0.78rem;">📌 ${q.taskStatement}</span>` : '';
+  const diffTag = q.difficulty ? `<span class="badge badge-d2" style="font-size: 0.75rem; text-transform: uppercase;">⚡ ${q.difficulty}</span>` : '';
+
   qContainer.innerHTML = `
     <div class="card" style="padding: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
-        <span class="badge badge-${q.domain.toLowerCase()}">Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}</span>
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="badge badge-${q.domain.toLowerCase()}">Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}</span>
+          ${taskTag}
+          ${diffTag}
+        </div>
         
         <button type="button" class="btn btn-secondary" style="font-size: 0.82rem; ${isFlagged ? 'background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber); color: var(--accent-amber);' : ''}" onclick="window.toggleFlagCurrentQuestion()">
           ${isFlagged ? '🚩 Đã Cắm Cờ Bỏ Qua' : '🏁 Cắm Cờ Xem Lại (Flag)'}
@@ -252,11 +259,31 @@ function renderCurrentQuestion() {
       </div>
 
       ${isMockSubmitted ? `
-        <div class="callout ${isSelected === q.correct ? '' : 'callout-warning'}" style="margin-top: 1.5rem;">
-          <div class="callout-title">
+        <div class="callout ${isSelected === q.correct ? '' : 'callout-warning'}" style="margin-top: 1.5rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem;">
+          <div class="callout-title" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; color: ${isSelected === q.correct ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
             ${isSelected === q.correct ? '✅ ĐÁP ÁN CHÍNH XÁC' : '❌ CHƯA CHÍNH XÁC'}
           </div>
-          <div style="font-size: 0.95rem; line-height: 1.6;">${q.explanation}</div>
+
+          ${q.rationale ? `
+            <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(139, 92, 246, 0.1); border-left: 4px solid var(--accent-purple); border-radius: 6px; font-size: 0.9rem;">
+              <strong>💡 Rationale:</strong> ${q.rationale}
+            </div>
+          ` : ''}
+
+          <div style="font-size: 0.92rem; line-height: 1.6; white-space: pre-line; margin-bottom: 1rem;">${q.explanation}</div>
+
+          ${(q.sources && q.sources.length > 0) ? `
+            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
+              <strong style="color: var(--accent-purple);">📚 Official Reference Sources:</strong>
+              <ul style="margin: 0.4rem 0 0 1.2rem; padding: 0;">
+                ${q.sources.map(s => {
+                  let url = s.url || '#';
+                  if (url.startsWith && url.startsWith('/')) url = 'https://claudecertificationguide.com' + url;
+                  return `<li><a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;">${s.label || url}</a></li>`;
+                }).join('')}
+              </ul>
+            </div>
+          ` : ''}
         </div>
       ` : ''}
 
@@ -293,6 +320,30 @@ window.toggleFlagCurrentQuestion = function() {
   renderCurrentQuestion();
 };
 
+window.cancelMockExam = function() {
+  if (mockExamTimer) {
+    clearInterval(mockExamTimer);
+    mockExamTimer = null;
+  }
+  isMockSubmitted = false;
+  mockExamAnswers = {};
+  mockExamFlags.clear();
+  mockExamQuestions = [];
+  currentExamIndex = 0;
+
+  const arenaBox = document.getElementById('mock-arena-box');
+  const setupCard = document.getElementById('mock-setup-card');
+
+  if (arenaBox) arenaBox.style.display = 'none';
+  if (setupCard) setupCard.style.display = 'block';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+    AppStore.showToast("🛑 Đã hủy lượt làm bài và quay lại màn hình chọn đề!");
+  }
+};
+
 window.submitMockExam = function() {
   if (isMockSubmitted) return;
   isMockSubmitted = true;
@@ -302,11 +353,18 @@ window.submitMockExam = function() {
   const domainScores = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
   const domainTotals = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
 
+  const subtopicStats = {}; // ts -> { total: 0, correct: 0 }
+
   mockExamQuestions.forEach(q => {
     domainTotals[q.domain] = (domainTotals[q.domain] || 0) + 1;
+    const ts = q.taskStatement || 'General';
+    if (!subtopicStats[ts]) subtopicStats[ts] = { total: 0, correct: 0 };
+    subtopicStats[ts].total++;
+
     if (mockExamAnswers[q.id] === q.correct) {
       totalScore++;
       domainScores[q.domain] = (domainScores[q.domain] || 0) + 1;
+      subtopicStats[ts].correct++;
     }
   });
 
@@ -363,6 +421,27 @@ window.submitMockExam = function() {
           <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.4rem;">
             <span>${dom}: ${dScore}/${dTot}</span>
             <strong style="color: ${dPct >= 72 ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">${dPct}%</strong>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Subtopic Weakness Breakdown Report
+    const subtopicContainer = document.getElementById('mock-subtopic-breakdown');
+    if (subtopicContainer) {
+      const sortedSubtopics = Object.keys(subtopicStats).map(ts => {
+        const item = subtopicStats[ts];
+        const pct = Math.round((item.correct / item.total) * 100);
+        return { ts, correct: item.correct, total: item.total, pct };
+      }).sort((a, b) => a.pct - b.pct);
+
+      subtopicContainer.innerHTML = sortedSubtopics.map(item => {
+        const color = item.pct >= 75 ? 'var(--accent-emerald)' : item.pct >= 50 ? 'var(--accent-amber)' : 'var(--accent-rose)';
+        const icon = item.pct >= 75 ? '✅' : item.pct >= 50 ? '⚠️' : '❌';
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <span>${icon} <code style="color: var(--text-primary); font-size: 0.78rem;">${item.ts}</code></span>
+            <strong style="color: ${color};">${item.correct}/${item.total} (${item.pct}%)</strong>
           </div>
         `;
       }).join('');
