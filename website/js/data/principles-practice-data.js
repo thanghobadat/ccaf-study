@@ -20,8 +20,8 @@ function generatePrinciplesPracticePool() {
         const idx = scenarioCounter++;
         const qId = currentId++;
 
-        const questionTextVI = `${tmpl} Yêu cầu kiến trúc: ${p.bodyVI} Phương án nào dưới đây là quyết định chuẩn xác nhất theo chứng chỉ Anthropic CCAF?`;
-        const questionTextEN = `${tmpl} Requirement: ${p.body} Which architectural decision below is most accurate according to the Anthropic CCAF exam?`;
+        const questionTextVI = `${tmpl} Phương án kiến trúc nào dưới đây là quyết định chuẩn xác nhất để xử lý tình huống này theo chứng chỉ Anthropic CCAF?`;
+        const questionTextEN = `${tmpl} Which architectural decision below is most accurate to resolve this scenario according to the Anthropic CCAF exam?`;
 
         const correctOptVI = `A. ${p.correctPattern}`;
         const wrongOpt1VI = `B. ${p.antiPattern}`;
