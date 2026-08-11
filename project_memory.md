@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-11 14:33 (Local Time)*  
+> *Last Updated: 2026-08-11 15:28 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -90,7 +90,7 @@ d:\AI\CCAF\
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            ├── mock-exam-data.js    # 500 Gold Standard Questions Pool v7.0 (100% bilingual VI/EN, 25% balanced A/B/C/D correct options)
+            ├── mock-exam-data.js    # 500 Gold Standard Questions Pool v12.0 (100% unique scenarios, 35 subtopics, 3 formats, 67 principles, 25% balanced A/B/C/D)
             └── raw-docs-data.js     # Bundled dataset of 5 markdown study guides + mock-exam-data.js text
 ```
 
@@ -98,8 +98,8 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
-- **Raw Documents & Copy Text Hub (`raw-docs.html` & `raw-docs.js`):** Built dedicated raw text repository hosting 100% full text of 5 markdown study guides and `mock-exam-data.js` dataset (~2.5 MB text total). Features 1-click single file copy, master Copy All Files button, text search filter, and instant toast notifications.
-- **500 100% Unique CCAF Gold Standard Questions Pool (`mock-exam-data.js`):** Built 500 questions across 10 Batches (B01-B10). Verified 100% PASS with 14-field JSON schema, full bilingual support (VI/EN), and balanced correct answer position distribution (125 A, 125 B, 125 C, 125 D).
+- **500 100% Unique Gold Standard Questions Pool v12.0 (`mock-exam-data.js`):** Built 500 questions across 10 Batches (B01-B10) covering 35 official Subtopics, 67 Core Architectural Principles (IDs 1-67), 3 Question Difficulty Formats (93 RECALL, 270 APPLICATION, 137 SCENARIO-ANALYSIS matching official 254 exam bank distribution), and balanced correct answer position distribution (125 A, 125 B, 125 C, 125 D). Verified 100% PASS across 5 automated audits.
+- **Raw Documents & Copy Text Hub (`raw-docs.html` & `raw-docs.js`):** Built dedicated raw text repository hosting 100% full text of 5 markdown study guides and updated `mock-exam-data.js` dataset (~2.5 MB text total). Features 1-click single file copy, master Copy All Files button, text search filter, and instant toast notifications.
 - **Interactive Practice Arena & Preset Selectors (`mock-exam.html` & `mock-exam.js`):** Added domain breakdown counters (D1: 135, D2: 90, D3: 100, D4: 100, D5: 75) and preset count buttons (10, 25, 50, 100, 500).
 - **Instant Stop Exam Mechanism (`cancelMockExam`):** Added `🛑 Dừng Thi / Hủy Bài` button in header bar with smooth reset and state recovery, eliminating native `confirm()` blocking.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
