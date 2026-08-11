@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Tài Liệu Raw & Copy Text — CCAF Learning Hub</title>
+  <link rel="stylesheet" href="css/style.css?v=7.0">
+  <style>
+    .raw-docs-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .doc-control-panel {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .jump-nav-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .jump-nav-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .jump-nav-btn:hover {
+      border-color: var(--accent-purple);
+      background: var(--bg-card-hover);
+      color: var(--accent-purple);
+    }
+
+    .doc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card-highlight {
+      border-color: var(--accent-purple) !important;
+      box-shadow: 0 0 20px var(--accent-purple-glow) !important;
+    }
+
+    .doc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .doc-card-title-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .doc-badge {
+      background: var(--accent-purple);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-md);
+    }
+
+    .doc-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .doc-path-tag {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--accent-blue);
+      background: rgba(14, 165, 233, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .doc-meta-badge {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .doc-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-copy {
+      background: linear-gradient(135deg, var(--accent-purple), #6366f1) !important;
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .btn-copy:hover {
+      box-shadow: 0 4px 12px var(--accent-purple-glow);
+    }
+
+    .doc-textarea {
+      width: 100%;
+      height: 380px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-family: 'Consolas', 'Fira Code', 'Monaco', monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      resize: vertical;
+      box-sizing: border-box;
+      outline: none;
+      user-select: all;
+    }
+
+    .doc-textarea:focus {
+      border-color: var(--accent-purple);
+    }
+
+    /* Toast Notification System */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      pointer-events: none;
+    }
+
+    .toast-item {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-purple);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1.4rem;
+      font-size: 0.95rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+      max-width: 450px;
+    }
+
+    .toast-item.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-error {
+      border-color: var(--accent-rose);
+    }
+
+    .search-input-box {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input-box:focus {
+      border-color: var(--accent-purple);
+    }
+
+    .copy-all-master-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .copy-all-master-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    }
+  </style>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo-badge">CCAF</div>
+      <div>
+        <span class="logo-text">Pass in 15 Days</span>
+        <span class="logo-sub">Claude Certified Architect Hub</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="domains.html" class="nav-item">🌐 Tổng Quan Domain</a>
+      <a href="learn.html" class="nav-item">📚 Lý Thuyết (13 Chương)</a>
+      <a href="principles.html" class="nav-item">💡 67 Nguyên Tắc</a>
+      <a href="mock-exam.html" class="nav-item">🏆 Thi Mô Phỏng (500 Câu)</a>
+      <a href="raw-docs.html" class="nav-item active">📄 Copy Raw Docs</a>
+    </nav>
+
+    <div class="user-status">
+      <div class="streak-badge">🔥 <span id="user-streak-val">1</span> ngày</div>
+      <div class="xp-badge">⚡ <span id="user-xp-val">0</span> XP</div>
+      <button class="theme-toggle" id="theme-toggle-btn" title="Đổi giao diện Dark/Light">🌙</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Top Summary Banner -->
+    <section class="raw-docs-header">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">
+            📄 Kho Tài Liệu Raw & Copy Text CCAF
+          </h1>
+          <p style="color: var(--text-secondary); max-width: 800px; line-height: 1.6; margin: 0;">
+            Trang tập hợp toàn bộ văn bản (Raw Text) của 5 file Markdown trong thư mục <code>tài liệu/</code> và dữ liệu thi 500 câu hỏi <code>mock-exam-data.js</code>.
+            Bạn có thể dễ dàng sao chép từng file hoặc copy toàn bộ 100% nội dung chỉ với 1 click!
+          </p>
+        </div>
+        <div>
+          <button class="copy-all-master-btn" id="copy-all-btn">
+            📋 Copy Tất Cả 6 Tài Liệu (All-in-One)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Control Panel -->
+      <div class="doc-control-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-secondary);">⚡ ĐIỀU HƯỚNG NHANH ĐẾN FILE:</span>
+          <span style="font-size: 0.85rem; color: var(--accent-purple);">Tổng cộng: 6 Tài Liệu (~2.5 MB Text)</span>
+        </div>
+        <div class="jump-nav-container" id="doc-jump-nav">
+          <!-- Rendered dynamically -->
+        </div>
+        <div>
+          <input type="text" id="doc-search-input" class="search-input-box" placeholder="🔍 Tìm kiếm từ khóa hoặc tên file tài liệu...">
+        </div>
+      </div>
+    </section>
+
+    <!-- Documents List Container -->
+    <section id="docs-container">
+      <!-- Doc Cards Rendered dynamically from js/data/raw-docs-data.js -->
+    </section>
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/data/raw-docs-data.js"></script>
+  <script src="js/raw-docs.js"></script>
+</body>
+</html>

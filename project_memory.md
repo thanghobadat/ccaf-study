@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-11 09:15 (Local Time)*  
+> *Last Updated: 2026-08-11 14:33 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -65,7 +65,8 @@ d:\AI\CCAF\
 │   ├── CCA_Foundations_Study_Guide.md
 │   ├── The Architect's Playbook.md
 │   ├── CCAF_Question_Generation_Guide.md
-│   └── CCAF_254_Official_Mock_Exam_Bank.md
+│   ├── CCAF_254_Official_Mock_Exam_Bank.md
+│   └── CCAF_Addition_Guide_for_Weak_Models.md
 └── website/                         # Web Application Root (Python HTTP server on 8080)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
@@ -73,6 +74,7 @@ d:\AI\CCAF\
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── mock-exam.html               # 500Q Gold Standard Exam Simulator + Custom Practice + Instant Stop Exam Button
+    ├── raw-docs.html                # Raw Documents & Copy Text Hub (~2.5MB bundled raw text viewer & 1-click copy)
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
     └── js/
@@ -81,19 +83,22 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, 500 Pool Custom Practice, Instant cancelMockExam
+        ├── raw-docs.js              # Copy text, search filter, smooth jump scroll, and toast notification controller
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            └── mock-exam-data.js    # 500 Gold Standard Questions Pool v7.0 (100% bilingual VI/EN, 25% balanced A/B/C/D correct options)
+            ├── mock-exam-data.js    # 500 Gold Standard Questions Pool v7.0 (100% bilingual VI/EN, 25% balanced A/B/C/D correct options)
+            └── raw-docs-data.js     # Bundled dataset of 5 markdown study guides + mock-exam-data.js text
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Raw Documents & Copy Text Hub (`raw-docs.html` & `raw-docs.js`):** Built dedicated raw text repository hosting 100% full text of 5 markdown study guides and `mock-exam-data.js` dataset (~2.5 MB text total). Features 1-click single file copy, master Copy All Files button, text search filter, and instant toast notifications.
 - **500 100% Unique CCAF Gold Standard Questions Pool (`mock-exam-data.js`):** Built 500 questions across 10 Batches (B01-B10). Verified 100% PASS with 14-field JSON schema, full bilingual support (VI/EN), and balanced correct answer position distribution (125 A, 125 B, 125 C, 125 D).
 - **Interactive Practice Arena & Preset Selectors (`mock-exam.html` & `mock-exam.js`):** Added domain breakdown counters (D1: 135, D2: 90, D3: 100, D4: 100, D5: 75) and preset count buttons (10, 25, 50, 100, 500).
 - **Instant Stop Exam Mechanism (`cancelMockExam`):** Added `🛑 Dừng Thi / Hủy Bài` button in header bar with smooth reset and state recovery, eliminating native `confirm()` blocking.
