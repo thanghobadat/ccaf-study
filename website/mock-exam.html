@@ -272,11 +272,11 @@
         </div>
 
         <div style="display: flex; gap: 0.75rem; align-items: center; position: relative; z-index: 100;">
-          <button type="button" class="btn btn-secondary" style="border-color: var(--accent-rose); color: var(--accent-rose); position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.cancelMockExam()">
+          <button type="button" id="btn-cancel-mock" class="btn btn-secondary" style="border-color: var(--accent-rose); color: var(--accent-rose); position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.cancelMockExam()">
             🛑 Dừng Thi / Hủy Bài
           </button>
 
-          <button type="button" class="btn btn-success" style="position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.submitMockExam()">
+          <button type="button" id="btn-submit-mock" class="btn btn-success" style="position: relative; z-index: 100; cursor: pointer !important; pointer-events: auto !important;" onclick="window.submitMockExam()">
             ✓ Nộp Bài Thi & Xem Kết Quả
           </button>
         </div>
@@ -294,7 +294,7 @@
         <div class="mock-grid-sidebar">
           <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-primary);">BẢNG CÂU HỎI</h3>
           <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">
-            🟢 Đã làm | 🟡 Cắm cờ (Flag) | ⚪ Chưa làm
+            🔵 Đang xem | 🟢 Đã làm | 🟡 Cắm cờ | ⚪ Chưa làm
           </p>
 
           <div class="question-grid-layout" id="question-nav-grid">

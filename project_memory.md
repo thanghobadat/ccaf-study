@@ -97,6 +97,9 @@ d:\AI\CCAF\
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
 - **Expanded 644 Unique Questions Dataset v18.0 (`mock-exam-data.js`):** Formatted all 289 output files in `tài liệu/generate/output` and merged 570 unique Gold Standard questions into `mock-exam-data.js`, expanding the pool from 74 to 644 scenario questions (D1: 116, D2: 121, D3: 153, D4: 169, D5: 85). Verified 100% valid JS/JSON syntax, 0 duplicate IDs, 0 duplicate scenarios, and balanced answer spread (178 A / 175 B / 148 C / 143 D).
+- **Fixed 0-Score Exam Grading Bug (`mock-exam.js`):** Fixed `selectOption` inline onclick parameter escaping by quoting `'${q.id}'`, ensuring user choices save properly to `mockExamAnswers` and scoring operates with 100% precision.
+- **Enhanced Grid Navigator CSS (`style.css` & `mock-exam.html`):** Added clear visual indicators for Active (Cyan ring), Answered (Emerald glow), Active+Answered (Cyan ring + Emerald fill), and Flagged (Amber) questions, with updated legend.
+- **Review Mode Header Controls (`mock-exam.js` & `mock-exam.html`):** Dynamically transformed top sticky bar buttons upon exam submission from "🛑 Dừng Thi / Hủy Bài" to "🏠 Về Trang Chọn Đề" and "✓ Nộp Bài" to "📊 Xem Báo Cáo Score".
 - **Navigation & Page Cleanup:** Completely deleted deprecated Copy Raw Docs page (`raw-docs.html`, `js/raw-docs.js`, `js/data/raw-docs-data.js`) and cleaned up all navigation links across `domains.html`, `learn.html`, `principles.html`, and `mock-exam.html`.
 - **Interactive Practice Arena & Simulator (`mock-exam.html` & `mock-exam.js`):** Supports practice filtering and exam simulation across 644 scenario questions.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.

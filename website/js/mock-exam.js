@@ -63,6 +63,7 @@ window.startCustomPracticeExam = function() {
   mockExamAnswers = {};
   mockExamFlags.clear();
   currentExamIndex = 0;
+  updateHeaderBarState();
 
   mockSecondsRemaining = Math.max(5 * 60, Math.round(mockExamQuestions.length * 1.5 * 60));
 
@@ -86,6 +87,7 @@ window.startOfficialMockExam = function() {
   mockSecondsRemaining = 120 * 60;
   currentExamIndex = 0;
   currentMockExamLabel = 'OFFICIAL_MOCK_60Q';
+  updateHeaderBarState();
 
   // Draw 60 UNIQUE questions matching official domain weight distribution (D1: 16Q, D2: 11Q, D3: 12Q, D4: 12Q, D5: 9Q)
   const drawUniqueDomain = (domCode, count) => {
@@ -154,7 +156,7 @@ function renderQuestionGrid() {
     let btnClass = 'grid-nav-btn';
     if (isActive) btnClass += ' active-nav';
     if (isFlagged) btnClass += ' flagged-nav';
-    else if (isAnswered) btnClass += ' answered-nav';
+    if (isAnswered) btnClass += ' answered-nav';
 
     return `
       <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})">
@@ -250,7 +252,7 @@ function renderCurrentQuestion() {
           const cardStyle = `display: flex !important; align-items: center !important; gap: 0.85rem !important; background: ${cardBg} !important; border: ${cardBorder} !important; padding: 1rem 1.25rem !important; border-radius: 12px !important; cursor: pointer !important; font-size: 0.95rem !important; color: ${cardColor} !important; margin-bottom: 0.75rem !important; box-shadow: ${cardShadow} !important; transition: all 0.2s ease !important;`;
 
           return `
-            <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption(${q.id}, ${oIdx})">
+            <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption('${q.id}', ${oIdx})">
               <input type="radio" name="mock_q_${q.id}" ${isSelected === oIdx ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
               <span>${opt}</span>
             </label>
@@ -320,16 +322,51 @@ window.toggleFlagCurrentQuestion = function() {
   renderCurrentQuestion();
 };
 
+function updateHeaderBarState() {
+  const cancelBtn = document.getElementById('btn-cancel-mock');
+  const submitBtn = document.getElementById('btn-submit-mock');
+  if (!cancelBtn || !submitBtn) return;
+
+  if (isMockSubmitted) {
+    cancelBtn.innerHTML = '🏠 Về Trang Chọn Đề';
+    cancelBtn.style.borderColor = 'var(--accent-purple)';
+    cancelBtn.style.color = 'var(--accent-purple)';
+
+    submitBtn.innerHTML = '📊 Xem Báo Cáo Score';
+    submitBtn.className = 'btn btn-primary';
+    submitBtn.onclick = function() { window.openReportModal(); };
+  } else {
+    cancelBtn.innerHTML = '🛑 Dừng Thi / Hủy Bài';
+    cancelBtn.style.borderColor = 'var(--accent-rose)';
+    cancelBtn.style.color = 'var(--accent-rose)';
+
+    submitBtn.innerHTML = '✓ Nộp Bài Thi & Xem Kết Quả';
+    submitBtn.className = 'btn btn-success';
+    submitBtn.onclick = function() { window.submitMockExam(); };
+  }
+}
+
+window.openReportModal = function() {
+  const reportModal = document.getElementById('mock-report-modal');
+  if (reportModal) {
+    reportModal.style.display = 'flex';
+    reportModal.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
 window.cancelMockExam = function() {
   if (mockExamTimer) {
     clearInterval(mockExamTimer);
     mockExamTimer = null;
   }
+  const wasSubmitted = isMockSubmitted;
   isMockSubmitted = false;
   mockExamAnswers = {};
   mockExamFlags.clear();
   mockExamQuestions = [];
   currentExamIndex = 0;
+  updateHeaderBarState();
 
   const arenaBox = document.getElementById('mock-arena-box');
   const setupCard = document.getElementById('mock-setup-card');
@@ -340,7 +377,11 @@ window.cancelMockExam = function() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (typeof AppStore !== 'undefined' && AppStore.showToast) {
-    AppStore.showToast("🛑 Đã hủy lượt làm bài và quay lại màn hình chọn đề!");
+    if (wasSubmitted) {
+      AppStore.showToast("🏠 Đã quay lại màn hình chọn đề!");
+    } else {
+      AppStore.showToast("🛑 Đã hủy lượt làm bài và quay lại màn hình chọn đề!");
+    }
   }
 };
 
@@ -348,6 +389,7 @@ window.submitMockExam = function() {
   if (isMockSubmitted) return;
   isMockSubmitted = true;
   if (mockExamTimer) clearInterval(mockExamTimer);
+  updateHeaderBarState();
 
   let totalScore = 0;
   const domainScores = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
