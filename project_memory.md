@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-12 12:25 (Local Time)*  
+> *Last Updated: 2026-08-12 21:05 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -74,22 +74,22 @@ d:\AI\CCAF\
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
-    ├── terms.html                   # NEW: CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
-    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Stop Exam Button
+    ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
+    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Term-Based Practice Sub-mode
     ├── css/
-    │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
+    │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
         ├── app.js                   # AppStore crash-proof state management, XP, Streak, Language state
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
-        ├── terms.js                 # NEW: Render & Real-time Filter/Search Engine for 40 CCAF Terms
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant cancelMockExam
+        ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Term-based Practice & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
-            ├── terms-data.js        # NEW: 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
+            ├── terms-data.js        # 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             └── mock-exam-data.js    # Expanded 644 Unique Core Scenario Questions Dataset v18.0 (100% valid JSON)
@@ -99,11 +99,12 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Term-Based Practice Sub-Mode & 100% Question Count Mapping (`mock-exam.html`, `mock-exam.js`):** Built dedicated "📖 Ôn Theo Từ Điển Thuật Ngữ" sub-mode in Custom Practice Mode. Mapped 100% of question counts between `terms.html` and `mock-exam.html` using strict phrase relevance scoring and target frequency clamping (`getMatchingQuestionsForTermId`), ensuring terms like Prerequisite Gate match exactly 6 questions.
+- **Round-Robin Question Repetition Algorithm (`mock-exam.js`):** Implemented cycle-based question repetition for term practice when requested count $Q > N$. Guaranteed full-round sweeps across $N$ base questions before repeating, with unique instance IDs (`uniqueId: `${item.id}_inst_${idx}``) preventing answer, flag, and score collisions.
+- **Mobile Responsiveness Optimization for iPhone 15 Pro (`mock-exam.html`, `style.css`):** Fixed right-edge overflow on 393px mobile screens by adjusting mode card grid minmax from `420px` to `280px`. Added mobile media queries (`@media (max-width: 768px)`) for sticky timer bar, 60Q question grid, card padding, and horizontal touch scrolling on header navigation.
 - **CCAF Architecture Terms Hub (`terms.html`, `terms.js`, `terms-data.js`):** Built dedicated terms dictionary hub systemizing 40 canonical technical terms, patterns, safety gates, and CLI flags extracted across the 644 mock question dataset (v18.0) and 254 Anthropic question bank. Verified 100% term coverage between 254 bank and 644 dataset.
 - **Header Navigation Bar Synchronization:** Placed `📖 Từ Điển Thuật Ngữ` (`terms.html`) prominently in the navigation menu between `💡 67 Nguyên Tắc` (`principles.html`) and `🏆 Ôn Tập & Thi Mô Phỏng` (`mock-exam.html`) across all 5 HTML pages.
-- **Expanded 644 Unique Questions Dataset v18.0 (`mock-exam-data.js`):** Formatted all 289 output files in `tài liệu/generate/output` and merged 570 unique Gold Standard questions into `mock-exam-data.js`, expanding the pool from 74 to 644 scenario questions (D1: 116, D2: 121, D3: 153, D4: 169, D5: 85). Verified 100% valid JS/JSON syntax, 0 duplicate IDs, 0 duplicate scenarios, and balanced answer spread (178 A / 175 B / 148 C / 143 D).
-- **Fixed 0-Score Exam Grading Bug (`mock-exam.js`):** Fixed `selectOption` inline onclick parameter escaping by quoting `'${q.id}'`, ensuring user choices save properly to `mockExamAnswers` and scoring operates with 100% precision.
-- **Enhanced Grid Navigator CSS (`style.css` & `mock-exam.html`):** Added clear visual indicators for Active (Cyan ring), Answered (Emerald glow), Active+Answered (Cyan ring + Emerald fill), and Flagged (Amber) questions, with updated legend.
+- **Expanded 644 Unique Questions Dataset v18.0 (`mock-exam-data.js`):** Formatted all 289 output files in `tài liệu/generate/output` and merged 570 unique Gold Standard questions into `mock-exam-data.js`, expanding the pool from 74 to 644 scenario questions (D1: 116, D2: 121, D3: 153, D4: 169, D5: 85).
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
@@ -114,3 +115,4 @@ d:\AI\CCAF\
 2. **Planning First:** Always present an Implementation Plan first before executing file edits.
 3. **Summary Rule:** Always summarize accomplishments briefly upon completion.
 4. **Manual Git Push & Memory Sync Only:** NEVER automatically `git push` or edit `project_memory.md` after editing files. ONLY run `git push` and update `project_memory.md` when the user explicitly requests it.
+

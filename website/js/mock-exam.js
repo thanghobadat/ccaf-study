@@ -1,13 +1,25 @@
-/* CCAF Learning Hub - Proctored Official Mock Exam Engine (Global Scope & Zero-Duplicate Filter) */
+let currentPracticeSubMode = 'DOMAIN'; // 'DOMAIN' or 'TERM'
 
-let mockExamQuestions = [];
-let mockExamAnswers = {}; // qId -> selectedIndex
-let mockExamFlags = new Set(); // qId set
-let mockExamTimer = null;
-let mockSecondsRemaining = 120 * 60; // 120 mins
-let isMockSubmitted = false;
-let currentExamIndex = 0;
-let currentMockExamLabel = 'OFFICIAL_MOCK_60Q';
+window.switchPracticeSubMode = function(mode) {
+  currentPracticeSubMode = mode;
+  const domainTab = document.getElementById('tab-practice-domain');
+  const termTab = document.getElementById('tab-practice-term');
+  const domainBox = document.getElementById('practice-domain-box');
+  const termBox = document.getElementById('practice-term-box');
+
+  if (mode === 'DOMAIN') {
+    if (domainTab) domainTab.className = 'btn btn-primary';
+    if (termTab) termTab.className = 'btn btn-secondary';
+    if (domainBox) domainBox.style.display = 'block';
+    if (termBox) termBox.style.display = 'none';
+  } else {
+    if (domainTab) domainTab.className = 'btn btn-secondary';
+    if (termTab) termTab.className = 'btn btn-primary';
+    if (domainBox) domainBox.style.display = 'none';
+    if (termBox) termBox.style.display = 'block';
+    window.renderPracticeTermsGrid();
+  }
+};
 
 window.toggleMockDomains = function(selectState) {
   document.querySelectorAll('.mock-domain-cb').forEach(cb => {
@@ -15,50 +27,196 @@ window.toggleMockDomains = function(selectState) {
   });
 };
 
+window.toggleMockTerms = function(selectState) {
+  document.querySelectorAll('.mock-term-cb').forEach(cb => {
+    cb.checked = selectState;
+  });
+};
+
+const TERM_KEYWORDS_MAP = {
+  'term-d1-prerequisite-gate': ['prerequisite gate', 'prerequisite check', 'deterministic prerequisite', 'cổng kiểm soát điều kiện tiên quyết', 'tiên quyết'],
+  'term-d1-sdk-hooks': ['pretooluse', 'posttooluse', 'sdk hook', 'lifecycle hook', 'interceptor hook'],
+  'term-d1-coordinator-worker': ['coordinator-worker', 'coordinator worker', 'sub-agent delegation', 'agent công nhân'],
+  'term-d1-state-recovery': ['state recovery', 'turn limit', 'session recovery', 'phục hồi trạng thái'],
+  'term-d1-hitl-escalation': ['human-in-the-loop', 'hitl', 'escalation hook', 'can thiệp con người'],
+  'term-d1-idempotency-gate': ['idempotency gate', 'idempotent', 'non-idempotent', 'đẳng quản'],
+  'term-d1-asymmetric-retry': ['asymmetric retry', 'exponential backoff', 'thử lại bất đối xứng'],
+  'term-d1-state-machine': ['state machine', 'stop_reason', 'máy trạng thái'],
+  'term-d1-rollback-checkpoint': ['rollback', 'transaction checkpoint', 'khôi phục điểm kiểm soát'],
+  'term-d2-granular-tool': ['granular tool', 'single-purpose tool', 'công cụ đơn chức năng'],
+  'term-d2-resilient-schema': ['resilient schema', 'resilient tool schema', 'input validation', 'schema kiên cường'],
+  'term-d2-mcp-transport': ['mcp transport', 'stdio', 'sse transport', 'giao thức stdio'],
+  'term-d2-tool-error-feedback': ['tool error handling', 'structured error response', 'phản hồi lỗi cấu trúc'],
+  'term-d2-tool-choice': ['tool_choice', 'tool choice', 'hạn chế chọn công cụ'],
+  'term-d2-tool-poisoning': ['tool poisoning', 'prompt injection', 'nhiễm độc công cụ'],
+  'term-d3-cli-permissions': ['dangerously-skip-permissions', 'cli permission', 'cờ quyền cli'],
+  'term-d3-claude-md-hierarchy': ['claude.md', 'hierarchy', 'hệ thống claude.md'],
+  'term-d3-glob-grep-navigation': ['glob tool', 'grep tool', 'glob before view', 'định vị tập tin'],
+  'term-d3-cicd-pipeline': ['ci/cd', 'github actions', 'pr review', 'tự động hóa pr'],
+  'term-d3-headless-mode': ['headless mode', 'non-interactive', 'chế độ không giao diện'],
+  'term-d4-structured-output': ['structured output', 'json schema', 'đầu ra cấu trúc'],
+  'term-d4-temperature-control': ['temperature = 0', 'temperature', 'kiểm soát nhiệt độ'],
+  'term-d4-few-shot-prompting': ['few-shot', 'exemplar', 'ví dụ mẫu'],
+  'term-d4-cot-thinking': ['chain-of-thought', '<thinking>', 'tư duy từng bước'],
+  'term-d4-xml-boundaries': ['xml tag', 'xml boundaries', '<context>', 'thẻ xml'],
+  'term-d4-conditional-directives': ['conditional directive', 'system prompt instruction', 'chỉ thị điều kiện'],
+  'term-d5-lost-in-the-middle': ['lost-in-the-middle', 'lost in the middle', 'attention dilution', 'lạc ở giữa'],
+  'term-d5-prompt-caching': ['prompt caching', 'ephemeral cache', 'bộ nhớ đệm câu lệnh'],
+  'term-d5-message-batches': ['message batches', 'batches api', 'xử lý theo lô'],
+  'term-d5-context-pruning': ['context pruning', 'sliding window', 'cắt tỉa bối cảnh'],
+  'term-d5-state-summarization': ['summarization compaction', 'state compaction', 'nén tóm tắt']
+};
+
+window.getMatchingQuestionsForTermId = function(termId) {
+  if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') return [];
+  
+  let targetCount = 0;
+  let termDomain = '';
+  if (typeof TERMS_DATA !== 'undefined') {
+    const termObj = TERMS_DATA.find(t => t.id === termId);
+    if (termObj) {
+      termDomain = termObj.domain;
+      const matchNum = (termObj.frequency || '').match(/(\d+)\s*câu/);
+      if (matchNum) targetCount = parseInt(matchNum[1], 10);
+    }
+  }
+
+  const kws = TERM_KEYWORDS_MAP[termId] || [];
+  
+  const scored = MOCK_EXAM_QUESTION_POOL.map(q => {
+    const text = (q.question + ' ' + (q.questionEN||'') + ' ' + (q.explanation||'') + ' ' + (q.taskStatement||'') + ' ' + (q.rationale||'')).toLowerCase();
+    let score = 0;
+    kws.forEach(kw => {
+      if (text.includes(kw)) score += kw.length > 8 ? 3 : 1;
+    });
+    if (termDomain && q.domain === termDomain) score += 0.5;
+    return { q, score };
+  }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
+
+  let pool = scored.map(item => item.q);
+
+  if (targetCount > 0 && pool.length > targetCount) {
+    pool = pool.slice(0, targetCount);
+  }
+
+  return pool;
+};
+
+window.renderPracticeTermsGrid = function() {
+  const container = document.getElementById('practice-terms-grid');
+  if (!container) return;
+
+  if (typeof TERMS_DATA === 'undefined') {
+    container.innerHTML = '<div style="font-size:0.82rem; color:var(--text-muted);">⚠️ Chưa tải được từ điển thuật ngữ.</div>';
+    return;
+  }
+
+  container.innerHTML = TERMS_DATA.map(t => {
+    const matchCount = window.getMatchingQuestionsForTermId(t.id).length;
+    return `
+      <label class="domain-cb-card" style="padding: 0.45rem 0.6rem; font-size: 0.8rem; cursor: pointer;">
+        <input type="checkbox" class="mock-term-cb" value="${t.id}" checked style="transform: scale(1.1); margin-right: 0.35rem;">
+        <span><strong style="color: var(--accent-cyan);">${t.domain}</strong> ${t.nameEN} <em style="color: var(--text-muted); font-size: 0.75rem;">(${matchCount} câu)</em></span>
+      </label>
+    `;
+  }).join('');
+};
+
 window.startCustomPracticeExam = function() {
-  const checkedDoms = Array.from(document.querySelectorAll('.mock-domain-cb:checked')).map(cb => cb.value);
   const countInput = document.getElementById('practice-count-input');
   let qCount = parseInt(countInput ? countInput.value : '10', 10);
 
   if (isNaN(qCount) || qCount < 1) qCount = 10;
-
-  if (checkedDoms.length === 0) {
-    AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Domain để ôn tập!");
-    return;
-  }
 
   if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') {
     AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
     return;
   }
 
-  // Filter questions belonging to checked domains
-  let pool = MOCK_EXAM_QUESTION_POOL.filter(q => checkedDoms.includes(q.domain));
+  let pool = [];
+  let modeLabel = '';
+
+  if (currentPracticeSubMode === 'TERM') {
+    const checkedTermIds = Array.from(document.querySelectorAll('.mock-term-cb:checked')).map(cb => cb.value);
+    if (checkedTermIds.length === 0) {
+      AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Thuật ngữ để ôn tập!");
+      return;
+    }
+
+    const matchedMap = new Map();
+    checkedTermIds.forEach(tId => {
+      const qList = window.getMatchingQuestionsForTermId(tId);
+      qList.forEach(q => {
+        if (!matchedMap.has(q.id)) matchedMap.set(q.id, q);
+      });
+    });
+
+    pool = Array.from(matchedMap.values());
+    modeLabel = `TERMS_${checkedTermIds.length}T`;
+  } else {
+    const checkedDoms = Array.from(document.querySelectorAll('.mock-domain-cb:checked')).map(cb => cb.value);
+    if (checkedDoms.length === 0) {
+      AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Domain để ôn tập!");
+      return;
+    }
+    pool = MOCK_EXAM_QUESTION_POOL.filter(q => checkedDoms.includes(q.domain));
+    modeLabel = `DOMAINS_${checkedDoms.join('_')}`;
+  }
 
   if (pool.length === 0) {
-    AppStore.showToast("⚠️ Không tìm thấy câu hỏi cho Domain đã chọn!");
+    AppStore.showToast("⚠️ Không tìm thấy câu hỏi phù hợp cho lựa chọn của bạn!");
     return;
   }
 
-  // Shuffle pool with zero-duplicate guarantee
-  pool.sort(() => Math.random() - 0.5);
-  
-  // Pick unique questions by ID & text
-  const picked = [];
-  const pickedIds = new Set();
-  const pickedTexts = new Set();
+  // Deduplicate base pool by question text & id
+  const basePool = [];
+  const baseIds = new Set();
+  const baseTexts = new Set();
   for (const q of pool) {
     const cleanText = q.question.replace(/^\[.*?\]\s*/, '');
-    if (!pickedIds.has(q.id) && !pickedTexts.has(cleanText)) {
-      pickedIds.add(q.id);
-      pickedTexts.add(cleanText);
-      picked.push(q);
-      if (picked.length >= qCount) break;
+    if (!baseIds.has(q.id) && !baseTexts.has(cleanText)) {
+      baseIds.add(q.id);
+      baseTexts.add(cleanText);
+      basePool.push(q);
     }
   }
 
-  mockExamQuestions = picked;
-  currentMockExamLabel = `PRACTICE_${checkedDoms.join('_')}_${mockExamQuestions.length}Q`;
+  const N = basePool.length;
+  const pickedList = [];
+
+  if (qCount <= N) {
+    // Standard random pick without duplicates
+    const shuffled = [...basePool].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < qCount; i++) {
+      pickedList.push(shuffled[i]);
+    }
+  } else {
+    // Round-robin repetition: Ensure full rounds sweep through all N base questions before repeating
+    const fullRounds = Math.floor(qCount / N);
+    const remainder = qCount % N;
+
+    for (let r = 0; r < fullRounds; r++) {
+      const roundPool = [...basePool].sort(() => Math.random() - 0.5);
+      pickedList.push(...roundPool);
+    }
+
+    if (remainder > 0) {
+      const remPool = [...basePool].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < remainder; i++) {
+        pickedList.push(remPool[i]);
+      }
+    }
+  }
+
+  // Assign unique instance IDs to guarantee zero collision in answers/flags
+  mockExamQuestions = pickedList.map((item, idx) => {
+    return {
+      ...item,
+      uniqueId: `${item.id}_inst_${idx}`
+    };
+  });
+
+  currentMockExamLabel = `PRACTICE_${modeLabel}_${mockExamQuestions.length}Q`;
   isMockSubmitted = false;
   mockExamAnswers = {};
   mockExamFlags.clear();
@@ -506,5 +664,5 @@ window.closeReportModal = function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Setup default state
+  window.renderPracticeTermsGrid();
 });
