@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-12 09:35 (Local Time)*  
+> *Last Updated: 2026-08-12 12:25 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -74,6 +74,7 @@ d:\AI\CCAF\
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
+    ├── terms.html                   # NEW: CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
     ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Stop Exam Button
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
@@ -82,11 +83,13 @@ d:\AI\CCAF\
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
+        ├── terms.js                 # NEW: Render & Real-time Filter/Search Engine for 40 CCAF Terms
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant cancelMockExam
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
+            ├── terms-data.js        # NEW: 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             └── mock-exam-data.js    # Expanded 644 Unique Core Scenario Questions Dataset v18.0 (100% valid JSON)
@@ -96,12 +99,11 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **CCAF Architecture Terms Hub (`terms.html`, `terms.js`, `terms-data.js`):** Built dedicated terms dictionary hub systemizing 40 canonical technical terms, patterns, safety gates, and CLI flags extracted across the 644 mock question dataset (v18.0) and 254 Anthropic question bank. Verified 100% term coverage between 254 bank and 644 dataset.
+- **Header Navigation Bar Synchronization:** Placed `📖 Từ Điển Thuật Ngữ` (`terms.html`) prominently in the navigation menu between `💡 67 Nguyên Tắc` (`principles.html`) and `🏆 Ôn Tập & Thi Mô Phỏng` (`mock-exam.html`) across all 5 HTML pages.
 - **Expanded 644 Unique Questions Dataset v18.0 (`mock-exam-data.js`):** Formatted all 289 output files in `tài liệu/generate/output` and merged 570 unique Gold Standard questions into `mock-exam-data.js`, expanding the pool from 74 to 644 scenario questions (D1: 116, D2: 121, D3: 153, D4: 169, D5: 85). Verified 100% valid JS/JSON syntax, 0 duplicate IDs, 0 duplicate scenarios, and balanced answer spread (178 A / 175 B / 148 C / 143 D).
 - **Fixed 0-Score Exam Grading Bug (`mock-exam.js`):** Fixed `selectOption` inline onclick parameter escaping by quoting `'${q.id}'`, ensuring user choices save properly to `mockExamAnswers` and scoring operates with 100% precision.
 - **Enhanced Grid Navigator CSS (`style.css` & `mock-exam.html`):** Added clear visual indicators for Active (Cyan ring), Answered (Emerald glow), Active+Answered (Cyan ring + Emerald fill), and Flagged (Amber) questions, with updated legend.
-- **Review Mode Header Controls (`mock-exam.js` & `mock-exam.html`):** Dynamically transformed top sticky bar buttons upon exam submission from "🛑 Dừng Thi / Hủy Bài" to "🏠 Về Trang Chọn Đề" and "✓ Nộp Bài" to "📊 Xem Báo Cáo Score".
-- **Navigation & Page Cleanup:** Completely deleted deprecated Copy Raw Docs page (`raw-docs.html`, `js/raw-docs.js`, `js/data/raw-docs-data.js`) and cleaned up all navigation links across `domains.html`, `learn.html`, `principles.html`, and `mock-exam.html`.
-- **Interactive Practice Arena & Simulator (`mock-exam.html` & `mock-exam.js`):** Supports practice filtering and exam simulation across 644 scenario questions.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
