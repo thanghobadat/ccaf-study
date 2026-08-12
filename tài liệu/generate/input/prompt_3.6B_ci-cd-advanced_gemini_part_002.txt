@@ -1,0 +1,104 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d3-b07-B-003", "d3-b07-B-004".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D3 — Claude Code Configuration & Workflows
+Subtopic: 3.6 CI/CD Integration — Part B: Advanced Patterns
+Gemini part: 2/11
+Original source prompt: prompt_3.6B_ci-cd-advanced.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d3-b07-B-003` — angle-03 — correct=2 (C)
+   Scenario: B3: Async PR review posts comment but doesn't block merge → critical security bug merged before review returns
+2. ID `d3-b07-B-004` — angle-04 — correct=3 (D)
+   Scenario: B4: Blocking gate: review fails on formatting issue, blocks hotfix deployment in production incident
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. GitHub Actions workflow hangs because Claude Code waits at interactive permission prompt
+2. Jenkins pipeline with RESULT=$(claude -p 'Audit this PR' --output-format json) — parsing structured output
+3. CI/CD runner uses --dangerously-skip-permissions; developer proposes using it on local desktop
+
+From Part A (already generated):
+- ANTHROPIC_API_KEY missing / exposed in logs
+- --allowedTools / --disallowedTools basic usage
+- --max-turns on simple vs complex tasks
+- Exit code not checked
+- jq parsing of --output-format json
+- stdin pipe with large diff
+- --dangerously-skip-permissions on wrong context
+
+## TECHNICAL PRINCIPLES
+- Rate limiting: concurrent CI jobs all call API → 429 Too Many Requests → use exponential backoff or job queue
+- Message Batches API: 50% cheaper for bulk CI processing where results don't need to be real-time
+- Parallel matrix jobs: GitHub Actions matrix strategy runs claude -p concurrently → shared rate limit
+- Asynchronous review: post PR comment without blocking merge gate (fire-and-forget vs blocking gate)
+- Blocking gate: `if [ $EXIT_CODE -ne 0 ]; then exit 1; fi` — review failure blocks merge
+- Non-blocking: review always posts, human decides — useful for advisory reviews
+- CI caching: Claude Code has no built-in cache — implement at HTTP/proxy layer or skip if non-deterministic
+- `--output-format stream-json`: emits newline-delimited JSON events — requires streaming consumer, not `jq` direct
+- Reusable workflow: GitHub Actions reusable workflow for shared Claude review step across repos
+- Multi-repo CI: different repos need different CLAUDE.md configs — use --config flag or repo-specific env
+- Retry logic: transient API error in CI → retry 3x with backoff before failing pipeline
+- Cost monitoring: every PR triggers claude -p → 50 PRs/day × $0.05 = $2.50/day → budget alert needed
+- Artifact upload: save Claude review output as CI artifact for audit trail
+- Conditional execution: only run claude -p review if diff size > threshold (skip trivial whitespace-only PRs)
+- Secret rotation: ANTHROPIC_API_KEY rotated → all CI pipelines fail simultaneously → use secret manager reference
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `3.6 ci-cd-integration / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D3",
+  "domainTitle": "Claude Code Configuration & Workflows",
+  "taskStatement": "3.6 ci-cd-integration / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 3.6: CI/CD Integration", "url": "https://claudecertificationguide.com/learn/3-claude-code-config/3-6-ci-cd-integration"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

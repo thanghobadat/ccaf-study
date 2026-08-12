@@ -1,0 +1,104 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d3-b06-B-005", "d3-b06-B-006".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D3 — Claude Code Configuration & Workflows
+Subtopic: 3.1 CLAUDE.md Hierarchy and Scoping — Part B: Security, .claudeignore & Special Patterns
+Gemini part: 3/12
+Original source prompt: prompt_3.1B_claude-md-security.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d3-b06-B-005` — angle-05 — correct=0 (A)
+   Scenario: B5: .claudeignore vs CLAUDE.md: which one prevents Claude from reading a file vs which one changes Claude's behavior when working with a file
+2. ID `d3-b06-B-006` — angle-06 — correct=1 (B)
+   Scenario: B6: /src/payments/CLAUDE.md: "Never log full credit card numbers. Mask to last 4 digits." \u2192 payment charge function: rule applied?
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. Monorepo British English vs American English conflict across 3 CLAUDE.md levels
+2. Enterprise repo double-quotes vs single-quotes Python conflict across 3 levels
+
+From Part A (DO NOT REPEAT these angles):
+- Basic precedence: global vs project vs subdirectory (indent style, docstrings, quotes)
+- Missing one level (project or global missing)
+- Additive rules (no conflict)
+- @import directive behavior
+- Glob sections [rules for "**/*.test.ts"] in project CLAUDE.md
+- Session restart requirement for changes
+- Monorepo services with different rules per service
+- .claude/CLAUDE.md vs project root CLAUDE.md location
+- Committed (project) vs personal (global) distinction
+
+## TECHNICAL PRINCIPLES
+- .claudeignore: excludes files from Claude's view entirely — Claude cannot read, modify, or reference them
+- .claudeignore patterns: same glob syntax as .gitignore — use for secrets, generated files, large binaries
+- .claudeignore vs CLAUDE.md: claudeignore = file visibility; CLAUDE.md = behavioral rules
+- Security rules in subdirectory CLAUDE.md: /src/payments/CLAUDE.md can enforce "never log PCI data"
+- Compliance: /src/healthcare/CLAUDE.md can enforce HIPAA rules scoped to that component
+- CLAUDE.md for CI/CD: /ci/CLAUDE.md rules apply when Claude Code runs in CI context
+- CLAUDE.md for tests: /tests/CLAUDE.md can enforce "always use fixtures, never production data"
+- CLAUDE.md for generated code: /generated/CLAUDE.md "do not modify this directory"
+- CLAUDE.md for migrations: /migrations/CLAUDE.md "never alter existing migrations, only add new ones"
+- @import shared standards: team can @import a shared company-wide standards file
+- Memory sections in CLAUDE.md: Claude accumulates project knowledge in CLAUDE.md over sessions
+- Long CLAUDE.md: very long files may have "lost in middle" degradation — keep rules concise
+- Conflicting @imports: two @imported files have conflicting rules — harder to resolve than direct conflicts
+- CLAUDE.md and tool permissions: can document which tools are appropriate, but doesn't enforce — use allowedTools for enforcement
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `3.1 claude-md-hierarchy / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D3",
+  "domainTitle": "Claude Code Configuration & Workflows",
+  "taskStatement": "3.1 claude-md-hierarchy / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 3.1: CLAUDE.md Hierarchy", "url": "https://claudecertificationguide.com/learn/3-claude-code-config/3-1-claude-md-hierarchy"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

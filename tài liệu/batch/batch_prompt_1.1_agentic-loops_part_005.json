@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-009",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-09",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-009",
+    "scenarioSignature": {
+      "testedPrinciple": "tool results containing valid empty structures must be fed back to model for continuation evaluation",
+      "failureMode": "premature workflow termination when query returns zero records",
+      "rootCause": "orchestrator interprets empty valid tool response payload as end of task",
+      "requiredFix": "pass empty tool result back in tool_result block to allow model reasoning"
+    },
+    "questionEN": "An inventory audit agent calls search_warehouse_items with specific filtering criteria. The tool executes successfully with HTTP 200 OK and returns an empty list {\"items\": [], \"total\": 0}. The orchestrator driver code detects the empty payload, assumes the retrieval phase is complete, and halts the agentic loop without sending the result back to Claude. Why is this driver behavior flawed, and what is the proper architectural handling?",
+    "question": "[d1-b01-1.1-009] Một agent kiểm toán kho hàng gọi công cụ search_warehouse_items với các tiêu chí lọc cụ thể. Công cụ thực thi thành công với HTTP 200 OK và trả về một danh sách rỗng {\"items\": [], \"total\": 0}. Mã trình điều khiển bộ điều phối phát hiện tải dữ liệu rỗng, giả định giai đoạn truy xuất đã hoàn tất và dừng vòng lặp agentic mà không gửi kết quả lại cho Claude. Tại sao hành vi của trình điều khiển này bị lỗi và cách xử lý kiến trúc đúng là gì?",
+    "optionsEN": [
+      "A. An empty tool payload is a valid execution result; the driver must append the tool_result to history so Claude can choose next actions like broadening search terms or concluding turn.",
+      "B. An empty payload indicates tool execution failure, so the driver should trigger an automated retry with tool_choice: \"any\".",
+      "C. The driver must raise a runtime exception and rollback conversation history whenever a tool returns zero records.",
+      "D. The driver should automatically inject dummy items into the tool_result array to force Claude to continue looping."
+    ],
+    "options": [
+      "A. Tải dữ liệu công cụ rỗng là kết quả thực thi hợp lệ; trình điều khiển phải thêm tool_result vào lịch sử để Claude có thể lựa chọn hành động tiếp theo như mở rộng cụm từ tìm kiếm hoặc kết thúc lượt.",
+      "B. Tải dữ liệu rỗng biểu thị sự thất bại khi thực thi công cụ, vì vậy trình điều khiển nên kích hoạt thử lại tự động với tool_choice: \"any\".",
+      "C. Trình điều khiển phải đưa ra ngoại lệ thời gian chạy và cuộn lại lịch sử trò chuyện bất cứ khi nào một công cụ trả về 0 bản ghi.",
+      "D. Trình điều khiển nên tự động chèn các mục giả vào mảng tool_result để buộc Claude tiếp tục vòng lặp."
+    ],
+    "correct": 0,
+    "optionExplanations": [
+      "Option A correct: An empty JSON payload {\"items\": []} is a successful and valid output. The orchestrator must return it inside a tool_result block to let Claude decide whether to try a different query, synthesize an answer about zero matches, or end the turn.",
+      "Option B incorrect: Returning zero items is not an execution failure or API error; forcing tool_choice: \"any\" will cause an infinite execution loop.",
+      "Option C incorrect: Zero search matches is a standard data result rather than a system exception that warrants context rollback.",
+      "Option D incorrect: Injecting synthetic data corrupts application context and violates tool transparency principles."
+    ],
+    "rationale": "An empty result array is a valid tool output response, not a loop termination event or failure. The driver must construct a tool_result content block with the payload and pass it to Claude so the model can reason about the absence of records and determine subsequent actions.",
+    "explanation": "Một danh sách rỗng {\"items\": [], \"total\": 0} trả về từ công cụ tìm kiếm là một kết quả thực thi thành công và hợp lệ (HTTP 200 OK), phản ánh không có bản ghi nào khớp với điều kiện lọc. Trình điều khiển vòng lặp không được tự ý dừng vòng lặp agentic khi thấy dữ liệu rỗng. Thay vào đó, nó phải gửi phản hồi rỗng này lại cho Claude thông qua khối tool_result. Claude sẽ dựa vào dữ liệu đó để suy luận bước tiếp theo—ví dụ: thay đổi từ khóa tìm kiếm, thử tiêu chí khác, hoặc trả lời người dùng rằng không tìm thấy sản phẩm.\n- Lựa chọn A đúng vì dữ liệu rỗng là kết quả hợp lệ cần được đưa lại cho Claude để tiếp tục đánh giá vòng lặp.\n- Lựa chọn B sai vì dữ liệu rỗng không phải là lỗi thực thi công cụ và việc áp đặt tool_choice: \"any\" có thể gây ra vòng lặp vô hạn.\n- Lựa chọn C sai vì 0 bản ghi không phải ngoại lệ hệ thống cần rollback lịch sử.\n- Lựa chọn D sai vì việc tự động chèn dữ liệu giả sẽ làm sai lệch thông tin và vi phạm tính trung thực của agent.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-010",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-10",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-010",
+    "scenarioSignature": {
+      "testedPrinciple": "structured error context delivery in tool result blocks",
+      "failureMode": "agent loop failure caused by swallowing tool execution exception",
+      "rootCause": "driver skips tool result block on exception leaving model without error context",
+      "requiredFix": "wrap exception details inside tool result block with is error set to true"
+    },
+    "questionEN": "During a database migration task, an agent invokes execute_sql_migration which throws a connection timeout exception DatabaseConnectionTimeoutException. The orchestrator's exception handler catches the error, logs it locally, but proceeds to invoke the model in the next iteration without appending a tool_result block containing the error details. Why does this orchestration pattern break the agentic loop?",
+    "question": "[d1-b01-1.1-010] Trong nhiệm vụ dịch chuyển cơ sở dữ liệu, một agent gọi execute_sql_migration và ném ra ngoại lệ hết thời gian kết nối DatabaseConnectionTimeoutException. Trình xử lý ngoại lệ của bộ điều phối bắt lỗi, ghi log cục bộ, nhưng tiếp tục gọi mô hình trong lượt tiếp theo mà không thêm khối tool_result chứa chi tiết lỗi. Tại sao mô hình điều phối này làm hỏng vòng lặp agentic?",
+    "optionsEN": [
+      "A. The API server automatically aborts the conversation session when a client side database driver throws an unhandled exception.",
+      "B. Omitting the tool_result block violates the Claude API schema contract for tool use responses and hides failure context needed for agent self-correction.",
+      "C. The orchestrator should catch the exception and automatically substitute a successful 200 OK status in the tool execution response.",
+      "D. Exception details must only be passed through system prompt updates rather than conversation message blocks."
+    ],
+    "options": [
+      "A. Máy chủ API tự động hủy phiên trò chuyện khi trình điều khiển cơ sở dữ liệu phía client ném ra ngoại lệ không được xử lý.",
+      "B. Việc bỏ qua khối tool_result vi phạm hợp đồng schema API Claude đối với phản hồi gọi công cụ và ẩn ngữ cảnh thất bại cần thiết cho agent tự sửa lỗi.",
+      "C. Bộ điều phối nên bắt ngoại lệ và tự động thay thế bằng trạng thái 200 OK thành công trong phản hồi thực thi công cụ.",
+      "D. Chi tiết ngoại lệ chỉ được truyền qua các bản cập nhật system prompt chứ không phải qua các khối tin nhắn trò chuyện."
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "Option A incorrect: The Claude API does not track client-side database driver exceptions directly; the failure is caused by schema violation and missing conversation context.",
+      "Option B correct: Every tool_use block emitted by Claude MUST be matched by a corresponding tool_result block (with tool_use_id and optional is_error: true). Omitting it breaks API validation and deprives Claude of the error details needed to adapt or retry.",
+      "Option C incorrect: Masking failures with fake 200 OK responses leads to hallucinated downstream operations and corrupt state.",
+      "Option D incorrect: Tool execution errors must be communicated in tool_result message content blocks within the message history, not through system prompt modifications."
+    ],
+    "rationale": "The Claude API strictly enforces that every tool_use request must receive a corresponding tool_result block referencing the tool_use_id. When a tool throws an error, the driver must capture the exception and pass it back in a tool_result with is_error=true so Claude receives the structured error context to perform self-correction.",
+    "explanation": "Trong kiến trúc vòng lặp agentic của Claude API, mọi khối tool_use mà mô hình phát ra bắt buộc phải có một khối tool_result tương ứng (khớp tool_use_id). Nếu công cụ bị lỗi (ví dụ ngoại lệ timeout), trình điều khiển không được nuốt lỗi hoặc bỏ qua việc gửi tool_result. Đúng ra, trình điều khiển phải bắt ngoại lệ, đóng gói thông điệp lỗi vào tool_result với thuộc tính is_error: true và gửi lại cho Claude. Điều này vừa đảm bảo tuân thủ schema của API, vừa cung cấp ngữ cảnh lỗi để Claude có thể tự điều chỉnh (self-correction) hoặc thử lại chiến lược khác.\n- Lựa chọn A sai vì API phía server không tự theo dõi các ngoại lệ driver phía client mà lỗi xảy ra do vi phạm schema gửi lên.\n- Lựa chọn B đúng vì bỏ qua tool_result làm vi phạm ràng buộc schema API và tước đi cơ hội tự sửa lỗi của agent.\n- Lựa chọn C sai vì ngụy tạo trạng thái 200 OK thành công sẽ làm sai lệch trạng thái hệ thống.\n- Lựa chọn D sai vì các lỗi thực thi công cụ phải được đưa vào khối tool_result trong lịch sử trò chuyện chứ không phải thay đổi system prompt.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]

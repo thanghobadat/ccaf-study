@@ -1,0 +1,94 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b05-new-005", "d2-b05-new-006".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.4 MCP Server Integration  EPart A: Transport, Config & Capabilities
+Gemini part: 3/10
+Original source prompt: prompt_2.4_mcp-server-integration.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b05-new-005` — angle-05 — correct=0 (A)
+   Scenario: A5: 500 API documentation pages each implemented as a separate MCP Tool ↁEshould be Resources (readable data, not actions)
+2. ID `d2-b05-new-006` — angle-06 — correct=1 (B)
+   Scenario: A6: Single large knowledge base document: Tool vs Resource  Ewhich is correct and why
+
+## EXISTING SCENARIOS TO AVOID
+1. DevOps team: local git CLI (stdio) + PagerDuty cloud API (SSE)  Eboth incorrectly set to stdio
+2. Documentation platform implementing 250 individual document pages as 250 separate MCP tools  Eshould use Resources
+3. Enterprise DevOps team standardizing code audit templates across VS Code + Claude Code CLI + internal tools  EMCP Prompts
+4. Developer configures MCP server with stdio in Kubernetes container (no TTY)  Efails because stdio requires interactive terminal
+
+## TECHNICAL PRINCIPLES
+- stdio transport: for local CLI-based tools spawned as subprocesses (git, filesystem, local binaries). Requires a terminal/TTY.
+- SSE (Server-Sent Events) transport: for remote HTTP API servers accessible over HTTPS. Works in any environment.
+- mcp.json location:
+  - Project root (mcp.json or .claude/mcp.json): available to ALL developers on the project (commit to git)
+  - User-level (~/.config/claude/mcp.json or ~/.claude.json): personal tools only, not shared
+- MCP server capabilities: Tools (executable actions), Resources (readable data/documents), Prompts (reusable prompt templates)
+- Tools: for actions the agent can invoke (search, create, update, delete)
+- Resources: for exposing large amounts of readable data (docs, files, databases)  Eagent reads, doesn't invoke
+- Prompts: for reusable prompt templates that can be referenced across different clients (standardize workflows)
+- MCP config must specify: command (executable path), args, env (env vars), transport type
+- Security: never put API keys in mcp.json directly  Euse env vars from CI/OS secrets
+- MCP server discovery: Claude Code reads mcp.json at startup; changes require restart
+- Multiple MCP servers: can configure any number in mcp.json
+- MCP server for REST API: wrap REST API calls in tool definitions, use SSE transport
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.4 mcp-server-integration / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.4 mcp-server-integration / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.4: MCP Server Integration", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-4-mcp-server-integration"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

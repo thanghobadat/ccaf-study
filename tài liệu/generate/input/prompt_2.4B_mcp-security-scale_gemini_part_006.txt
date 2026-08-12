@@ -1,0 +1,110 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b05-B-011", "d2-b05-B-012".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.4 MCP Server Integration — Part B: Security, Scale & Advanced Patterns
+Gemini part: 6/9
+Original source prompt: prompt_2.4B_mcp-security-scale.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b05-B-011` — angle-11 — correct=2 (C)
+   Scenario: B11: MCP Prompt `code_review` accepts `language` and `style` arguments \u2192 prompt is customized per invocation
+2. ID `d2-b05-B-012` — angle-12 — correct=3 (D)
+   Scenario: B12: stdio MCP server: each new Claude Code session spawns new process \u2192 stateful operations reset between sessions
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. Local git CLI (stdio) + PagerDuty cloud API (SSE) — both incorrectly set to stdio
+2. 250 documentation pages as 250 separate MCP Tools → should use Resources
+3. Code audit templates across VS Code + CLI + internal tools → MCP Prompts
+4. stdio transport in Kubernetes container (no TTY) → fails
+
+From Part A (DO NOT REPEAT these angles):
+- Jira REST API with stdio / ripgrep with SSE (wrong transport)
+- User-level vs project-level mcp.json visibility
+- 500 API docs as Tools vs Resources
+- Prompts for CI/CD templates
+- API key plaintext in mcp.json
+- Session restart required after config change
+- Multiple MCP servers in same mcp.json
+- Database connection string in command args
+- Two tools with same name (non-deterministic)
+- Unstructured HTML return vs structured JSON
+- Personal MCP appearing in all projects
+- Relative path in command failing in CI
+
+## TECHNICAL PRINCIPLES
+- MCP server authentication: each server handles its own auth — Claude passes through, doesn't store credentials
+- Sandbox isolation: MCP server should run with least privilege (read-only filesystem, no network if local)
+- Tool input validation: MCP server must validate inputs, not trust model output blindly
+- MCP server health check: if MCP server crashes, Claude Code can't use its tools — need startup validation
+- Timeout configuration: MCP tool calls can time out — configure appropriate timeout per server
+- MCP server logs: separate from Claude Code logs — important for debugging tool failures
+- Environment variable injection: use `env` key in mcp.json to pass secrets safely
+- Multi-tenant MCP server: single MCP server serving multiple projects — isolation requirements
+- MCP server versioning: when server API changes, existing mcp.json configs may break
+- Resource content size: large Resource content fills context window — use pagination or excerpt
+- MCP Resource vs Tool for search: search is an action (Tool), not readable data (Resource)
+- MCP Prompt parameters: Prompts can accept arguments to customize the template
+- stdio vs SSE latency: stdio starts a new process per session — SSE maintains persistent connection
+- MCP server for third-party SaaS: implement as SSE server wrapping REST API
+- Claude Code `--mcp-config` flag: specify alternative mcp.json path in headless/CI mode
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.4 mcp-server-integration / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.4 mcp-server-integration / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.4: MCP Server Integration", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-4-mcp-server-integration"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

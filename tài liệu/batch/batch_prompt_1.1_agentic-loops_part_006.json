@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-011",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-11",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-011",
+    "scenarioSignature": {
+      "testedPrinciple": "isolation of subagent execution scope and lifecycle status signals",
+      "failureMode": "parent coordinator halts prematurely when delegate task completes",
+      "rootCause": "orchestrator bubbles child agent end turn status up to main loop",
+      "requiredFix": "encapsulate child agent turn end within subagent scope and return result payload to parent"
+    },
+    "questionEN": "In a hierarchical multi-agent framework, a parent orchestrator invokes a specialized subagent as a tool call delegate_research_task. When the subagent finishes processing, its internal API call returns stop_reason=\"end_turn\". The orchestrator's central loop handler intercepts this stop_reason and immediately terminates the entire parent workflow, returning the subagent's intermediate result as the final user answer. Why is this implementation flawed?",
+    "question": "[d1-b01-1.1-011] Trong một framework đa agent phân cấp, một agent cha (parent orchestrator) gọi một subagent chuyên biệt thông qua cuộc gọi công cụ delegate_research_task. Khi subagent hoàn thành xử lý, lệnh gọi API nội bộ của nó trả về stop_reason=\"end_turn\". Trình xử lý vòng lặp trung tâm của bộ điều phối chặn stop_reason này và ngay lập tức chấm dứt toàn bộ luồng công việc của agent cha, trả về kết quả trung gian của subagent làm câu trả lời cuối cùng cho người dùng. Tại sao triển khai này bị lỗi?",
+    "optionsEN": [
+      "A. The subagent failed to emit a required parent_continue content block before returning its final text delta.",
+      "B. Subagents are strictly prohibited from using stop_reason=\"end_turn\" and must always terminate with stop_reason=\"tool_use\".",
+      "C. The child agent's end_turn only signifies completion of the delegated sub-task; the parent driver must encapsulate this scope and feed the result back into the parent loop as a tool_result.",
+      "D. Parent orchestrators must run child agents sequentially without using tool call abstractions."
+    ],
+    "options": [
+      "A. Subagent đã không phát ra khối nội dung parent_continue bắt buộc trước khi trả về delta văn bản cuối cùng của nó.",
+      "B. Các subagent bị nghiêm cấm sử dụng stop_reason=\"end_turn\" và phải luôn kết thúc bằng stop_reason=\"tool_use\".",
+      "C. Trạng thái end_turn của agent con chỉ biểu thị việc hoàn thành nhiệm vụ phụ được giao; trình điều khiển agent cha phải đóng gói phạm vi này và gửi kết quả lại vào vòng lặp agent cha dưới dạng tool_result.",
+      "D. Bộ điều phối agent cha phải chạy các agent con một cách tuần tự mà không được sử dụng các trừu tượng hóa cuộc gọi công cụ."
+    ],
+    "correct": 2,
+    "optionExplanations": [
+      "Option A incorrect: There is no parent_continue block in the Claude API schema; subagents communicate results via standard message responses wrapped into tool outputs.",
+      "Option B incorrect: Subagents naturally conclude their turn with stop_reason=\"end_turn\" when finished with their sub-task.",
+      "Option C correct: A child agent completing its turn (end_turn) only finishes the delegated sub-task. The parent orchestrator driver must capture the output, form a tool_result block, and resume the parent agentic loop to allow the parent to continue orchestration.",
+      "Option D incorrect: Hierarchical agent delegation using tool invocation abstractions is standard practice and does not restrict subagent concurrency."
+    ],
+    "rationale": "A child agent's end_turn stop reason applies strictly to its isolated sub-loop context. The parent orchestrator must isolate child lifecycle events, wrap the child output into a tool_result block, and present it to the parent model so the parent loop can continue until the parent itself decides to emit end_turn.",
+    "explanation": "Trong mô hình đa agent phân cấp (parent-child agent hierarchy), khi agent con (subagent) thực hiện xong nhiệm vụ phụ được giao, lệnh gọi API của agent con sẽ trả về stop_reason=\"end_turn\". Trạng thái này chỉ áp dụng cho phạm vi vòng lặp riêng của agent con. Trình điều khiển bộ điều phối phải cô lập sự kiện này, lấy kết quả của agent con đóng gói thành một khối tool_result và trả lại cho vòng lặp của agent cha. Agent cha sẽ dùng kết quả đó để tiếp tục thực thi cho đến khi chính agent cha phát ra end_turn.\n- Lựa chọn A sai vì API không có khối nội dung parent_continue nào.\n- Lựa chọn B sai vì agent con hoàn toàn hợp lệ khi dùng end_turn để báo hoàn thành lượt làm việc của chính nó.\n- Lựa chọn C đúng vì end_turn của agent con chỉ hoàn thành task phụ, trình điều khiển agent cha phải đóng gói kết quả đó làm tool_result để agent cha tiếp tục luồng.\n- Lựa chọn D sai vì việc dùng trừu tượng hóa gọi công cụ để phân cấp agent là mô hình kiến trúc chuẩn.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-012",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-12",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-012",
+    "scenarioSignature": {
+      "testedPrinciple": "streaming completion evaluation requires message_stop event metadata parsing",
+      "failureMode": "streaming client closes loop connection early missing pending tool call blocks",
+      "rootCause": "client checks text delta arrival instead of message_stop event stop reason",
+      "requiredFix": "listen for message_stop event to inspect authoritative stop_reason payload"
+    },
+    "questionEN": "A real-time AI assistant uses Claude's streaming API (/v1/messages with stream=true). The client UI listener monitors content_block_delta events and terminates the agent loop connection immediately after receiving a text block ending with a period (.). As a result, when the model generates introductory text followed by a tool_use content block, the client disconnects before receiving the tool parameters. How should the streaming event listener determine loop continuation?",
+    "question": "[d1-b01-1.1-012] Một trợ lý AI thời gian thực sử dụng API phát trực tuyến (streaming API) của Claude (/v1/messages với stream=true). Trình lắng nghe UI phía client theo dõi các sự kiện content_block_delta và chấm dứt kết nối vòng lặp agent ngay sau khi nhận được một khối văn bản kết thúc bằng dấu chấm (.). Kết quả là, khi mô hình tạo văn bản giới thiệu theo sau bởi một khối tool_use, client ngắt kết nối trước khi nhận được các tham số công cụ. Trình lắng nghe sự kiện streaming nên xác định việc tiếp tục vòng lặp như thế nào?",
+    "optionsEN": [
+      "A. The client should parse content_block_stop events and close the loop if the block type is text.",
+      "B. The client must aggregate incoming text deltas into a buffer and execute a regex search for tool_use keywords.",
+      "C. The client should set tool_choice: \"none\" to prevent the model from streaming text and tool calls in the same turn.",
+      "D. The client must await the message_stop event and inspect the top-level stop_reason field to determine whether to execute tools (tool_use) or terminate (end_turn)."
+    ],
+    "options": [
+      "A. Client nên phân tích các sự kiện content_block_stop và đóng vòng lặp nếu loại khối là text.",
+      "B. Client phải tổng hợp các delta văn bản đến vào một bộ đệm và thực hiện tìm kiếm regex cho các từ khóa tool_use.",
+      "C. Client nên đặt tool_choice: \"none\" để ngăn mô hình phát trực tuyến văn bản và cuộc gọi công cụ trong cùng một lượt.",
+      "D. Client phải chờ sự kiện message_stop và kiểm tra trường stop_reason cấp cao nhất để xác định xem nên thực thi công cụ (tool_use) hay kết thúc (end_turn)."
+    ],
+    "correct": 3,
+    "optionExplanations": [
+      "Option A incorrect: Individual content_block_stop events only mark the end of a single block (e.g., text block), which can be followed by a tool_use block within the same message.",
+      "Option B incorrect: Text deltas do not reliably represent tool call signatures, and regex matching on streaming text delta payloads is error-prone.",
+      "Option C incorrect: Disabling tool use via tool_choice: \"none\" disables tool capabilities completely rather than resolving event handling logic.",
+      "Option D correct: The authoritative completion metadata is delivered in the message_stop event (or message_delta event), which contains the final stop_reason. The streaming listener must inspect this field rather than inferring turn completion from text block boundaries."
+    ],
+    "rationale": "In streaming mode, text content blocks and tool call content blocks are streamed sequentially. Terminating execution based on text deltas or text block completion (content_block_stop) cuts off subsequent tool call blocks. The streaming handler must process events until message_stop and evaluate the authoritative stop_reason payload.",
+    "explanation": "Trong chế độ phát trực tuyến (streaming mode), mô hình Claude có thể gửi một khối văn bản giải thích trước, sau đó mới tới khối tool_use trong cùng một phản hồi tin nhắn. Các sự kiện content_block_delta hoặc content_block_stop chỉ báo hiệu sự hoàn thành của từng khối đơn lẻ (ví dụ: khối text kết thúc), chứ không phản ánh trạng thái hoàn thành của toàn bộ tin nhắn lượt đó. Trình điều khiển streaming phải lắng nghe cho tới khi sự kiện message_stop (hoặc message_delta) xuất hiện và đọc trường stop_reason chính thức để quyết định có chạy công cụ (tool_use) hay kết thúc vòng lặp (end_turn).\n- Lựa chọn A sai vì content_block_stop chỉ đóng một khối nội dung đơn lẻ, sau khối text vẫn có thể là khối tool_use.\n- Lựa chọn B sai vì khớp regex trên chuỗi văn bản không phản ánh đúng cấu trúc gọi công cụ dạng JSON được stream.\n- Lựa chọn C sai vì đặt tool_choice: \"none\" sẽ vô hiệu hóa hoàn toàn khả năng gọi công cụ của agent.\n- Lựa chọn D đúng vì sự kiện message_stop chứa trường stop_reason chính thức xác định hành vi tiếp theo của vòng lặp.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]

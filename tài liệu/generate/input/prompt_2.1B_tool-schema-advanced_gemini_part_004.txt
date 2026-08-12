@@ -1,0 +1,110 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b04-B-007", "d2-b04-B-008".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.1 Tool Schema Design — Part B: Return Schema, Granularity & Advanced Patterns
+Gemini part: 4/7
+Original source prompt: prompt_2.1B_tool-schema-advanced.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b04-B-007` — angle-07 — correct=2 (C)
+   Scenario: B7: `tag_document(tags: string)` should accept `tags: string[]` (array) \u2192 model passes `"urgent,compliance"` as single string
+2. ID `d2-b04-B-008` — angle-08 — correct=3 (D)
+   Scenario: B8: `send_payment()` idempotency not documented \u2192 model calls it 3x on retry \u2192 three payments charged to customer
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. Monolithic manage_database(action: backup|query|drop_table) tool
+2. Customer support flight-booking: search_flights fails HTTP 400 due to wrong parameter type
+3-12. All variations of execute_sql_query(query: string) scenario
+
+From Part A (DO NOT REPEAT these angles):
+- get_ticket/create_ticket ambiguous description
+- Missing enum for order status (pending/shipped/delivered)
+- Missing pattern for date format
+- Monolithic tool exposing delete to read-only subagent
+- String instead of integer for limit parameter
+- Two similar tool names (send_notification vs send_alert)
+- Boolean for 3-state choice (PDF/CSV/Excel)
+- Circular tool description
+- Missing "when to use" guidance
+- DDL query not blocked by missing constraint
+- Missing 404 behavior documentation
+- Tool requiring admin scope without documenting it
+- update vs patch ambiguity
+- Boolean vs enum comparison
+
+## TECHNICAL PRINCIPLES
+- Return schema documentation: model must know what the tool returns to interpret it correctly
+- Undocumented return fields: model may hallucinate field names that don't exist
+- Error codes in return schema: list possible error objects — model decides to retry, use fallback, or escalate
+- Tool granularity decision: too granular (30 tiny tools) is as bad as too monolithic — aim for coherent actions
+- Required vs optional parameters: optional params model may skip; required must be explicit
+- Nested parameter objects: complex schemas can confuse model — flatten where possible
+- Array parameters: model may pass single item instead of array when not clearly typed
+- Input validation in tool implementation: validate before executing — return error, not exception
+- Idempotency documentation: tool is/isn't safe to call twice — model needs this for retry decisions
+- Conflicting tool results: two tools return different data for same entity — model must pick authoritative source
+- Tool chaining design: tool A output feeds tool B input — schema must be compatible
+- Tool versioning: v1 and v2 of same tool exist — model picks wrong version without clear description
+- Side effects documentation: tool has side effects (sends email, charges card) — model must know to call once only
+- Rate limit documentation: tool is rate-limited — model should batch or add delay between calls
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.1 tool-schema-design / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.1 tool-schema-design / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.1: Tool Schema Design", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-1-tool-schema-design"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

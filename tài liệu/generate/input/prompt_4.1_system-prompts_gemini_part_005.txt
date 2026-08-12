@@ -1,0 +1,91 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d4-b08-4.1-009", "d4-b08-4.1-010".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D4 — Prompt Engineering & Structured Output
+Subtopic: 4.1 System Prompts and Explicit Criteria
+Gemini part: 5/5
+Original source prompt: prompt_4.1_system-prompts.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d4-b08-4.1-009` — angle-09 — correct=0 (A)
+   Scenario: Multi-role system: system prompt defines multiple roles → ambiguous behavior
+2. ID `d4-b08-4.1-010` — angle-10 — correct=1 (B)
+   Scenario: Context window limit for system prompt: system prompt too long → key rules truncated
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- CI/CD pipeline flags documentation mismatches, 45% false positive rate — developers ignore all findings
+- PR review pipeline using Claude with high false positive rate for security findings
+Any: false positive rate in automated review causing developers to ignore alerts
+
+## TECHNICAL PRINCIPLES
+- System prompt role: sets persona, scope, constraints, and evaluation CRITERIA for the entire conversation
+- Explicit criteria: define exactly WHAT constitutes a finding — not "flag issues" but "flag issues where X AND Y AND NOT Z"
+- False positive reduction: add specific criteria that distinguish real issues from non-issues
+- Scope limiting: "Only report issues affecting production security — not style, not test code"
+- Persona: "You are a senior [role] at [company type]" → consistent domain-appropriate reasoning
+- Negative criteria: explicitly state what NOT to flag, not just what to flag
+- Threshold calibration: "Report only if confidence > 0.8" — reduces noise but may miss real issues
+- System prompt vs user prompt: system prompt = fixed instruction set; user prompt = per-request input
+- Contradictions: if user prompt contradicts system prompt, system prompt usually wins (depends on framing)
+- Security context injection: inject relevant security standards (OWASP, PCI-DSS) as system context
+- Role-specific output format: instruct model to output in format matching downstream consumer
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `4.1 system-prompts / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D4",
+  "domainTitle": "Prompt Engineering & Structured Output",
+  "taskStatement": "4.1 system-prompts / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 4.1: System Prompts", "url": "https://claudecertificationguide.com/learn/4-prompt-engineering/4-1-system-prompts"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

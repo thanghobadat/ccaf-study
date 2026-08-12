@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-11 18:07 (Local Time)*  
+> *Last Updated: 2026-08-12 09:35 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -36,11 +36,11 @@
 ## 🎯 3. EXAM WEIGHTINGS & 6 PRODUCTION ARCHETYPES
 
 ### 5 Exam Domains & Weights
-1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits. (13 Questions)
-2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Redundancy schemas. (12 Questions)
-3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`), `CLAUDE.md` hierarchy, Glob/Grep before View, CI/CD pipelines. (12 Questions)
-4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples, JSON Schemas, Explicit Null, CoT `<thinking>`, XML boundaries `<context>`. (12 Questions)
-5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Escalation hooks. (11 Questions)
+1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits. (116 Questions)
+2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Redundancy schemas. (121 Questions)
+3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`), `CLAUDE.md` hierarchy, Glob/Grep before View, CI/CD pipelines. (153 Questions)
+4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples, JSON Schemas, Explicit Null, CoT `<thinking>`, XML boundaries `<context>`. (169 Questions)
+5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Escalation hooks. (85 Questions)
 
 ### 6 Production Archetypes
 1. Customer Support Resolution Agent
@@ -66,7 +66,8 @@ d:\AI\CCAF\
 │   ├── The Architect's Playbook.md
 │   ├── CCAF_Question_Generation_Guide.md
 │   ├── CCAF_254_Official_Mock_Exam_Bank.md
-│   └── CCAF_Addition_Guide_for_Weak_Models.md
+│   ├── CCAF_Addition_Guide_for_Weak_Models.md
+│   └── generate/                    # 289 Output JSON Question Batches (570 Questions)
 └── website/                         # Web Application Root (Python HTTP server on 8080)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
@@ -74,7 +75,6 @@ d:\AI\CCAF\
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Stop Exam Button
-    ├── raw-docs.html                # Raw Documents & Copy Text Hub (~2.5MB bundled raw text viewer & 1-click copy)
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn)
     └── js/
@@ -83,25 +83,22 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant cancelMockExam
-        ├── raw-docs.js              # Copy text, search filter, smooth jump scroll, and toast notification controller
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            ├── mock-exam-data.js    # Clean 60 Unique Core Scenario Questions Dataset v13.0 (0% template clones, 100% unique stems)
-            └── raw-docs-data.js     # Bundled dataset of 5 markdown study guides + mock-exam-data.js text
+            └── mock-exam-data.js    # Expanded 644 Unique Core Scenario Questions Dataset v18.0 (100% valid JSON)
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
-- **Clean 60 Unique Questions Dataset v13.0 (`mock-exam-data.js`):** Pruned dataset keeping only the 60 100% unique core scenario questions (D1: 13, D2: 12, D3: 12, D4: 12, D5: 11). Removed all 440 parametric template clones. Verified 100% unique question stems with zero scenario duplication.
-- **Raw Documents & Copy Text Hub (`raw-docs.html` & `raw-docs.js`):** Built dedicated raw text repository hosting 100% full text of 5 markdown study guides and updated `mock-exam-data.js` dataset (~2.5 MB text total). Features 1-click single file copy, master Copy All Files button, text search filter, and instant toast notifications.
-- **Interactive Practice Arena & Preset Selectors (`mock-exam.html` & `mock-exam.js`):** Updated domain breakdown counters (D1: 13, D2: 12, D3: 12, D4: 12, D5: 11) and preset count buttons (10, 25, 50, 60).
-- **Instant Stop Exam Mechanism (`cancelMockExam`):** Added `🛑 Dừng Thi / Hủy Bài` button in header bar with smooth reset and state recovery, eliminating native `confirm()` blocking.
+- **Expanded 644 Unique Questions Dataset v18.0 (`mock-exam-data.js`):** Formatted all 289 output files in `tài liệu/generate/output` and merged 570 unique Gold Standard questions into `mock-exam-data.js`, expanding the pool from 74 to 644 scenario questions (D1: 116, D2: 121, D3: 153, D4: 169, D5: 85). Verified 100% valid JS/JSON syntax, 0 duplicate IDs, 0 duplicate scenarios, and balanced answer spread (178 A / 175 B / 148 C / 143 D).
+- **Navigation & Page Cleanup:** Completely deleted deprecated Copy Raw Docs page (`raw-docs.html`, `js/raw-docs.js`, `js/data/raw-docs-data.js`) and cleaned up all navigation links across `domains.html`, `learn.html`, `principles.html`, and `mock-exam.html`.
+- **Interactive Practice Arena & Simulator (`mock-exam.html` & `mock-exam.js`):** Supports practice filtering and exam simulation across 644 scenario questions.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

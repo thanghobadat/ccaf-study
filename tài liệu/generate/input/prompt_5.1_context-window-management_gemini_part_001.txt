@@ -1,0 +1,91 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d5-b10-5.1-001", "d5-b10-5.1-002".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D5 — Context Management & Reliability
+Subtopic: 5.1 Context Window Management
+Gemini part: 1/5
+Original source prompt: prompt_5.1_context-window-management.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d5-b10-5.1-001` — angle-01 — correct=0 (A)
+   Scenario: 200-page technical spec review: changes in pages 80-120 missed → lost-in-middle
+2. ID `d5-b10-5.1-002` — angle-02 — correct=1 (B)
+   Scenario: 50-turn customer support conversation: constraints from turn 3 forgotten by turn 45
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- 90-page legal contract, pages 40-55 missed → lost-in-middle → reposition critical content
+Any: legal contract with pages 40-55 analysis scenario
+
+## TECHNICAL PRINCIPLES
+- Lost-in-the-middle: model accuracy drops for content in MIDDLE of long context — strong at start/end
+- Fix options: (1) move critical info to start or end; (2) multi-pass targeted reads; (3) summarization
+- Key-facts block: maintain persistent summary of essential facts at context START — survives long conversations
+- Tool result trimming: remove large tool outputs once processed — don't keep raw API responses
+- Progressive summarization: as context fills, condense older turns into key-facts block
+- Context budget rule: leave at least 20% headroom for model response — never fill to 100%
+- Max tokens vs context window: max_tokens = output limit (different from context_window input limit)
+- Context overflow: API returns error when input exceeds context window — must handle gracefully
+- Compaction (Claude Code): summarizes conversation automatically when approaching limit — may lose precision
+- When NOT to summarize: when verbatim content needed (code, SQL schema, legal text) — summarization loses precision
+- Token counting: use token counting API endpoint before sending to avoid overflow surprise
+- Multi-turn context growth: each turn adds tokens — prune/summarize proactively, not reactively
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `5.1 context-window-management / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D5",
+  "domainTitle": "Context Management & Reliability",
+  "taskStatement": "5.1 context-window-management / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 5.1: Context Window Management", "url": "https://claudecertificationguide.com/learn/5-context-management/5-1-context-window-management"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

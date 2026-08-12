@@ -1,0 +1,87 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d5-b11-5.5-005", "d5-b11-5.5-006".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D5 — Context Management & Reliability
+Subtopic: 5.5 Message Batches API
+Gemini part: 3/7
+Original source prompt: prompt_5.5_message-batches-api.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d5-b11-5.5-005` — angle-05 — correct=0 (A)
+   Scenario: Operations polls completion every second, creating needless traffic.
+2. ID `d5-b11-5.5-006` — angle-06 — correct=1 (B)
+   Scenario: Webhook delivery fails; use idempotent handler plus polling fallback.
+
+## EXISTING SCENARIOS TO AVOID
+- Blocking pre-merge review vs overnight technical-debt report
+- Batch of 200 security documents with 15 oversized failures; chunk/resubmit by `custom_id`
+- Recall-only 50% cost/24-hour tradeoff
+- Correlating CI results to pull requests through `custom_id`
+- Existing legal contract overnight extraction with changed counts/costs
+
+## TECHNICAL PRINCIPLES
+- Batches are asynchronous and 50% cheaper for latency-tolerant bulk work.
+- Maximum 10,000 requests per batch.
+- Interactive/real-time workloads remain synchronous.
+- Discover completion via polling or webhook.
+- Results remain available for 29 days; copy elsewhere for longer retention.
+- Use stable `custom_id`, idempotent submission/ingestion, manifests, and mixed sync/batch routing.
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `5.5 message-batches-api / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D5",
+  "domainTitle": "Context Management & Reliability",
+  "taskStatement": "5.5 message-batches-api / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 5.5: Message Batches API", "url": "https://claudecertificationguide.com/learn/5-context-management/5-5-message-batches-api"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

@@ -1,0 +1,104 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d1-b03-B-015", "d1-b03-B-016".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D1 — Agent Architecture & Orchestration
+Subtopic: 1.3 Subagent Invocation Context — Part B: Failure Handling, Context & Multi-Round
+Gemini part: 8/9
+Original source prompt: prompt_1.3B_subagent-failure-handling.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d1-b03-B-015` — angle-15 — correct=2 (C)
+   Scenario: B15: Coordinator spawns subagents for all 10 customer accounts in parallel \u2192 subagent #7 processes account #3 data (wrong account due to context injection error)
+2. ID `d1-b03-B-016` — angle-16 — correct=3 (D)
+   Scenario: B16: Subagent context isolation: subagent cannot access coordinator's memory of prior turns \u2014 coordinator must re-inject constraint from turn 1
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. Financial pipeline: market-data(12s) + news-sentiment(9s) sequential → parallel
+2. Multi-agent codebase migration — subagent A returns metadata, B receives prose
+3. Research coordinator strips source URLs → attribution lost
+4. Legal system coordinator generates message but no subagent executes (allowedTools missing Task)
+
+From Part A (DO NOT REPEAT these angles):
+- Task tool missing in allowedTools (customer analytics, supply chain scenarios)
+- Direct subagent-to-subagent communication (hub-and-spoke violation)
+- Passing full conversation history to subagents (context overload)
+- Metadata stripping: passing prose instead of structured fields (medical, e-commerce)
+- Sequential vs parallel for independent tasks (HR, document review)
+- Write tool given to read-only subagent
+- Partial aggregation (dropping some results)
+- Insufficient Task description (missing context, missing input fields)
+- Parallel spawning rate limit / account limit
+
+## TECHNICAL PRINCIPLES
+- Subagent failure detection: coordinator checks result for error indicator — not just "got a response"
+- Retry strategy: coordinator decides to retry subagent, use cached result, or escalate to human
+- Partial failure in parallel batch: 3/5 succeed → coordinator uses 3 or aborts all?
+- Shared knowledge injection: coordinator must explicitly pass shared context each subagent needs (not implicit)
+- Downstream dependency: if subagent A output feeds subagent B, B cannot spawn until A completes
+- Multi-round orchestration: coordinator spawns round-1 subagents → collects → spawns round-2 based on round-1 results
+- Iterative decomposition: task broken into subtasks dynamically as information is discovered
+- Subagent system prompt: coordinator can inject specialized instructions via Task tool
+- Result synthesis strategy: coordinator aggregates structured results, not raw prose
+- Audit trail: coordinator logs which subagent produced which piece of output
+- Subagent context isolation: subagent cannot read coordinator's full history — only what coordinator passes
+- Citation tracking: coordinator must collect source references from each subagent and consolidate
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `1.3 subagent-invocation-context / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D1",
+  "domainTitle": "Agent Architecture & Orchestration",
+  "taskStatement": "1.3 subagent-invocation-context / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 1.3: Subagent Invocation", "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-3-subagent-invocation-context"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

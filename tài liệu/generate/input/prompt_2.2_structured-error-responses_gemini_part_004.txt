@@ -1,0 +1,92 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b04-2.2-007", "d2-b04-2.2-008".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.2 Structured Error Responses
+Gemini part: 4/5
+Original source prompt: prompt_2.2_structured-error-responses.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b04-2.2-007` — angle-07 — correct=2 (C)
+   Scenario: Input validation: model passes wrong date format, gets generic 400 error, doesn't know which field to fix
+2. ID `d2-b04-2.2-008` — angle-08 — correct=3 (D)
+   Scenario: Error escalation: model escalates retryable transient error instead of retrying → unnecessary human interrupt
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- check_inventory() returns [] for both out-of-stock AND permission denied → duplicate orders
+- check_stock returns [] for both permission error and no results → purchasing agent confused
+Any scenario: inventory check, warehouse management with ambiguous empty array
+
+## TECHNICAL PRINCIPLES
+- NEVER return same signal (empty array, null, generic string) for semantically different error types
+- Error categories and their required fields:
+  - Permission/Auth error: {"error": "ACCESS_DENIED", "retryable": false, "message": "..."}
+  - Not found (valid empty): {"results": [], "count": 0, "message": "No matching records"}
+  - Transient/retryable: {"error": "SERVICE_UNAVAILABLE", "retryable": true, "retry_after_seconds": 30}
+  - Validation error: {"error": "INVALID_INPUT", "field": "date_of_birth", "message": "Expected YYYY-MM-DD"}
+- retryable boolean: model uses this to decide whether to retry or escalate to human
+- error_code vs message: error_code is machine-readable for branching; message is human-readable
+- Structured errors enable model to: retry transient errors, escalate auth errors, correct input validation errors
+- Unstructured errors ("Error: something went wrong") → model cannot take appropriate action
+- Tool MUST distinguish: (a) empty result, (b) error (permission), (c) error (not found), (d) error (input invalid)
+- Downstream agent impact: if tool conflates errors, downstream logic makes wrong decisions
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.2 structured-error-responses / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.2 structured-error-responses / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.2: Structured Error Responses", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-2-structured-error-responses"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

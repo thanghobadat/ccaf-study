@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-001",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-01",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-001",
+    "scenarioSignature": {
+      "testedPrinciple": "stop_reason determines loop continuation regardless of text content blocks",
+      "failureMode": "agent loop terminates prematurely when response contains text preamble alongside tool calls",
+      "rootCause": "driver inspects content block types instead of checking stop_reason",
+      "requiredFix": "evaluate stop_reason field to drive tool execution and loop iteration"
+    },
+    "questionEN": "An automated database migration orchestrator (DBMigrateAgent) invokes the Anthropic Messages API. During a schema validation step, Claude returns a message containing a text preamble ('Analyzing table constraints...') followed by two tool_use blocks (run_sql_query and check_index_status). The custom driver checks any(block.type == 'text' for block in response.content) and immediately terminates the loop, returning the preamble string to the user. As a result, database verification queries are never executed. How should the driver logic be modified to ensure all tool calls execute properly?",
+    "question": "[d1-b01-1.1-001] Một trình điều phối dịch chuyển cơ sở dữ liệu tự động (DBMigrateAgent) gọi Anthropic Messages API. Trong bước xác thực schema, Claude trả về một message chứa đoạn văn bản mở đầu ('Analyzing table constraints...') theo sau bởi hai block tool_use (run_sql_query và check_index_status). Driver tùy chỉnh kiểm tra any(block.type == 'text' for block in response.content) và lập tức dừng vòng lặp, trả về chuỗi văn bản mở đầu cho người dùng. Kết quả là các truy vấn xác minh cơ sở dữ liệu không bao giờ được thực thi. Driver logic nên được sửa đổi như thế nào để đảm bảo tất cả lệnh gọi tool được thực thi đúng cách?",
+    "optionsEN": [
+      "A. Update the driver loop to check if response.stop_reason == 'tool_use' rather than evaluating block types in response.content, and process all tool_use blocks present in the response.",
+      "B. Strip all text blocks from response.content before parsing tool invocations, ensuring the driver only receives pure tool_use arrays.",
+      "C. Configure tool_choice={'type': 'any'} in the API payload to explicitly forbid Claude from outputting text preambles alongside tool calls.",
+      "D. Increase max_tokens and set temperature=0 so that Claude generates tool calls without preceding explanation text."
+    ],
+    "options": [
+      "A. Cập nhật vòng lặp driver để kiểm tra liệu response.stop_reason == 'tool_use' thay vì đánh giá các kiểu block trong response.content, và xử lý tất cả các block tool_use có trong response.",
+      "B. Loại bỏ tất cả các block text khỏi response.content trước khi phân tích các lệnh gọi tool, đảm bảo driver chỉ nhận được mảng chứa thuần tool_use.",
+      "C. Cấu hình tool_choice={'type': 'any'} trong payload API để cấm Claude tạo ra đoạn văn bản mở đầu kèm theo các lệnh gọi tool.",
+      "D. Tăng max_tokens và đặt temperature=0 để Claude tạo các lệnh gọi tool mà không có văn bản giải thích phía trước."
+    ],
+    "correct": 0,
+    "optionExplanations": [
+      "Option A (Correct): Evaluating response.stop_reason == 'tool_use' ensures the driver executes all tool blocks in response.content regardless of preamble text, allowing the agentic loop to continue correctly.",
+      "Option B (Incorrect): Stripping text blocks does not fix the root cause because the driver's termination check still triggers on the original text block presence before stripping occurs.",
+      "Option C (Incorrect): Setting tool_choice={'type': 'any'} forces tool selection but can prevent natural turn completion (end_turn) and lead to infinite loops without addressing how the driver inspects stop_reason.",
+      "Option D (Incorrect): Adjusting max_tokens and temperature alters generation parameters but does not guarantee the complete omission of text blocks, nor does it fix the flawed driver logic."
+    ],
+    "rationale": "Checking response.stop_reason is the authoritative mechanism for determining if Claude requires tool execution (stop_reason == 'tool_use') or has completed its task (stop_reason == 'end_turn'). Text preamble blocks frequently coexist with tool_use blocks in Claude responses, so relying on block type presence instead of stop_reason breaks loop execution.",
+    "explanation": "Việc kiểm tra response.stop_reason là cơ chế chuẩn duy nhất để xác định xem vòng lặp agentic cần tiếp tục thực thi tool (stop_reason == 'tool_use') hay dừng lại khi hoàn thành tác vụ (stop_reason == 'end_turn'). Claude thường xuyên trả về các text block (ví dụ: đoạn suy luận hoặc giải thích) cùng với các tool_use block trong cùng một tin nhắn.\n- Lựa chọn A đúng vì kiểm tra stop_reason == 'tool_use' sẽ cho phép driver thực thi đầy đủ các tool_use block bất kể có đoạn text mở đầu hay không.\n- Lựa chọn B sai vì việc loại bỏ text block không giải quyết được logic dừng vòng lặp sai lầm vốn kích hoạt ngay từ trước khi lọc.\n- Lựa chọn C sai vì ép buộc tool_choice={'type': 'any'} làm mất khả năng tự kết thúc tự nhiên (end_turn) của model và gây ra vòng lặp vô tận.\n- Lựa chọn D sai vì thay đổi parameter thế hệ không đảm bảo model ngưng tạo text block và không sửa được driver logic.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-002",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-02",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-002",
+    "scenarioSignature": {
+      "testedPrinciple": "all tool_use blocks in a response must have corresponding tool_result blocks appended",
+      "failureMode": "api error when trailing tool calls lack matching tool_result responses",
+      "rootCause": "driver loop processes only the first tool block instead of iterating all tool_use blocks",
+      "requiredFix": "iterate all tool blocks and append tool_result entries for every tool_use_id"
+    },
+    "questionEN": "A cloud infrastructure automation agent (CloudInfraProvisioner) sends a task to the Messages API. Claude responds with a message containing three parallel tool_use blocks (create_vpc, create_subnet, create_security_group). The custom driver only extracts response.content[0], executes create_vpc, appends a single tool_result block, and sends the updated conversation to the API. The API returns an invalid_request_error stating that tool_use blocks are missing matching tool_result blocks. How should the driver be refactored to handle multiple tool calls correctly?",
+    "question": "[d1-b01-1.1-002] Một agent tự động hóa hạ tầng đám mây (CloudInfraProvisioner) gửi một tác vụ tới Messages API. Claude phản hồi bằng một tin nhắn chứa ba block tool_use song song (create_vpc, create_subnet, create_security_group). Driver tùy chỉnh chỉ trích xuất response.content[0], thực thi create_vpc, đính kèm một block tool_result duy nhất, và gửi hội thoại đã cập nhật lại API. API trả về invalid_request_error thông báo rằng các block tool_use bị thiếu các block tool_result tương ứng. Driver nên được refactor như thế nào để xử lý chính xác nhiều lệnh gọi tool?",
+    "optionsEN": [
+      "A. Split the tool_use blocks in a single assistant response into separate assistant messages within the conversation history before calling the Messages API.",
+      "B. Iterate through all tool_use blocks in response.content, execute each function, and construct matching tool_result blocks for every tool_use_id in a single user message.",
+      "C. Set tool_choice={'type': 'tool', 'name': 'create_vpc'} to force Claude to issue only one tool call per turn.",
+      "D. Parse response.stop_reason and if it is 'tool_use', terminate the agent loop immediately after the first tool execution to prevent duplicate calls."
+    ],
+    "options": [
+      "A. Chia tách các block tool_use trong một câu trả lời của assistant thành nhiều tin nhắn assistant riêng biệt trong lịch sử hội thoại trước khi gọi Messages API.",
+      "B. Lặp qua tất cả các block tool_use trong response.content, thực thi từng hàm, và tạo các block tool_result tương ứng cho mọi tool_use_id trong một tin nhắn user duy nhất.",
+      "C. Đặt tool_choice={'type': 'tool', 'name': 'create_vpc'} để buộc Claude chỉ phát ra một lệnh gọi tool duy nhất trong mỗi lượt.",
+      "D. Phân tích response.stop_reason và nếu là 'tool_use', dừng vòng lặp agent lập tức sau khi thực thi tool đầu tiên để tránh các lệnh gọi trùng lặp."
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "Option A (Incorrect): Splitting single assistant responses into multiple artificial assistant messages corrupts the API conversation turn structure and does not resolve missing tool results.",
+      "Option B (Correct): Iterating all tool_use blocks and returning a tool_result for each tool_use_id satisfies API validation requirements and allows Claude to process all completed actions in the next turn.",
+      "Option C (Incorrect): Restricting tool_choice to a single tool name disables parallel tool execution capabilities and degrades multi-resource provisioning efficiency.",
+      "Option D (Incorrect): Stopping the loop after one tool execution leaves requested actions incomplete and prevents Claude from completing the workflow."
+    ],
+    "rationale": "When Claude returns multiple tool_use blocks within a single assistant message, every tool_use block must have a matching tool_result block (referenced by tool_use_id) provided in the subsequent user turn. Processing only response.content[0] leaves remaining tool_use blocks unhandled, breaking API schema validation.",
+    "explanation": "Khi Claude trả về nhiều block tool_use trong cùng một tin nhắn assistant (thực thi tool song song), Messages API yêu cầu mọi block tool_use phải có một block tool_result tương ứng (khớp theo tool_use_id) trong lượt của người dùng ngay tiếp theo.\n- Lựa chọn A sai vì tự ý chia tách response thành nhiều tin nhắn assistant sẽ làm hỏng cấu trúc lượt hội thoại của API.\n- Lựa chọn B đúng vì driver phải lặp qua toàn bộ mảng response.content, thực thi tất cả các tool, và trả về đầy đủ các block tool_result tương ứng cho mọi tool_use_id.\n- Lựa chọn C sai vì cấu hình tool_choice như vậy sẽ triệt tiêu khả năng gọi tool song song và không giải quyết được lỗi driver hiện tại.\n- Lựa chọn D sai vì việc dừng vòng lặp sau tool đầu tiên khiến các tài nguyên hạ tầng còn lại không bao giờ được khởi tạo và tác vụ bị thất bại.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]

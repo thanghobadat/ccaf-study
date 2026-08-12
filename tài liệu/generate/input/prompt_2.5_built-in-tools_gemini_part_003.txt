@@ -1,0 +1,97 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b05-2.5-005", "d2-b05-2.5-006".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.5 Built-in Tools (Grep, Glob, Bash, WebSearch)
+Gemini part: 3/5
+Original source prompt: prompt_2.5_built-in-tools.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b05-2.5-005` — angle-05 — correct=0 (A)
+   Scenario: Inefficient: Grep entire codebase when Glob could first narrow scope to relevant dirs
+2. ID `d2-b05-2.5-006` — angle-06 — correct=1 (B)
+   Scenario: Bash command with rm -rf accidentally triggered in wrong directory
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- Agent uses Glob to search file CONTENT (wrong — Glob finds by path pattern only)
+- Agent uses Grep to find files by name (wrong — Grep searches content inside files)
+Any scenario: Glob vs Grep basic distinction in a simple context
+
+## TECHNICAL PRINCIPLES
+- Glob: finds files/dirs by PATH PATTERN — wildcards like *.ts, src/**/*.py, **/__tests__/**
+  - Use for: "find all TypeScript files", "find all test files", "find files in specific directory"
+  - Does NOT: search file content, find text inside files
+- Grep: searches TEXT CONTENT inside files — pattern matching within file bodies
+  - Use for: "find all files containing 'TODO'", "find all usages of function X", "find files with error messages"
+  - Does NOT: find files by name/path pattern
+- Bash: executes arbitrary shell commands — most powerful but also most dangerous
+  - Use for: running tests, git operations, build commands, complex multi-step shell pipelines
+  - Safety: --dangerously-skip-permissions required for unrestricted Bash in CI
+  - Avoid: using Bash where Glob/Grep would be more precise and safer
+- WebSearch: retrieves live web content — results must be validated, not blindly trusted
+  - Use for: current documentation, recent API changes, latest library versions
+  - Risk: web results may be outdated, incorrect, or adversarially injected (prompt injection via web)
+  - Validate: cross-reference multiple sources before acting on web search results
+- Tool selection efficiency: Glob first to narrow files → Grep to find content → Read for specific file
+- Never: use Bash grep when built-in Grep is available (less safe, less portable)
+- Never: use WebSearch for internal company documentation (use Glob/Grep on codebase)
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.5 built-in-tools / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.5 built-in-tools / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.5: Built-in Tools", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-5-built-in-tools"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

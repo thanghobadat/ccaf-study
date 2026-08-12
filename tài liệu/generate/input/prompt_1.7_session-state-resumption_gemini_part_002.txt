@@ -1,0 +1,89 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d1-b03-1.7-003", "d1-b03-1.7-004".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D1 — Agent Architecture & Orchestration
+Subtopic: 1.7 Session State and Resumption
+Gemini part: 2/4
+Original source prompt: prompt_1.7_session-state-resumption.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d1-b03-1.7-003` — angle-03 — correct=2 (C)
+   Scenario: Missing checkpoint: 4-hour data processing job fails at step 18/20 → restarts from step 1
+2. ID `d1-b03-1.7-004` — angle-04 — correct=3 (D)
+   Scenario: State injection too large: injecting full 50K-token prior session instead of 2K summary
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- Developer resumes Claude Code session after modifying 3 files in 50-file codebase → stale tool results → fresh session + injected summary + targeted re-read
+Any variation of: resuming after file changes, stale context from prior session
+
+## TECHNICAL PRINCIPLES
+- Stale context problem: resumed session has tool results from BEFORE state changed → agent gives wrong advice
+- Correct fix: fresh session + inject summary of prior findings + targeted re-read of ONLY changed parts
+- WRONG fixes: (a) re-read all N files (wasteful), (b) resume same session (stale data persists), (c) fork_session for stale data (wrong tool)
+- fork_session: for DIVERGENT EXPLORATION — trying two different approaches from same baseline. NOT for handling stale context.
+- Session state externalization: persist agent state (decisions, findings, context) to external storage (DB, file) so it survives session end
+- Checkpoint pattern: for long multi-hour tasks, save progress checkpoints so failure at step 7/20 doesn't restart from step 1
+- State injection: at session start, inject: (1) summary of previous findings, (2) list of changes since last session, (3) current task objective
+- Context budget: don't inject entire previous session — summarize to key facts (< 2K tokens)
+- State drift: external state (DB, files) changes while agent context is stale → agent acts on wrong assumptions
+- Idempotent resumption: design agent to safely re-execute steps if unsure whether they completed
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `1.7 session-state-resumption / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D1",
+  "domainTitle": "Agent Architecture & Orchestration",
+  "taskStatement": "1.7 session-state-resumption / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 1.7: Session State and Resumption", "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-7-session-state-resumption"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

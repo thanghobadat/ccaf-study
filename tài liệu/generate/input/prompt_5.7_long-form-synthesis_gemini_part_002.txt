@@ -1,0 +1,90 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d5-b12-5.7-003", "d5-b12-5.7-004".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D5 — Context Management & Reliability
+Subtopic: 5.7 Long-Form Synthesis
+Gemini part: 2/7
+Original source prompt: prompt_5.7_long-form-synthesis.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d5-b12-5.7-003` — angle-03 — correct=2 (C)
+   Scenario: One claim has three supporting documents; schema permits only one `source_id`.
+2. ID `d5-b12-5.7-004` — angle-04 — correct=3 (D)
+   Scenario: Executive summary combines two claims into one sentence but retains one source.
+
+## EXISTING SCENARIOS TO AVOID
+- Growth rates from different years shown with source/date
+- Financial filings/news/white-paper workers lose attribution in final report
+- Annual-report citation lost downstream; structured value/source/page/date fix
+- Conflicting medical studies preserved with methodology/sample size
+- Snowflake 12% vs API 8% dual attribution
+- Quarterly claims needing refresh timestamps
+- Architecture guide requiring file/line/retrieval date
+- 50-page document split into per-section extraction/reconciliation
+
+## TECHNICAL PRINCIPLES
+- Every report claim links to source evidence.
+- Use structured `{claim, source_id, confidence}` tuples; support multiple sources and source versions.
+- Preserve provenance and evidentiary strength through paraphrasing and formatting.
+- Synthesize sections separately, then merge with deduplication/reconciliation.
+- Merge-added assertions require provenance; unsupported claims are retrieved or omitted.
+- Preserve conflicting attributed positions rather than average into false consensus.
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `5.7 long-form-synthesis / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D5",
+  "domainTitle": "Context Management & Reliability",
+  "taskStatement": "5.7 long-form-synthesis / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 5.7: Long-Form Synthesis", "url": "https://claudecertificationguide.com/learn/5-context-management/5-7-long-form-synthesis"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

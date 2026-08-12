@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-005",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-05",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-005",
+    "scenarioSignature": {
+      "testedPrinciple": "preservation of tool_use and tool_result block pairs in conversation history",
+      "failureMode": "API returns invalid_request_error due to missing tool_use block",
+      "rootCause": "driver overwrites assistant tool_use message with tool_result",
+      "requiredFix": "append tool_result as a new user message following the assistant tool_use message"
+    },
+    "questionEN": "An orchestrator service running an agentic loop executes a database query requested by Claude via a tool_use block. When appending the response to the context window, the driver replaces the assistant message containing the tool_use block with a single user message containing the tool_result block instead of maintaining both blocks. Why does the Anthropic API reject the subsequent call with an invalid_request_error?",
+    "question": "[d1-b01-1.1-005] Một dịch vụ điều phối running một agentic loop thực thi một câu truy vấn cơ sở dữ liệu do Claude yêu cầu qua khối tool_use. Khi thêm phản hồi vào cửa sổ ngữ cảnh, driver thay thế tin nhắn của assistant chứa khối tool_use bằng một tin nhắn user đơn lẻ chỉ chứa khối tool_result thay vì giữ lại cả hai khối. Tại sao API Anthropic lại từ chối lệnh gọi tiếp theo với lỗi invalid_request_error?",
+    "optionsEN": [
+      "A. The API requires the complete assistant message containing the original tool_use block to precede the user message containing the tool_result block with matching tool_use_id.",
+      "B. Replacing the message drops the iteration cost cap metadata, causing the loop driver to fail internal token accounting.",
+      "C. The system prompt requires tool_result blocks to be nested inside an assistant message rather than a user message.",
+      "D. Overwriting the assistant message causes the model's stop_reason to revert from tool_use to end_turn, terminating the loop prematurely."
+    ],
+    "options": [
+      "A. API yêu cầu tin nhắn đầy đủ của assistant chứa khối tool_use ban đầu phải đứng trước tin nhắn của user chứa khối tool_result có tool_use_id tương ứng.",
+      "B. Việc thay thế tin nhắn làm mất dữ liệu giới hạn chi phí mỗi vòng lặp, khiến driver thất bại trong việc tính toán token nội bộ.",
+      "C. Prompt hệ thống yêu cầu các khối tool_result phải được lồng bên trong tin nhắn của assistant thay vì tin nhắn của user.",
+      "D. Việc ghi đè tin nhắn của assistant khiến stop_reason của mô hình chuyển từ tool_use về end_turn, làm ngắt vòng lặp quá sớm."
+    ],
+    "correct": 0,
+    "optionExplanations": [
+      "Option A is correct: The Anthropic API requires conversation history to preserve assistant messages with tool_use blocks followed by user messages with corresponding tool_result blocks using matching tool_use_id values.",
+      "Option B is incorrect: Token accounting or cost caps are managed client-side or via metadata headers and do not trigger Anthropic API schema validation errors.",
+      "Option C is incorrect: tool_result content blocks must be placed inside user messages, not assistant messages; the error arises from omitting the preceding assistant tool_use message.",
+      "Option D is incorrect: stop_reason is returned by the API response and is not stored as a stateful parameter inside past message content arrays that causes schema validation errors."
+    ],
+    "rationale": "Replacing the assistant message removes the tool_use block from context. The Anthropic API enforces that every tool_result block in a user message must reference a tool_use block in the immediately preceding assistant message via tool_use_id.",
+    "explanation": "Để thực thi công cụ đúng cách trong vòng lặp agent của Claude, lịch sử trò chuyện phải duy trì cả tin nhắn từ assistant chứa khối tool_use và tin nhắn tiếp theo từ user chứa khối tool_result với tool_use_id khớp nhau. Lựa chọn A giải thích đúng nguyên nhân gây ra invalid_request_error. Lựa chọn B sai vì việc tính toán token không gây ra lỗi schema API. Lựa chọn C sai vì tool_result thuộc về user message. Lựa chọn D sai vì stop_reason là thuộc tính phản hồi trả về từ API chứ không phải trường dữ liệu điều khiển schema tin nhắn.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-006",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-06",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-006",
+    "scenarioSignature": {
+      "testedPrinciple": "impact of forced tool_choice modes on loop termination",
+      "failureMode": "agent stuck calling redundant tools in infinite loop",
+      "rootCause": "tool_choice set to any prevents model from choosing end_turn",
+      "requiredFix": "dynamically relax tool_choice to auto or default after required tool execution"
+    },
+    "questionEN": "A travel itinerary builder agent is configured with tool_choice: {\"type\": \"any\"} forced on every API request. After compiling the complete itinerary with flight and hotel bookings, the agent remains stuck in an infinite loop calling non-essential lookup tools instead of delivering the final text summary to the user. What is the technical cause of this behavior, and how should it be resolved?",
+    "question": "[d1-b01-1.1-006] Một agent lập lịch trình du lịch được cấu hình ép buộc tool_choice: {\"type\": \"any\"} trên mỗi yêu cầu API. Sau khi thu thập đủ thông tin chuyến bay và khách sạn để hoàn tất lịch trình, agent bị kẹt trong một vòng lặp vô hạn gọi các công cụ tra cứu không cần thiết thay vì trả về tóm tắt văn bản cuối cùng cho người dùng. Nguyên nhân kỹ thuật của hiện tượng này là gì và làm thế nào để khắc phục?",
+    "optionsEN": [
+      "A. The model requires max_tokens to be doubled when tool_choice is set to any so that it can append text alongside tool calls.",
+      "B. Forcing tool_choice: any prevents the model from choosing stop_reason: end_turn; the driver must switch tool_choice to auto or omit it once mandatory tools finish.",
+      "C. The system prompt lacks an explicit end_turn tool, preventing the model from signaling completion when tool_choice is set to any.",
+      "D. The API automatically sets stop_reason to max_tokens when tool_choice: any is active, requiring an increased iteration cap."
+    ],
+    "options": [
+      "A. Mô hình yêu cầu gấp đôi max_tokens khi tool_choice được đặt thành any để có thể đính kèm văn bản cùng với các lời gọi công cụ.",
+      "B. Việc ép buộc tool_choice: any ngăn mô hình chọn stop_reason: end_turn; driver phải chuyển tool_choice sang auto hoặc bỏ cấu hình này sau khi hoàn thành các công cụ bắt buộc.",
+      "C. Prompt hệ thống thiếu công cụ end_turn rõ ràng, khiến mô hình không thể phát tín hiệu hoàn thành khi tool_choice được đặt thành any.",
+      "D. API tự động đặt stop_reason thành max_tokens khi tool_choice: any hoạt động, yêu cầu tăng giới hạn số vòng lặp."
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "Option A is incorrect: max_tokens limits generation length per response and does not control whether the model emits text versus tool execution requests under tool_choice.",
+      "Option B is correct: tool_choice: {\"type\": \"any\"} forces the model to select at least one tool on every turn, preventing it from outputting an end_turn stop reason; transitioning to auto or default behavior lets the model finalize text responses.",
+      "Option C is incorrect: end_turn is a standard API stop_reason and completion signal, not a custom user-defined tool block that must be injected into the tools schema.",
+      "Option D is incorrect: stop_reason: max_tokens is triggered only when token output caps are reached, not automatically as a byproduct of enforcing tool_choice: any."
+    ],
+    "rationale": "Setting tool_choice: {\"type\": \"any\"} forces the model to select at least one tool on every turn, disabling its ability to return a standard text completion with stop_reason: \"end_turn\". Relaxing tool_choice permits the agent to finish its execution naturally.",
+    "explanation": "Cấu hình tool_choice: {\"type\": \"any\"} bắt buộc mô hình phải chọn ít nhất một công cụ trong mỗi phản hồi, khiến mô hình không bao giờ có thể tự phát ra stop_reason: end_turn để hoàn tất nhiệm vụ. Để khắc phục, driver cần linh hoạt chuyển tool_choice về auto hoặc loại bỏ tham số này sau khi các bước thu thập dữ liệu chính hoàn tất. Lựa chọn A sai vì max_tokens không ảnh hưởng đến việc chọn công cụ. Lựa chọn C sai vì end_turn là cơ chế ngắt của API chứ không phải một công cụ tự định nghĩa. Lựa chọn D sai vì stop_reason: max_tokens chỉ xảy ra khi vượt quá giới hạn token.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]

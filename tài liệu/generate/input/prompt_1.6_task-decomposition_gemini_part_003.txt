@@ -1,0 +1,93 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d1-b03-1.6-005", "d1-b03-1.6-006".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D1 — Agent Architecture & Orchestration
+Subtopic: 1.6 Task Decomposition Strategies
+Gemini part: 3/4
+Original source prompt: prompt_1.6_task-decomposition.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d1-b03-1.6-005` — angle-05 — correct=0 (A)
+   Scenario: Wrong decomposition: sequential pipeline for parallelizable subtasks → 5x slower
+2. ID `d1-b03-1.6-006` — angle-06 — correct=1 (B)
+   Scenario: Over-decomposition: spawning 50 micro-agents for 50 sentences — coordination overhead
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- Code review agent processes 14 files, detailed feedback for files 1-5, misses bugs in 10-14, flags same pattern inconsistently → attention dilution → multi-pass architecture
+- Security audit agent scans 18 microservices, superficial for 12-18 → attention dilution
+Any variation of: multi-file code review with attention dilution as root cause
+
+## TECHNICAL PRINCIPLES
+- Attention dilution: too many items in one pass → quality drops for later items, inconsistent cross-item behavior
+- Multi-pass fix: (1) per-item local analysis pass, (2) cross-item integration pass — NOT a single monolithic pass
+- Glob → Grep → Read: map structure first, then search content, then read specific files (never read all files first)
+- Task decomposition patterns:
+  - Sequential pipeline: fixed steps A→B→C (code review: style → security → docs)
+  - Parallel fan-out: independent subtasks spawned concurrently, results merged
+  - Iterative refinement: draft → review → revise loop until quality threshold met
+  - Hierarchical: coordinator breaks into subproblems, subagents handle each
+- Wrong decomposition: treating a hierarchical problem as sequential → coordinator bottleneck
+- Under-decomposition: everything in one agent context → attention dilution
+- Over-decomposition: too many tiny agents → coordination overhead exceeds benefit
+- Scratchpad pattern: write intermediate analysis to file during complex investigation
+- Build dependency graph BEFORE making cross-file changes
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `1.6 task-decomposition / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D1",
+  "domainTitle": "Agent Architecture & Orchestration",
+  "taskStatement": "1.6 task-decomposition / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 1.6: Task Decomposition Strategies", "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-6-task-decomposition"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

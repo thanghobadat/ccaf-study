@@ -1,0 +1,87 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d4-b11-4.8-001", "d4-b11-4.8-002".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D4 — Prompt Engineering & Structured Output
+Subtopic: 4.8 JSON Schema
+Gemini part: 1/7
+Original source prompt: prompt_4.8_json-schema.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d4-b11-4.8-001` — angle-01 — correct=0 (A)
+   Scenario: Top-level object lacks `additionalProperties:false`, allowing helper fields.
+2. ID `d4-b11-4.8-002` — angle-02 — correct=1 (B)
+   Scenario: Deployment environment string should be finite enum, not free text.
+
+## EXISTING SCENARIOS TO AVOID
+- Prompt-only JSON vs schema-enforced `tool_use`
+- Moderation category with 47 spelling variants fixed by enum+other
+- Required non-null fields causing invented missing dates/amounts
+- Spam classifier fabricating `target_demographic`
+- Nullable-vs-absent/default/nested-nullable scenarios from 4.6
+- Invoice sum/date cross-field semantic validation
+
+## TECHNICAL PRINCIPLES
+- Include `$schema`, object `type`, `properties`, `required`, and `additionalProperties:false`.
+- Use `enum` for finite sets, `minItems`/`maxItems` for array cardinality, and `items` for element shape.
+- Nested objects need their own strictness and required fields.
+- Property descriptions communicate units/semantics; semantic IDs may be strings even if numeric-looking.
+- JSON Schema structural constraints do not replace business-rule validation.
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `4.8 json-schema / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D4",
+  "domainTitle": "Prompt Engineering & Structured Output",
+  "taskStatement": "4.8 json-schema / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 4.8: JSON Schema", "url": "https://claudecertificationguide.com/learn/4-prompt-engineering/4-8-json-schema"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

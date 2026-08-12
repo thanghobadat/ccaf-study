@@ -1,0 +1,99 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d4-b09-B-003", "d4-b09-B-004".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D4 — Prompt Engineering & Structured Output
+Subtopic: 4.6 Nullable Fields in JSON Schema — Part B: Schema Design & Technical Patterns
+Gemini part: 2/11
+Original source prompt: prompt_4.6B_nullable-schema-design.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d4-b09-B-003` — angle-03 — correct=2 (C)
+   Scenario: B3: `default: "N/A"` in schema → model outputs "N/A" string instead of null → downstream string comparison fails
+2. ID `d4-b09-B-004` — angle-04 — correct=3 (D)
+   Scenario: B4: `additionalProperties: false` + nullable field → model tries to add `_nullable_flag` helper field → rejected by schema
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+1. Auto insurance claims — pedestrian claim has no vehicle_vin — model hallucinates fake VIN
+2. Insurance driver_license_number — pedestrian accident — model fabricates 9-digit number
+
+From Part A (already generated — these domains ARE USED, do NOT reuse same field+domain):
+- Medical/diagnostic_code, E-commerce/coupon_code, HR/previous_employer, Legal/opposing_counsel
+- Banking/co_borrower_id, Travel/return_date, Real estate/tenant_name, Healthcare/referring_physician
+- Tax/spouse_ssn, Logistics/customs_broker_id, Insurance/witness_statement, Recruitment/linkedin_url
+
+## TECHNICAL PRINCIPLES
+- `{"field": null}` ≠ `{}` (field absent) — completely different semantic meaning
+- Nullable: `"type": ["string", "null"]` — field present with null value
+- Optional (not in required): field may be absent entirely — UNPREDICTABLE model behavior
+- Pattern: make ALL optional contextual fields BOTH nullable AND in required array → forces explicit null signal
+- `additionalProperties: false` + nullable fields interaction: model cannot add unlisted fields
+- `default` values: not enforced by Claude — model may or may not use them; cannot replace required+nullable pattern
+- `oneOf: [{"type":"string"},{"type":"null"}]` vs `"type":["string","null"]` — both valid, same semantic
+- Multiple nullable fields: 3+ nullable fields in same schema — all must follow same pattern
+- Validation cascade: model outputs `{}` missing nullable field → downstream treats as "no data" → wrong business logic
+- Retry with schema error: on validation failure, include exact field name and expected type in retry prompt
+- Null vs empty string: `null` = "not applicable/unknown"; `""` = "applicable but blank" — semantically different
+- Null vs 0 (for numbers): `null` = "not applicable"; `0` = "zero value, applicable" — same distinction
+- Nested nullable: `address.apartment_number` nullable inside required address object — depth adds complexity
+- Array nullable: `tags: null` vs `tags: []` — null = no tags field applicable; [] = applicable but empty
+- Schema documentation: `"description"` field in schema helps model understand WHEN to output null vs value
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `4.6 nullable-fields / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D4",
+  "domainTitle": "Prompt Engineering & Structured Output",
+  "taskStatement": "4.6 nullable-fields / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 4.6: Nullable Fields", "url": "https://claudecertificationguide.com/learn/4-prompt-engineering/4-6-nullable-fields"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

@@ -1,0 +1,96 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d2-b04-new-001", "d2-b04-new-002".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D2 — Tool Design & MCP Integration
+Subtopic: 2.1 Tool Schema Design  EPart A: Descriptions, Constraints & Naming
+Gemini part: 1/7
+Original source prompt: prompt_2.1_tool-schema-design.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d2-b04-new-001` — angle-01 — correct=0 (A)
+   Scenario: A1: `get_ticket()` and `create_ticket()` both vaguely described as "handles tickets" ↁEmodel calls create when it should read
+2. ID `d2-b04-new-002` — angle-02 — correct=1 (B)
+   Scenario: A2: `update_order(status: string)`  Eno enum constraint ↁEmodel passes "Pending" when valid values are "pending"|"shipped"|"delivered"
+
+## EXISTING SCENARIOS TO AVOID
+1. Database admin agent with monolithic manage_database(action: backup|query|drop_table) tool
+2. Customer support flight-booking agent  Esearch_flights fails with HTTP 400 because of wrong parameter type
+3-12. Database maintenance execute_sql_query(query: string) in turns 2-11 (ALL variations of this scenario  Eavoid entirely)
+Additional existing:
+- Granular vs monolithic tool split (security context)
+- Strict validation and descriptions example
+
+## TECHNICAL PRINCIPLES
+- Tool description: clearly state WHAT the tool does, WHEN to use it, WHAT it returns, and WHAT errors it may throw
+- Granular tools: one tool per action (read_customer, update_customer, delete_customer) > monolithic manage_customer(action)
+- Benefit of granular: clearer model reasoning, safer (can give read tool to read-only subagent), easier audit
+- Parameter descriptions: guide model to use correct types  Einclude format examples in description
+- enum constraints: use enum for fixed value sets  Eprevents model from guessing
+- pattern constraints: use regex pattern for structured strings (phone numbers, IDs, dates)
+- required vs optional parameters: make the model explicit about what's needed
+- Tool return schema: document the return value shape so model knows what to expect
+- Ambiguous tool names: model may call wrong tool; fix with clear naming + descriptions
+- Over-broad tools: a tool that does everything is hard to reason about and unsafe
+- Tool for read vs write: separate read tools from write tools for safety
+- Error documentation in tool schema: list possible error codes and their meanings
+- Input validation in tool implementation: validate before executing  Ereturn structured error, not exception
+- Tool naming conventions: use verb_noun format (get_customer, create_order, delete_file)
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `2.1 tool-schema-design / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D2",
+  "domainTitle": "Tool Design & MCP Integration",
+  "taskStatement": "2.1 tool-schema-design / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 2.1: Tool Schema Design", "url": "https://claudecertificationguide.com/learn/2-tool-design-mcp/2-1-tool-schema-design"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

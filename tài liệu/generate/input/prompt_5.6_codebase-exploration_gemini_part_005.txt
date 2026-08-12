@@ -1,0 +1,91 @@
+You are generating a very small CCAF exam-question batch for Gemini Flash.
+
+## NON-NEGOTIABLE OUTPUT CONTRACT
+- Generate exactly 2 question objects.
+- Output one valid JSON array only. No markdown fences, introduction, notes, or trailing text.
+- The first character must be `[`; the last character must be `]`.
+- Expected IDs, in this exact order: "d5-b10-5.6-009", "d5-b10-5.6-010".
+- Use each assigned scenario exactly once. Do not invent a replacement scenario.
+- Do not create a second question from the same scenario by changing names, numbers, metrics, industries, or option order.
+- Think privately, then emit JSON only.
+
+## TASK
+Domain: D5 — Context Management & Reliability
+Subtopic: 5.6 Codebase Exploration Strategies
+Gemini part: 5/5
+Original source prompt: prompt_5.6_codebase-exploration.txt
+
+## ASSIGNED QUESTIONS
+1. ID `d5-b10-5.6-009` — angle-09 — correct=0 (A)
+   Scenario: Grep for "error handling patterns" → conceptual query, semantic search better
+2. ID `d5-b10-5.6-010` — angle-10 — correct=1 (B)
+   Scenario: Build output dist/ not ignored → agent modifies compiled .js instead of TypeScript source
+
+## EXISTING SCENARIOS TO AVOID
+From 254 official bank:
+- Agent reads all 80 files before starting → context explosion
+- Glob → Grep → Read sequential strategy
+Any: basic "read all files first" anti-pattern vs Glob/Grep/Read solution
+
+## TECHNICAL PRINCIPLES
+- Optimal exploration order: Glob (map structure) → Grep (find exact symbols) → Read (target files only)
+- NEVER reverse order: don't read files before knowing which ones are relevant
+- Semantic search vs Grep: semantic = conceptually related code; Grep = exact text match — use each appropriately
+- Dependency graph: build import/call graph BEFORE cross-file refactor — avoids breaking hidden callers
+- Scratchpad: write intermediate findings to file during long investigation — don't rely on context memory alone
+- Incremental: Explore → Understand → Plan → Implement → Test one file at a time — not batch
+- Test after each change: run tests after EVERY file change — not batch at end
+- Read interface first: understand public API before reading implementation details
+- Ignore generated files: node_modules, dist/, build/, __pycache__ — use .claudeignore or .gitignore
+- Symbol search: Grep for exact function/class name; semantic search for "code that handles X"
+- Entry point first: README → package.json/pyproject.toml → main entry file — not random
+
+## QUALITY GATE FOR EACH QUESTION
+1. The English stem must be a concrete production scenario containing at least two of: exact API/CLI/schema field; named system; observable metric/failure.
+2. All four options must be plausible and in the same technical domain. No generic options such as “use a bigger model” or “add manual intervention.”
+3. Exactly one option is correct, at the assigned zero-based index. The option letter and `correct` value must agree.
+4. Explain the scenario-specific consequence of every option. Do not reuse generic explanation sentences.
+5. `question` and `options` are faithful Vietnamese translations of the English fields.
+6. Never copy an official stem and never create a number-swap, company-swap, or metric-swap variant.
+7. Set `taskStatement` to `5.6 codebase-exploration / angle-NN` using the assigned angle number.
+8. Set `scenarioId` to `g-<question-id>`.
+9. Fill `scenarioSignature` with four short canonical English phrases. Remove company names, numbers, product names, and decorative wording. Two questions with the same tested principle, failure mode, root cause, and required fix are the SAME scenario and are forbidden.
+10. The stem and correct option must faithfully implement the assigned scenario; do not merely copy the assigned angle into `scenarioSignature` while writing a different question.
+
+## REQUIRED OBJECT SCHEMA
+{
+  "id": "assigned exact ID",
+  "domain": "D5",
+  "domainTitle": "Context Management & Reliability",
+  "taskStatement": "5.6 codebase-exploration / angle-NN",
+  "difficulty": "application",
+  "scenarioId": "g-assigned-question-id",
+  "scenarioSignature": {
+    "testedPrinciple": "canonical technical principle being tested",
+    "failureMode": "observable failure without names or numbers",
+    "rootCause": "technical root cause without names or numbers",
+    "requiredFix": "correct architectural action without names or numbers"
+  },
+  "questionEN": "Concrete English scenario and question",
+  "question": "[assigned exact ID] Vietnamese translation",
+  "optionsEN": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+  "correct": 0,
+  "optionExplanations": [
+    "Option A ...: scenario-specific analysis",
+    "Option B ...: scenario-specific analysis",
+    "Option C ...: scenario-specific analysis",
+    "Option D ...: scenario-specific analysis"
+  ],
+  "rationale": "Why the assigned answer solves this exact scenario",
+  "explanation": "Vietnamese detailed explanation covering all four options",
+  "sources": [{"label": "Lesson 5.6: Codebase Exploration", "url": "https://claudecertificationguide.com/learn/5-context-management/5-6-codebase-exploration"}]
+}
+
+## FINAL SELF-CHECK BEFORE OUTPUT
+- Array length is exactly 2.
+- IDs and order match the expected list.
+- Correct indexes match the assignments above.
+- Every options array and optionExplanations array has exactly four items.
+- Every scenarioSignature has all four non-empty canonical fields and matches the actual stem/correct option.
+- JSON parses without comments, code fences, trailing commas, or literal unescaped newlines inside strings.

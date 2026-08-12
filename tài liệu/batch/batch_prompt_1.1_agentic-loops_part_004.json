@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-007",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-07",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-007",
+    "scenarioSignature": {
+      "testedPrinciple": "distinction between safety cap reached and natural turn completion",
+      "failureMode": "falsely reporting successful task completion on safety truncation",
+      "rootCause": "orchestrator loop exit assumes completion without checking stop reason",
+      "requiredFix": "verify stop reason is end turn before declaring execution success"
+    },
+    "questionEN": "A multi-agent workflow in an enterprise orchestrator reaches its maximum execution threshold of max_iterations=10 while the latest API response contains stop_reason=\"tool_use\". The orchestration framework breaks the loop and marks the job status as SUCCESS with a 200 OK response. Why did the system falsely report successful execution, and how should the loop handler handle this boundary state?",
+    "question": "[d1-b01-1.1-007] Một luồng công việc đa agent trong bộ điều phối doanh nghiệp đạt ngưỡng thực thi tối đa max_iterations=10 trong khi phản hồi API mới nhất chứa stop_reason=\"tool_use\". Khung điều phối thoát khỏi vòng lặp và đánh dấu trạng thái công việc là SUCCESS với phản hồi 200 OK. Tại sao hệ thống lại báo cáo sai là thực thi thành công, và trình xử lý vòng lặp nên xử lý trạng thái ranh giới này như thế nào?",
+    "optionsEN": [
+      "A. The orchestrator used HTTP 200 OK status as a completion signal instead of parsing the response payload.",
+      "B. The model emitted an implicit end_turn token in text blocks prior to initiating tool call parameters.",
+      "C. The loop controller exited upon hitting max_iterations and assumed normal completion without verifying if stop_reason was end_turn.",
+      "D. The runtime framework automatically transformed stop_reason=\"tool_use\" to end_turn when the iteration cap was breached."
+    ],
+    "options": [
+      "A. Bộ điều phối đã sử dụng mã HTTP 200 OK làm tín hiệu hoàn tất thay vì phân tích cú pháp tải dữ liệu phản hồi.",
+      "B. Mô hình đã phát ra một token end_turn ngầm trong các khối văn bản trước khi khởi tạo các tham số gọi công cụ.",
+      "C. Bộ điều khiển vòng lặp thoát khi đạt max_iterations và giả định hoàn tất bình thường mà không xác minh xem stop_reason có phải là end_turn hay không.",
+      "D. Framework thời gian chạy tự động chuyển đổi stop_reason=\"tool_use\" thành end_turn khi giới hạn vòng lặp bị vi phạm."
+    ],
+    "correct": 2,
+    "optionExplanations": [
+      "Option A incorrect: While HTTP status indicates network delivery success, the core issue is that hitting max_iterations during pending tool execution was treated as a successful completion by the loop controller.",
+      "Option B incorrect: The scenario explicitly specifies that the response stop_reason is tool_use, meaning no end_turn signal was provided by the model.",
+      "Option C correct: When max_iterations is reached while stop_reason is tool_use, the task remains incomplete. The controller must treat reaching the limit as a safety cap truncation error rather than a successful task completion.",
+      "Option D incorrect: The API does not modify response stop_reason fields dynamically based on client-side max_iterations counter logic."
+    ],
+    "rationale": "Reaching a safety cap (max_iterations) while stop_reason is tool_use means the loop was truncated mid-task with pending tool requests. The loop logic must check whether stop_reason is end_turn before returning a successful result, and surface a truncated/incomplete execution error when the iteration cap is reached.",
+    "explanation": "Khi vòng lặp agent đạt đến giới hạn an toàn max_iterations=10 trong khi stop_reason vẫn là \"tool_use\", điều đó có nghĩa là công việc của agent chưa hoàn thành và vẫn còn các lệnh gọi công cụ chưa được thực thi. Bộ điều khiển vòng lặp phải kiểm tra stop_reason: nếu thoát vòng lặp do vượt quá max_iterations mà stop_reason không phải là end_turn, hệ thống phải báo lỗi gián đoạn/quá ngưỡng (safety cap reached) thay vì giả định nhiệm vụ đã hoàn thành thành công (SUCCESS).\n- Lựa chọn A sai vì HTTP 200 OK chỉ xác nhận yêu cầu mạng thành công chứ không phản ánh trạng thái hoàn thành công việc của agent.\n- Lựa chọn B sai vì stop_reason được API trả về rõ ràng là tool_use, không có token end_turn nào đè lên.\n- Lựa chọn C đúng vì bộ điều khiển vòng lặp đã bỏ qua việc xác minh stop_reason khi đạt giới hạn vòng lặp max_iterations, dẫn đến việc báo cáo sai trạng thái thành công.\n- Lựa chọn D sai vì API không tự động chuyển đổi stop_reason từ tool_use thành end_turn khi client đạt giới hạn max_iterations.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-008",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-08",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-008",
+    "scenarioSignature": {
+      "testedPrinciple": "authoritative stop reason preservation in telemetry pipeline middleware",
+      "failureMode": "infinite agentic loop caused by modified response state metadata",
+      "rootCause": "middleware rewrites standard stop reason into custom string causing orchestrator check failure",
+      "requiredFix": "preserve raw API stop reason field or map telemetry back to expected lifecycle tokens"
+    },
+    "questionEN": "In an enterprise agent deployment, custom observability middleware intercepts API responses and rewrites stop_reason=\"end_turn\" into \"APP_AGENT_IDLE\" for custom logging dashboards. Following this update, the agentic loop enters an infinite retry cycle after completing its initial output. What architectural defect causes this infinite loop?",
+    "question": "[d1-b01-1.1-008] Trong một triển khai agent doanh nghiệp, middleware giám sát tùy chỉnh chặn các phản hồi API và ghi lại stop_reason=\"end_turn\" thành \"APP_AGENT_IDLE\" cho các bảng điều khiển ghi log tùy chỉnh. Sau bản cập nhật này, vòng lặp agentic đi vào một chu kỳ thử lại vô hạn sau khi hoàn thành đầu ra ban đầu. Khuyết điểm kiến trúc nào gây ra vòng lặp vô hạn này?",
+    "optionsEN": [
+      "A. The middleware strips assistant message content blocks before appending them to conversation history.",
+      "B. The LLM API rejects subsequent requests due to non-conforming role labels in conversation context.",
+      "C. The application fails to supply tool_result content blocks for completed operations.",
+      "D. The orchestrator loop evaluates stop_reason == 'end_turn' to break execution, causing unrecognized custom statuses to default to continuation."
+    ],
+    "options": [
+      "A. Middleware loại bỏ các khối nội dung tin nhắn của assistant trước khi thêm chúng vào lịch sử trò chuyện.",
+      "B. LLM API từ chối các yêu cầu tiếp theo do các nhãn vai trò không tuân thủ trong ngữ cảnh trò chuyện.",
+      "C. Ứng dụng không cung cấp các khối nội dung tool_result cho các thao tác đã hoàn thành.",
+      "D. Vòng lặp điều phối đánh giá stop_reason == 'end_turn' để dừng thực thi, khiến các trạng thái tùy chỉnh không được công nhận mặc định tiếp tục vòng lặp."
+    ],
+    "correct": 3,
+    "optionExplanations": [
+      "Option A incorrect: Content block stripping would cause payload format validation errors rather than clean continuous loop iterations.",
+      "Option B incorrect: The issue arises from response interpretation logic in the loop controller, not API server-side role validation failure.",
+      "Option C incorrect: The scenario states the initial output completed without pending tools; missing tool_result blocks are unrelated to end_turn transformation.",
+      "Option D correct: The agent loop controller relies on standard stop_reason values (like end_turn) to break execution. Mutating this field in telemetry middleware prevents the termination check from evaluating to true, leading to endless iterations."
+    ],
+    "rationale": "The loop controller relies on strict matching of authoritative stop_reason values (specifically end_turn) to terminate the agent loop. When telemetry middleware mutates stop_reason into a custom domain string like APP_AGENT_IDLE, the orchestrator fails to recognize the stop signal and continues looping indefinitely.",
+    "explanation": "Bộ điều khiển vòng lặp agent phụ thuộc vào giá trị chuẩn của trường stop_reason (cụ thể là \"end_turn\") để quyết định khi nào dứt điểm vòng lặp. Khi middleware giám sát thay đổi stop_reason từ \"end_turn\" thành chuỗi tùy chỉnh như \"APP_AGENT_IDLE\", câu lệnh kiểm tra điều kiện thoát (ví dụ response.stop_reason == 'end_turn') sẽ luôn trả về false, khiến vòng lặp điều phối không thể dừng và rơi vào chu kỳ chạy vô hạn.\n- Lựa chọn A sai vì việc loại bỏ khối nội dung sẽ dẫn đến lỗi xác thực cấu trúc dữ liệu chứ không phải tiếp tục vòng lặp bình thường.\n- Lựa chọn B sai vì vấn đề xuất phát từ logic giải mã phản hồi ở phía client/orchestrator chứ không phải từ phía server API từ chối role.\n- Lựa chọn C sai vì kịch bản xảy ra khi agent đã hoàn thành đầu ra (end_turn), không liên quan đến kết quả gọi công cụ tool_result.\n- Lựa chọn D đúng vì việc middleware ghi đè giá trị stop_reason tiêu chuẩn đã làm hỏng điều kiện dừng của bộ điều phối.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]

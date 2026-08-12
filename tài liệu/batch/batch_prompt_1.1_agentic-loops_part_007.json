@@ -1,0 +1,88 @@
+[
+  {
+    "id": "d1-b01-1.1-013",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-13",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-013",
+    "scenarioSignature": {
+      "testedPrinciple": "complete message history preservation across agentic iterations",
+      "failureMode": "agent hallucination and loss of initial user constraints during multi turn tool invocation",
+      "rootCause": "driver overwrites messages array with only the latest tool result payload",
+      "requiredFix": "append assistant message and tool result to full conversation history array"
+    },
+    "questionEN": "A financial analysis agent receives a request containing strict user constraints (e.g., 'exclude Q3 data' and 'output in EUR'). To reduce token costs, the orchestrator driver overwrites the messages array on iteration 2 so it contains only the initial user prompt and the latest user message with the tool_result block, discarding the intermediate assistant tool_use message and earlier tool exchanges. Why does this history truncation design produce incorrect financial reports?",
+    "question": "[d1-b01-1.1-013] Một agent phân tích tài chính nhận được yêu cầu chứa các ràng buộc nghiêm ngặt của người dùng (ví dụ: 'loại trừ dữ liệu Q3' và 'xuất bằng EUR'). Để giảm chi phí token, trình điều khiển bộ điều phối ghi đè mảng messages ở lượt 2 để nó chỉ chứa prompt người dùng ban đầu và tin nhắn user mới nhất có khối tool_result, loại bỏ tin nhắn assistant chứa tool_use trung gian và các trao đổi công cụ trước đó. Tại sao thiết kế cắt giảm lịch sử này lại tạo ra các báo cáo tài chính không chính xác?",
+    "optionsEN": [
+      "A. Discarding intermediate assistant tool_use messages breaks the model's multi-step reasoning context, causing it to lose track of executed steps and violate user constraints.",
+      "B. The Claude API dynamically reconstructs pruned conversation turns using server-side caching of the request conversation tree.",
+      "C. Truncating message history automatically forces the API stop reason to evaluate as end_turn on the next iteration.",
+      "D. Omitting intermediate turns reduces latency without impacting model reasoning accuracy because system prompt rules remain active."
+    ],
+    "options": [
+      "A. Việc loại bỏ các tin nhắn assistant chứa tool_use trung gian làm hỏng ngữ cảnh suy luận đa bước của mô hình, khiến nó mất dấu các bước đã thực thi và vi phạm các ràng buộc của người dùng.",
+      "B. API Claude tự động tái cấu trúc các lượt trò chuyện bị cắt tỉa bằng cách sử dụng bộ đệm phía server của cây trò chuyện yêu cầu.",
+      "C. Việc cắt ngắn lịch sử tin nhắn sẽ tự động buộc lý do dừng API đánh giá là end_turn ở lượt tiếp theo.",
+      "D. Việc bỏ qua các lượt trung gian làm giảm độ trễ mà không ảnh hưởng đến độ chính xác suy luận của mô hình vì các quy tắc system prompt vẫn hoạt động."
+    ],
+    "correct": 0,
+    "optionExplanations": [
+      "Option A correct: Agentic loops require maintaining the full sequence of assistant tool calls and user tool results alongside original instructions. Pruning previous turns causes context loss, leading to re-execution of tools or ignoring original user constraints.",
+      "Option B incorrect: Claude API endpoints are stateless; the server does not reconstruct missing conversation turns unless explicitly sent by the client.",
+      "Option C incorrect: Truncating message history does not alter model logic to emit end_turn; it distorts the model's understanding of current state.",
+      "Option D incorrect: Model accuracy relies heavily on full context history; stripping intermediate turns degrades reasoning and constraint adherence."
+    ],
+    "rationale": "Claude API calls in agentic loops must preserve full conversation history (user prompts, assistant tool call messages, and user tool result messages). Overwriting or truncating history removes critical intermediate context, breaking model reasoning continuity and causing constraint violations.",
+    "explanation": "Các cuộc gọi API Claude trong một vòng lặp agentic mang tính phi trạng thái (stateless), do đó ứng dụng phía client có trách nhiệm duy trì toàn bộ chuỗi lịch sử trò chuyện (gồm prompt người dùng ban đầu, các tin nhắn assistant chứa tool_use và các tin nhắn user chứa tool_result). Nếu trình điều khiển cắt giảm hoặc ghi đè mảng messages để bỏ qua các lượt tool_use trung gian nhằm tiết kiệm token, mô hình sẽ mất đi ngữ cảnh suy luận đa bước. Kết quả là agent sẽ mất dấu những gì đã thực hiện, lặp lại các lệnh gọi công cụ không cần thiết hoặc vi phạm các ràng buộc ban đầu của người dùng.\n- Lựa chọn A đúng vì việc loại bỏ các lượt trung gian làm đứt gãy mạch suy luận và làm trôi ngữ cảnh các quy tắc người dùng đã đưa ra.\n- Lựa chọn B sai vì API Claude không tự khôi phục lịch sử trò chuyện phía server nếu client không gửi lên.\n- Lựa chọn C sai vì việc cắt ngắn lịch sử không làm cho mô hình tự động phát ra end_turn.\n- Lựa chọn D sai vì bỏ qua các lượt trung gian làm suy giảm nghiêm trọng độ chính xác suy luận của mô hình.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  },
+  {
+    "id": "d1-b01-1.1-014",
+    "domain": "D1",
+    "domainTitle": "Agent Architecture & Orchestration",
+    "taskStatement": "1.1 agentic-loops / angle-14",
+    "difficulty": "application",
+    "scenarioId": "g-d1-b01-1.1-014",
+    "scenarioSignature": {
+      "testedPrinciple": "distinction between safety caps and normal completion control logic",
+      "failureMode": "misclassifying budget or turn exhaustion as successful task completion",
+      "rootCause": "developer uses safety caps as primary termination signals instead of stop reason end turn",
+      "requiredFix": "rely on stop reason end turn for task completion and handle caps as truncation errors"
+    },
+    "questionEN": "An incident root-cause investigation agent is configured with max_iterations=15 and a $2.00 budget safety cap. In the orchestrator code, the developer implements the loop condition as while (current_iteration < max_iterations && current_cost < max_budget), and returns job status COMPLETED_SUCCESS whenever this loop exits. Why is using safety caps as primary loop completion logic an anti-pattern?",
+    "question": "[d1-b01-1.1-014] Một agent điều tra nguyên nhân gốc rễ sự cố được cấu hình với max_iterations=15 và giới hạn chi phí an toàn $2.00. Trong mã bộ điều phối, nhà phát triển triển khai điều kiện vòng lặp dưới dạng while (current_iteration < max_iterations && current_cost < max_budget) và trả về trạng thái công việc COMPLETED_SUCCESS bất cứ khi nào vòng lặp này kết thúc. Tại sao việc sử dụng các giới hạn an toàn làm logic hoàn thành vòng lặp chính là một anti-pattern?",
+    "optionsEN": [
+      "A. Budget and iteration caps are enforced on the API server side, making client side counter evaluation redundant.",
+      "B. Safety caps are backstops for runaways; treating cap exhaustion as successful completion returns incomplete investigations when the model intended to continue (stop_reason=\"tool_use\").",
+      "C. The agentic loop should only evaluate cumulative token metrics instead of tracking financial cost or turn counts.",
+      "D. Setting max_iterations=15 automatically forces Claude to emit stop_reason=\"end_turn\" on the 15th iteration."
+    ],
+    "options": [
+      "A. Các giới hạn chi phí và vòng lặp được thực thi ở phía server API, khiến việc đánh giá bộ đếm phía client trở nên dư thừa.",
+      "B. Các giới hạn an toàn là rào chắn chống chạy ngoài kiểm soát; coi việc cạn kiệt giới hạn là hoàn thành thành công sẽ trả về kết quả điều tra chưa xong khi mô hình vẫn muốn tiếp tục (stop_reason=\"tool_use\").",
+      "C. Vòng lặp agentic chỉ nên đánh giá các chỉ số token tích lũy thay vì theo dõi chi phí tài chính hoặc số lượt chạy.",
+      "D. Việc đặt max_iterations=15 tự động buộc Claude phải phát ra stop_reason=\"end_turn\" ở lượt thứ 15."
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "Option A incorrect: The Claude API does not track application-level iteration limits or custom cost limits; client-side tracking is required.",
+      "Option B correct: Iteration and budget caps exist solely to prevent infinite loops and budget overruns. The authoritative completion signal is stop_reason=\"end_turn\". Reaching a cap while stop_reason=\"tool_use\" means the investigation was truncated mid-process and should be flagged as incomplete or failed.",
+      "Option C incorrect: Cost caps and iteration counts are both valid safety backstops, but neither serves as primary task completion logic.",
+      "Option D incorrect: The model is unaware of client-side max_iterations settings and will not alter its stop_reason based on external iteration counters."
+    ],
+    "rationale": "Safety caps (turn limits and cost bounds) serve as defensive guards against runaway loops, not task completion indicators. Primary loop completion logic must strictly check for stop_reason=\"end_turn\". Exiting the loop due to a breached cap must be handled as a truncation exception.",
+    "explanation": "Các giới hạn an toàn như số lượt chạy tối đa (max_iterations) và ngân sách tài chính (max_budget) chỉ đóng vai trò là rào chắn phòng thủ (backstops) nhằm ngăn chặn các vòng lặp vô tận hoặc chi phí phát sinh ngoài kiểm soát. Tín hiệu hoàn thành nhiệm vụ chuẩn xác duy nhất là stop_reason=\"end_turn\" do mô hình trả về. Nếu vòng lặp kết thúc vì chạm đến giới hạn lượt hoặc chi phí trong khi stop_reason vẫn là tool_use, nhiệm vụ điều tra đó thực chất chưa hoàn thành (bị cắt ngang) và phải được báo lỗi/dừng dở dang chứ không thể trả về COMPLETED_SUCCESS.\n- Lựa chọn A sai vì API của Claude không tự quản lý các giới hạn lượt chạy hoặc giới hạn ngân sách tùy chỉnh của phía client.\n- Lựa chọn B đúng vì các giới hạn an toàn chỉ để ngăn quá tải/tốn chi phí; dùng chúng để kết luận công việc hoàn thành thành công sẽ dẫn đến việc báo cáo sai các tác vụ bị cắt ngang.\n- Lựa chọn C sai vì cả số lượt lẫn chi phí đều là rào chắn an toàn hợp lệ, nhưng không cái nào làm logic hoàn thành chính.\n- Lựa chọn D sai vì mô hình không tự biết được bộ đếm max_iterations ở phía client để đổi stop_reason thành end_turn.",
+    "sources": [
+      {
+        "label": "Lesson 1.1: Agentic Loops",
+        "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-1-agentic-loops"
+      }
+    ]
+  }
+]
