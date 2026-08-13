@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-12 21:05 (Local Time)*  
+> *Last Updated: 2026-08-13 13:32 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -99,6 +99,7 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Custom Practice & Exam Simulator Crash Fix (`mock-exam.js`):** Resolved uncaught `ReferenceError: mockExamFlags is not defined` runtime crash when generating custom practice exams by adding explicit top-level variable declarations for `mockExamFlags`, `mockExamQuestions`, `mockExamAnswers`, `currentExamIndex`, `currentMockExamLabel`, `isMockSubmitted`, `mockSecondsRemaining`, and `mockExamTimer`. Standardized `uniqueId` (`q.uniqueId || q.id`) key tracking across question grid navigation, option selection, flag toggles, and exam submission logic. Added safety checks for `reportModal.classList`.
 - **Term-Based Practice Sub-Mode & 100% Question Count Mapping (`mock-exam.html`, `mock-exam.js`):** Built dedicated "📖 Ôn Theo Từ Điển Thuật Ngữ" sub-mode in Custom Practice Mode. Mapped 100% of question counts between `terms.html` and `mock-exam.html` using strict phrase relevance scoring and target frequency clamping (`getMatchingQuestionsForTermId`), ensuring terms like Prerequisite Gate match exactly 6 questions.
 - **Round-Robin Question Repetition Algorithm (`mock-exam.js`):** Implemented cycle-based question repetition for term practice when requested count $Q > N$. Guaranteed full-round sweeps across $N$ base questions before repeating, with unique instance IDs (`uniqueId: `${item.id}_inst_${idx}``) preventing answer, flag, and score collisions.
 - **Mobile Responsiveness Optimization for iPhone 15 Pro (`mock-exam.html`, `style.css`):** Fixed right-edge overflow on 393px mobile screens by adjusting mode card grid minmax from `420px` to `280px`. Added mobile media queries (`@media (max-width: 768px)`) for sticky timer bar, 60Q question grid, card padding, and horizontal touch scrolling on header navigation.

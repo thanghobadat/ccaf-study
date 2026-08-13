@@ -1,4 +1,12 @@
 let currentPracticeSubMode = 'DOMAIN'; // 'DOMAIN' or 'TERM'
+let mockExamQuestions = [];
+let mockExamAnswers = {};
+let mockExamFlags = new Set();
+let currentExamIndex = 0;
+let currentMockExamLabel = '';
+let isMockSubmitted = false;
+let mockSecondsRemaining = 0;
+let mockExamTimer = null;
 
 window.switchPracticeSubMode = function(mode) {
   currentPracticeSubMode = mode;
@@ -307,8 +315,9 @@ function renderQuestionGrid() {
   if (!gridEl) return;
 
   gridEl.innerHTML = mockExamQuestions.map((q, idx) => {
-    const isAnswered = mockExamAnswers[q.id] !== undefined;
-    const isFlagged = mockExamFlags.has(q.id);
+    const qKey = q.uniqueId || q.id;
+    const isAnswered = mockExamAnswers[qKey] !== undefined;
+    const isFlagged = mockExamFlags.has(qKey);
     const isActive = idx === currentExamIndex;
 
     let btnClass = 'grid-nav-btn';
@@ -346,14 +355,15 @@ function renderCurrentQuestion() {
   const q = mockExamQuestions[currentExamIndex];
   if (!q) return;
 
+  const qKey = q.uniqueId || q.id;
   const currentLang = AppStore.getLang();
 
   const rawQText = (currentLang === 'EN' && q.questionEN) ? q.questionEN : q.question;
   const qText = rawQText.replace(/^\[.*?\]\s*/, '');
   const optsText = (currentLang === 'EN' && q.optionsEN) ? q.optionsEN : q.options;
 
-  const isSelected = mockExamAnswers[q.id];
-  const isFlagged = mockExamFlags.has(q.id);
+  const isSelected = mockExamAnswers[qKey];
+  const isFlagged = mockExamFlags.has(qKey);
 
   const taskTag = q.taskStatement ? `<span class="badge badge-d3" style="font-family: monospace; font-size: 0.78rem;">📌 ${q.taskStatement}</span>` : '';
   const diffTag = q.difficulty ? `<span class="badge badge-d2" style="font-size: 0.75rem; text-transform: uppercase;">⚡ ${q.difficulty}</span>` : '';
@@ -410,8 +420,8 @@ function renderCurrentQuestion() {
           const cardStyle = `display: flex !important; align-items: center !important; gap: 0.85rem !important; background: ${cardBg} !important; border: ${cardBorder} !important; padding: 1rem 1.25rem !important; border-radius: 12px !important; cursor: pointer !important; font-size: 0.95rem !important; color: ${cardColor} !important; margin-bottom: 0.75rem !important; box-shadow: ${cardShadow} !important; transition: all 0.2s ease !important;`;
 
           return `
-            <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption('${q.id}', ${oIdx})">
-              <input type="radio" name="mock_q_${q.id}" ${isSelected === oIdx ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
+            <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption('${qKey}', ${oIdx})">
+              <input type="radio" name="mock_q_${qKey}" ${isSelected === oIdx ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
               <span>${opt}</span>
             </label>
           `;
@@ -471,10 +481,11 @@ window.toggleFlagCurrentQuestion = function() {
   const q = mockExamQuestions[currentExamIndex];
   if (!q) return;
 
-  if (mockExamFlags.has(q.id)) {
-    mockExamFlags.delete(q.id);
+  const qKey = q.uniqueId || q.id;
+  if (mockExamFlags.has(qKey)) {
+    mockExamFlags.delete(qKey);
   } else {
-    mockExamFlags.add(q.id);
+    mockExamFlags.add(qKey);
   }
   renderQuestionGrid();
   renderCurrentQuestion();
@@ -561,7 +572,8 @@ window.submitMockExam = function() {
     if (!subtopicStats[ts]) subtopicStats[ts] = { total: 0, correct: 0 };
     subtopicStats[ts].total++;
 
-    if (mockExamAnswers[q.id] === q.correct) {
+    const qKey = q.uniqueId || q.id;
+    if (mockExamAnswers[qKey] === q.correct) {
       totalScore++;
       domainScores[q.domain] = (domainScores[q.domain] || 0) + 1;
       subtopicStats[ts].correct++;
@@ -594,7 +606,7 @@ window.submitMockExam = function() {
   const reportModal = document.getElementById('mock-report-modal');
   if (reportModal) {
     reportModal.style.display = 'flex';
-    reportModal.classList.add('active');
+    if (reportModal.classList) reportModal.classList.add('active');
     
     const scoreEl = document.getElementById('mock-report-score');
     if (scoreEl) scoreEl.textContent = `${percentage}%`;
