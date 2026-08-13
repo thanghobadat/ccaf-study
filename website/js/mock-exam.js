@@ -572,10 +572,40 @@ window.openReportModal = function() {
   const reportModal = document.getElementById('mock-report-modal');
   if (reportModal) {
     reportModal.style.display = 'flex';
-    reportModal.classList.add('active');
+    if (reportModal.classList) reportModal.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
+
+window.closeReportModal = function() {
+  const reportModal = document.getElementById('mock-report-modal');
+  if (reportModal) {
+    reportModal.style.display = 'none';
+    if (reportModal.classList) reportModal.classList.remove('active');
+  }
+};
+
+function refreshReportModalState(totalScore, isPassed) {
+  const statusEl = document.getElementById('mock-report-status');
+  const detailsEl = document.getElementById('mock-report-details');
+  const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+
+  if (statusEl) {
+    if (isPassed) {
+      statusEl.style.color = 'var(--accent-emerald)';
+      statusEl.textContent = curLang === 'EN' ? '🎉 CONGRATULATIONS! PASSED' : '🎉 CHÚC MỪNG! BẠN ĐÃ ĐẠT (PASS)';
+    } else {
+      statusEl.style.color = 'var(--accent-rose)';
+      statusEl.textContent = curLang === 'EN' ? '❌ FAILED - PRACTICE MORE' : '❌ CHƯA ĐẠT (FAIL) - CẦN ÔN THÊM';
+    }
+  }
+
+  if (detailsEl) {
+    detailsEl.textContent = curLang === 'EN'
+      ? `Correct: ${totalScore}/${mockExamQuestions.length} questions. Passing requirement: 72%.`
+      : `Trả lời đúng: ${totalScore}/${mockExamQuestions.length} câu. Yêu cầu đỗ: 72%.`;
+  }
+}
 
 window.cancelMockExam = function() {
   if (mockExamTimer) {
