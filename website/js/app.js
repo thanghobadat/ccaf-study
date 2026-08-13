@@ -130,6 +130,28 @@ const AppStore = {
     }
   },
 
+  recordExamResult(resultObj) {
+    const results = this.getQuizResults();
+    const now = new Date();
+    const dateStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+
+    results.unshift({
+      id: Date.now(),
+      domains: resultObj.label || 'MOCK_EXAM',
+      score: resultObj.correct || 0,
+      total: resultObj.total || 0,
+      percentage: resultObj.score !== undefined ? resultObj.score : Math.round(((resultObj.correct || 0) / (resultObj.total || 1)) * 100),
+      pass: resultObj.passed !== undefined ? resultObj.passed : false,
+      date: dateStr,
+      questions: resultObj.questions || [],
+      userAnswers: resultObj.userAnswers || {}
+    });
+
+    if (results.length > 30) results.length = 30;
+
+    localStorage.setItem(this.KEYS.QUIZ_RESULTS, JSON.stringify(results));
+  },
+
   toggleTheme() {
     const current = this.getTheme();
     const next = current === 'dark' ? 'light' : 'dark';

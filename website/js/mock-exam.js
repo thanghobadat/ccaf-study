@@ -231,7 +231,7 @@ window.startCustomPracticeExam = function() {
   currentExamIndex = 0;
   updateHeaderBarState();
 
-  mockSecondsRemaining = Math.max(5 * 60, Math.round(mockExamQuestions.length * 1.5 * 60));
+  mockSecondsRemaining = Math.max(5 * 60, Math.round(mockExamQuestions.length * 2 * 60));
 
   document.getElementById('mock-setup-card').style.display = 'none';
   document.getElementById('mock-arena-box').style.display = 'block';
@@ -279,7 +279,12 @@ window.startOfficialMockExam = function() {
   const d4Pool = drawUniqueDomain('D4', 12);
   const d5Pool = drawUniqueDomain('D5', 9);
 
-  mockExamQuestions = [...d1Pool, ...d2Pool, ...d3Pool, ...d4Pool, ...d5Pool].sort(() => Math.random() - 0.5);
+  mockExamQuestions = [...d1Pool, ...d2Pool, ...d3Pool, ...d4Pool, ...d5Pool].sort(() => Math.random() - 0.5).map((item, idx) => {
+    return {
+      ...item,
+      uniqueId: `${item.id}_official_${idx}`
+    };
+  });
 
   document.getElementById('mock-setup-card').style.display = 'none';
   document.getElementById('mock-arena-box').style.display = 'block';
@@ -314,6 +319,25 @@ function renderQuestionGrid() {
   const gridEl = document.getElementById('question-nav-grid');
   if (!gridEl) return;
 
+  const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+  const legendEl = document.getElementById('question-grid-legend');
+
+  if (legendEl) {
+    if (isMockSubmitted) {
+      legendEl.innerHTML = curLang === 'EN' 
+        ? '🔵 Active | 🟢 Correct | 🔴 Incorrect | ⚪ Unanswered | 🚩 Flagged'
+        : '🔵 Đang xem | 🟢 Câu Đúng | 🔴 Câu Sai | ⚪ Chưa Làm | 🚩 Cắm Cờ';
+    } else {
+      legendEl.innerHTML = curLang === 'EN'
+        ? '🔵 Active | 🟢 Answered | 🟡 Flagged | ⚪ Unanswered'
+        : '🔵 Đang xem | 🟢 Đã làm | 🟡 Cắm cờ | ⚪ Chưa làm';
+    }
+  }
+
+  let correctCount = 0;
+  let wrongCount = 0;
+  let unansweredCount = 0;
+
   gridEl.innerHTML = mockExamQuestions.map((q, idx) => {
     const qKey = q.uniqueId || q.id;
     const isAnswered = mockExamAnswers[qKey] !== undefined;
@@ -322,11 +346,30 @@ function renderQuestionGrid() {
 
     let btnClass = 'grid-nav-btn';
     if (isActive) btnClass += ' active-nav';
-    if (isFlagged) btnClass += ' flagged-nav';
-    if (isAnswered) btnClass += ' answered-nav';
+
+    if (isMockSubmitted) {
+      const userAnswer = mockExamAnswers[qKey];
+      if (userAnswer === q.correct) {
+        btnClass += ' correct-nav';
+        correctCount++;
+      } else if (userAnswer !== undefined) {
+        btnClass += ' wrong-nav';
+        wrongCount++;
+      } else {
+        btnClass += ' unanswered-submitted-nav';
+        unansweredCount++;
+      }
+      if (isFlagged) btnClass += ' flagged-nav-review';
+    } else {
+      if (isFlagged) btnClass += ' flagged-nav';
+      if (isAnswered) btnClass += ' answered-nav';
+    }
+
+    const flagBadgeHtml = isFlagged ? '<span class="grid-nav-flag-badge">🚩</span>' : '';
 
     return `
-      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})">
+      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})${isFlagged ? ' [🚩 Flagged]' : ''}">
+        ${flagBadgeHtml}
         ${idx + 1}
       </button>
     `;
@@ -336,7 +379,15 @@ function renderQuestionGrid() {
   const flaggedCount = mockExamFlags.size;
   const statsEl = document.getElementById('grid-stats-text');
   if (statsEl) {
-    statsEl.textContent = `Đã làm: ${answeredCount}/${mockExamQuestions.length} | Cắm cờ: ${flaggedCount}`;
+    if (isMockSubmitted) {
+      statsEl.textContent = curLang === 'EN' 
+        ? `Correct: ${correctCount}/${mockExamQuestions.length} | Incorrect: ${wrongCount} | Skipped: ${unansweredCount} | Flagged: ${flaggedCount}`
+        : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | Cắm cờ: ${flaggedCount}`;
+    } else {
+      statsEl.textContent = curLang === 'EN' 
+        ? `Answered: ${answeredCount}/${mockExamQuestions.length} | Flagged: ${flaggedCount}`
+        : `Đã làm: ${answeredCount}/${mockExamQuestions.length} | Cắm cờ: ${flaggedCount}`;
+    }
   }
 }
 
@@ -372,13 +423,13 @@ function renderCurrentQuestion() {
     <div class="card" style="padding: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="badge badge-${q.domain.toLowerCase()}">Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}</span>
+          <span class="badge badge-${q.domain.toLowerCase()}">${currentLang === 'EN' ? `Question ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}` : `Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}`}</span>
           ${taskTag}
           ${diffTag}
         </div>
         
         <button type="button" class="btn btn-secondary" style="font-size: 0.82rem; ${isFlagged ? 'background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber); color: var(--accent-amber);' : ''}" onclick="window.toggleFlagCurrentQuestion()">
-          ${isFlagged ? '🚩 Đã Cắm Cờ Bỏ Qua' : '🏁 Cắm Cờ Xem Lại (Flag)'}
+          ${isFlagged ? (currentLang === 'EN' ? '🚩 Flagged / Skip' : '🚩 Đã Cắm Cờ Bỏ Qua') : (currentLang === 'EN' ? '🏁 Flag for Review' : '🏁 Cắm Cờ Xem Lại (Flag)')}
         </button>
       </div>
 
@@ -431,7 +482,7 @@ function renderCurrentQuestion() {
       ${isMockSubmitted ? `
         <div class="callout ${isSelected === q.correct ? '' : 'callout-warning'}" style="margin-top: 1.5rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem;">
           <div class="callout-title" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; color: ${isSelected === q.correct ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
-            ${isSelected === q.correct ? '✅ ĐÁP ÁN CHÍNH XÁC' : '❌ CHƯA CHÍNH XÁC'}
+            ${isSelected === q.correct ? (currentLang === 'EN' ? '✅ CORRECT ANSWER' : '✅ ĐÁP ÁN CHÍNH XÁC') : (currentLang === 'EN' ? '❌ INCORRECT' : '❌ CHƯA CHÍNH XÁC')}
           </div>
 
           ${q.rationale ? `
@@ -459,11 +510,11 @@ function renderCurrentQuestion() {
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
         <button type="button" class="btn btn-secondary" onclick="window.jumpToQuestion(${currentExamIndex - 1})" ${currentExamIndex === 0 ? 'disabled style="opacity:0.5;"' : ''}>
-          ← Câu Trước
+          ${currentLang === 'EN' ? '← Previous' : '← Câu Trước'}
         </button>
 
         <button type="button" class="btn btn-primary" onclick="window.jumpToQuestion(${currentExamIndex + 1})" ${currentExamIndex === mockExamQuestions.length - 1 ? 'disabled style="opacity:0.5;"' : ''}>
-          Câu Tiếp Theo →
+          ${currentLang === 'EN' ? 'Next →' : 'Câu Tiếp Theo →'}
         </button>
       </div>
     </div>
@@ -496,20 +547,22 @@ function updateHeaderBarState() {
   const submitBtn = document.getElementById('btn-submit-mock');
   if (!cancelBtn || !submitBtn) return;
 
+  const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+
   if (isMockSubmitted) {
-    cancelBtn.innerHTML = '🏠 Về Trang Chọn Đề';
+    cancelBtn.innerHTML = curLang === 'EN' ? '🏠 Return to Selection' : '🏠 Về Trang Chọn Đề';
     cancelBtn.style.borderColor = 'var(--accent-purple)';
     cancelBtn.style.color = 'var(--accent-purple)';
 
-    submitBtn.innerHTML = '📊 Xem Báo Cáo Score';
+    submitBtn.innerHTML = curLang === 'EN' ? '📊 View Score Report' : '📊 Xem Báo Cáo Score';
     submitBtn.className = 'btn btn-primary';
     submitBtn.onclick = function() { window.openReportModal(); };
   } else {
-    cancelBtn.innerHTML = '🛑 Dừng Thi / Hủy Bài';
+    cancelBtn.innerHTML = curLang === 'EN' ? '🛑 Cancel Exam' : '🛑 Dừng Thi / Hủy Bài';
     cancelBtn.style.borderColor = 'var(--accent-rose)';
     cancelBtn.style.color = 'var(--accent-rose)';
 
-    submitBtn.innerHTML = '✓ Nộp Bài Thi & Xem Kết Quả';
+    submitBtn.innerHTML = curLang === 'EN' ? '✓ Submit & View Results' : '✓ Nộp Bài Thi & Xem Kết Quả';
     submitBtn.className = 'btn btn-success';
     submitBtn.onclick = function() { window.submitMockExam(); };
   }
@@ -594,7 +647,9 @@ window.submitMockExam = function() {
           score: percentage,
           passed: isPassed,
           correct: totalScore,
-          total: mockExamQuestions.length
+          total: mockExamQuestions.length,
+          questions: mockExamQuestions,
+          userAnswers: mockExamAnswers
         });
       }
     } catch (e) {
@@ -611,16 +666,7 @@ window.submitMockExam = function() {
     const scoreEl = document.getElementById('mock-report-score');
     if (scoreEl) scoreEl.textContent = `${percentage}%`;
 
-    const statusEl = document.getElementById('mock-report-status');
-    if (statusEl) {
-      statusEl.textContent = isPassed ? "🎉 BẠN ĐÃ ĐẠT (PASS)" : "⚠️ CHƯA ĐẠT (FAIL)";
-      statusEl.style.color = isPassed ? "var(--accent-emerald)" : "var(--accent-rose)";
-    }
-
-    const detailsEl = document.getElementById('mock-report-details');
-    if (detailsEl) {
-      detailsEl.textContent = `Bạn trả lời đúng ${totalScore}/${mockExamQuestions.length} câu. Ngưỡng đạt CCAF của Anthropic là 72%.`;
-    }
+    refreshReportModalState(totalScore, isPassed);
 
     // Render Domain Scores Breakdown
     const breakContainer = document.getElementById('mock-domain-breakdown');
@@ -665,16 +711,115 @@ window.submitMockExam = function() {
 
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.renderMockHistoryTable();
 };
 
-window.closeReportModal = function() {
-  const reportModal = document.getElementById('mock-report-modal');
-  if (reportModal) {
-    reportModal.style.display = 'none';
-    reportModal.classList.remove('active');
+window.renderMockHistoryTable = function() {
+  const container = document.getElementById('mock-history-table-container');
+  if (!container || typeof AppStore === 'undefined') return;
+
+  const history = AppStore.getQuizResults();
+  const curLang = AppStore.getLang();
+
+  if (!history || history.length === 0) {
+    container.innerHTML = `<div style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+      ${curLang === 'EN' ? 'No history recorded yet. Complete an exam to view results!' : 'Chưa có lịch sử thi nào được ghi nhận. Hãy bắt đầu một bài thi để lưu lại kết quả!'}
+    </div>`;
+    return;
   }
+
+  container.innerHTML = `
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>${curLang === 'EN' ? 'Date & Time' : 'Thời gian'}</th>
+          <th>${curLang === 'EN' ? 'Exam Mode' : 'Chế độ thi'}</th>
+          <th>${curLang === 'EN' ? 'Score' : 'Điểm số'}</th>
+          <th>${curLang === 'EN' ? 'Status' : 'Trạng thái'}</th>
+          <th>${curLang === 'EN' ? 'Action' : 'Thao tác'}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${history.map(item => {
+          const passClass = item.pass ? 'color: var(--accent-emerald); font-weight: bold;' : 'color: var(--accent-rose); font-weight: bold;';
+          const passBadge = item.pass ? '✅ PASS' : '❌ FAIL';
+          return `
+            <tr>
+              <td>${item.date}</td>
+              <td><code style="color: var(--accent-purple);">${item.domains}</code></td>
+              <td><strong>${item.score}/${item.total} (${item.percentage}%)</strong></td>
+              <td><span style="${passClass}">${passBadge}</span></td>
+              <td>
+                ${(item.questions && item.questions.length > 0) ? `
+                  <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.78rem;" onclick="window.viewMockHistoryDetail(${item.id})">
+                    👁️ ${curLang === 'EN' ? 'Review' : 'Xem lại'}
+                  </button>
+                ` : '<span style="color: var(--text-muted); font-size: 0.78rem;">--</span>'}
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
 };
+
+window.viewMockHistoryDetail = function(historyId) {
+  if (typeof AppStore === 'undefined') return;
+  const history = AppStore.getQuizResults();
+  const item = history.find(h => h.id === historyId);
+  if (!item || !item.questions || item.questions.length === 0) {
+    AppStore.showToast("⚠️ Không tìm thấy chi tiết bài thi này!");
+    return;
+  }
+
+  mockExamQuestions = item.questions;
+  mockExamAnswers = item.userAnswers || {};
+  mockExamFlags.clear();
+  currentExamIndex = 0;
+  isMockSubmitted = true;
+  currentMockExamLabel = item.domains;
+
+  document.getElementById('mock-setup-card').style.display = 'none';
+  document.getElementById('mock-arena-box').style.display = 'block';
+
+  if (mockExamTimer) clearInterval(mockExamTimer);
+  const timerEl = document.getElementById('mock-timer-val');
+  if (timerEl) timerEl.textContent = "REVIEW MODE";
+
+  updateHeaderBarState();
+  renderQuestionGrid();
+  renderCurrentQuestion();
+  window.openReportModal();
+};
+
+window.closeMockHistoryDetailModal = function() {
+  const modal = document.getElementById('mock-history-detail-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.addEventListener('ccaf_lang_changed', () => {
+  window.renderMockHistoryTable();
+  const arenaBox = document.getElementById('mock-arena-box');
+  if (arenaBox && arenaBox.style.display !== 'none') {
+    updateHeaderBarState();
+    renderQuestionGrid();
+    renderCurrentQuestion();
+
+    const reportModal = document.getElementById('mock-report-modal');
+    if (reportModal && (reportModal.style.display === 'flex' || reportModal.classList.contains('active'))) {
+      let totalScore = 0;
+      mockExamQuestions.forEach(q => {
+        const qKey = q.uniqueId || q.id;
+        if (mockExamAnswers[qKey] === q.correct) totalScore++;
+      });
+      const pct = mockExamQuestions.length > 0 ? Math.round((totalScore / mockExamQuestions.length) * 100) : 0;
+      refreshReportModalState(totalScore, pct >= 72);
+    }
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   window.renderPracticeTermsGrid();
+  window.renderMockHistoryTable();
 });

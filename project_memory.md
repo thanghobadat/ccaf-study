@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-13 13:32 (Local Time)*  
+> *Last Updated: 2026-08-13 17:58 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -99,6 +99,7 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Question Grid & Review Mode Color Coding Fix (`mock-exam.html`, `mock-exam.js`, `style.css`, `app.js`):** Fixed Question Grid Navigator Sidebar color rendering in exam review mode. Implemented dynamic legend `#question-grid-legend` updating to `🔵 Đang xem | 🟢 Câu Đúng | 🔴 Câu Sai | ⚪ Chưa Làm | 🚩 Cắm Cờ` in Review Mode. Distinguished 3 submitted states: Green (`.correct-nav`) for correct, Red (`.wrong-nav`) for wrong, Neutral Gray dashed border (`.unanswered-submitted-nav`) for skipped/unanswered questions, overlaid with Cyan glow ring (`.active-nav`) for active question. Preserved flagged status in review mode with corner flag badge (`.grid-nav-flag-badge` 🚩) and `.flagged-nav-review` border overlay. Added `AppStore.recordExamResult()` and `renderMockHistoryTable()` for saving and reviewing past exam attempt details.
 - **Custom Practice & Exam Simulator Crash Fix (`mock-exam.js`):** Resolved uncaught `ReferenceError: mockExamFlags is not defined` runtime crash when generating custom practice exams by adding explicit top-level variable declarations for `mockExamFlags`, `mockExamQuestions`, `mockExamAnswers`, `currentExamIndex`, `currentMockExamLabel`, `isMockSubmitted`, `mockSecondsRemaining`, and `mockExamTimer`. Standardized `uniqueId` (`q.uniqueId || q.id`) key tracking across question grid navigation, option selection, flag toggles, and exam submission logic. Added safety checks for `reportModal.classList`.
 - **Term-Based Practice Sub-Mode & 100% Question Count Mapping (`mock-exam.html`, `mock-exam.js`):** Built dedicated "📖 Ôn Theo Từ Điển Thuật Ngữ" sub-mode in Custom Practice Mode. Mapped 100% of question counts between `terms.html` and `mock-exam.html` using strict phrase relevance scoring and target frequency clamping (`getMatchingQuestionsForTermId`), ensuring terms like Prerequisite Gate match exactly 6 questions.
 - **Round-Robin Question Repetition Algorithm (`mock-exam.js`):** Implemented cycle-based question repetition for term practice when requested count $Q > N$. Guaranteed full-round sweeps across $N$ base questions before repeating, with unique instance IDs (`uniqueId: `${item.id}_inst_${idx}``) preventing answer, flag, and score collisions.

@@ -1296,6 +1296,85 @@ html, body {
   z-index: 3 !important;
 }
 
+/* Review Mode - Correct Answer Question: Emerald Green */
+.grid-nav-btn.correct-nav {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.45) 0%, rgba(5, 150, 105, 0.55) 100%) !important;
+  border: 1px solid #10b981 !important;
+  color: #a7f3d0 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+.grid-nav-btn.active-nav.correct-nav {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+  border: 2px solid #34d399 !important;
+  outline: 3px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.95) !important;
+  transform: scale(1.15) !important;
+  z-index: 3 !important;
+}
+
+/* Review Mode - Wrong Answer Question: Vivid Rose Red */
+.grid-nav-btn.wrong-nav {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.45) 0%, rgba(225, 29, 72, 0.55) 100%) !important;
+  border: 1px solid #f43f5e !important;
+  color: #fecdd3 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.4) !important;
+}
+
+.grid-nav-btn.active-nav.wrong-nav {
+  background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%) !important;
+  border: 2px solid #fda4af !important;
+  outline: 3px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 18px rgba(244, 63, 94, 0.95) !important;
+  transform: scale(1.15) !important;
+  z-index: 3 !important;
+}
+
+/* Review Mode - Unanswered / Skipped Question: Neutral Gray with dashed border */
+.grid-nav-btn.unanswered-submitted-nav {
+  background: var(--bg-tertiary) !important;
+  border: 1.5px dashed var(--text-muted) !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  opacity: 0.75 !important;
+}
+
+.grid-nav-btn.active-nav.unanswered-submitted-nav {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  border: 2px solid #38bdf8 !important;
+  outline: 3px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.95) !important;
+  transform: scale(1.15) !important;
+  opacity: 1 !important;
+  z-index: 3 !important;
+}
+
+/* Flagged Badge Indicator Overlay in Review Mode */
+.grid-nav-flag-badge {
+  position: absolute !important;
+  top: -4px !important;
+  right: -4px !important;
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  z-index: 4 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+.grid-nav-btn.flagged-nav-review {
+  box-shadow: 0 0 0 1.5px #f59e0b !important;
+}
+
 /* ==========================================================================
    13. Global Mobile Responsive Header & Touch Scroll
    ========================================================================== */
