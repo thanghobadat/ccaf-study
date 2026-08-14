@@ -5,8 +5,16 @@ let mockExamFlags = new Set();
 let currentExamIndex = 0;
 let currentMockExamLabel = '';
 let isMockSubmitted = false;
+let isInstantFeedbackMode = false;
+let revealedQuestions = new Set();
 let mockSecondsRemaining = 0;
 let mockExamTimer = null;
+
+window.startInstantPracticeExam = function() {
+  isInstantFeedbackMode = true;
+  revealedQuestions.clear();
+  window.startCustomPracticeExam();
+};
 
 window.switchPracticeSubMode = function(mode) {
   currentPracticeSubMode = mode;
@@ -224,8 +232,12 @@ window.startCustomPracticeExam = function() {
     };
   });
 
-  currentMockExamLabel = `PRACTICE_${modeLabel}_${mockExamQuestions.length}Q`;
+  const modePrefix = isInstantFeedbackMode ? 'INSTANT_PRACTICE' : 'PRACTICE';
+  currentMockExamLabel = `${modePrefix}_${modeLabel}_${mockExamQuestions.length}Q`;
   isMockSubmitted = false;
+  if (!isInstantFeedbackMode) {
+    revealedQuestions.clear();
+  }
   mockExamAnswers = {};
   mockExamFlags.clear();
   currentExamIndex = 0;
@@ -248,6 +260,8 @@ window.startOfficialMockExam = function() {
   }
 
   isMockSubmitted = false;
+  isInstantFeedbackMode = false;
+  revealedQuestions.clear();
   mockExamAnswers = {};
   mockExamFlags.clear();
   mockSecondsRemaining = 120 * 60;
@@ -343,11 +357,12 @@ function renderQuestionGrid() {
     const isAnswered = mockExamAnswers[qKey] !== undefined;
     const isFlagged = mockExamFlags.has(qKey);
     const isActive = idx === currentExamIndex;
+    const isQuestionRevealed = isMockSubmitted || (isInstantFeedbackMode && revealedQuestions.has(qKey));
 
     let btnClass = 'grid-nav-btn';
     if (isActive) btnClass += ' active-nav';
 
-    if (isMockSubmitted) {
+    if (isQuestionRevealed) {
       const userAnswer = mockExamAnswers[qKey];
       if (userAnswer === q.correct) {
         btnClass += ' correct-nav';
@@ -379,7 +394,7 @@ function renderQuestionGrid() {
   const flaggedCount = mockExamFlags.size;
   const statsEl = document.getElementById('grid-stats-text');
   if (statsEl) {
-    if (isMockSubmitted) {
+    if (isMockSubmitted || isInstantFeedbackMode) {
       statsEl.textContent = curLang === 'EN' 
         ? `Correct: ${correctCount}/${mockExamQuestions.length} | Incorrect: ${wrongCount} | Skipped: ${unansweredCount} | Flagged: ${flaggedCount}`
         : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | Cắm cờ: ${flaggedCount}`;
@@ -419,11 +434,14 @@ function renderCurrentQuestion() {
   const taskTag = q.taskStatement ? `<span class="badge badge-d3" style="font-family: monospace; font-size: 0.78rem;">📌 ${q.taskStatement}</span>` : '';
   const diffTag = q.difficulty ? `<span class="badge badge-d2" style="font-size: 0.75rem; text-transform: uppercase;">⚡ ${q.difficulty}</span>` : '';
 
+  const isQuestionRevealed = isMockSubmitted || (isInstantFeedbackMode && revealedQuestions.has(qKey));
+
   qContainer.innerHTML = `
     <div class="card" style="padding: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
           <span class="badge badge-${q.domain.toLowerCase()}">${currentLang === 'EN' ? `Question ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}` : `Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}`}</span>
+          ${isInstantFeedbackMode ? '<span class="badge badge-d2" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); font-size: 0.75rem;">⚡ Instant Feedback</span>' : ''}
           ${taskTag}
           ${diffTag}
         </div>
@@ -440,7 +458,7 @@ function renderCurrentQuestion() {
           let optClass = 'quiz-option';
           if (isSelected === oIdx) optClass += ' selected';
 
-          if (isMockSubmitted) {
+          if (isQuestionRevealed) {
             if (oIdx === q.correct) optClass += ' correct-option';
             else if (isSelected === oIdx && isSelected !== q.correct) optClass += ' wrong-option';
           }
@@ -456,7 +474,7 @@ function renderCurrentQuestion() {
             cardShadow = '0 0 14px rgba(139, 92, 246, 0.35)';
           }
 
-          if (isMockSubmitted) {
+          if (isQuestionRevealed) {
             if (oIdx === q.correct) {
               cardBg = 'rgba(16, 185, 129, 0.18)';
               cardBorder = '2px solid var(--accent-emerald)';
@@ -479,10 +497,10 @@ function renderCurrentQuestion() {
         }).join('')}
       </div>
 
-      ${isMockSubmitted ? `
+      ${isQuestionRevealed ? `
         <div class="callout ${isSelected === q.correct ? '' : 'callout-warning'}" style="margin-top: 1.5rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem;">
           <div class="callout-title" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; color: ${isSelected === q.correct ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
-            ${isSelected === q.correct ? (currentLang === 'EN' ? '✅ CORRECT ANSWER' : '✅ ĐÁP ÁN CHÍNH XÁC') : (currentLang === 'EN' ? '❌ INCORRECT' : '❌ CHƯA CHÍNH XÁC')}
+            ${isSelected === q.correct ? (currentLang === 'EN' ? '✅ CORRECT ANSWER (+10 XP)' : '✅ ĐÁP ÁN CHÍNH XÁC (+10 XP)') : (currentLang === 'EN' ? '❌ INCORRECT (+2 XP)' : '❌ CHƯA CHÍNH XÁC (+2 XP)')}
           </div>
 
           ${q.rationale ? `
@@ -523,7 +541,29 @@ function renderCurrentQuestion() {
 
 window.selectOption = function(qId, oIdx) {
   if (isMockSubmitted) return;
+  
+  const isFirstTimeReveal = isInstantFeedbackMode && !revealedQuestions.has(qId);
   mockExamAnswers[qId] = oIdx;
+
+  if (isInstantFeedbackMode) {
+    revealedQuestions.add(qId);
+    const q = mockExamQuestions.find(item => (item.uniqueId || item.id) === qId);
+
+    if (q && isFirstTimeReveal) {
+      if (oIdx === q.correct) {
+        if (typeof AppStore !== 'undefined') {
+          AppStore.addXP(10);
+          AppStore.showToast("✅ Chính xác! +10 XP");
+        }
+      } else {
+        if (typeof AppStore !== 'undefined') {
+          AppStore.addXP(2);
+          AppStore.showToast("❌ Chưa chính xác! +2 XP thử sức");
+        }
+      }
+    }
+  }
+
   renderQuestionGrid();
   renderCurrentQuestion();
 };

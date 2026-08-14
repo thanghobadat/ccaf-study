@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-13 17:58 (Local Time)*  
+> *Last Updated: 2026-08-14 15:30 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -99,6 +99,7 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Instant Feedback Practice Mode (`mock-exam.html` & `mock-exam.js`):** Built 3rd practice mode (⚡ CHẾ ĐỘ 3: ÔN TẬP TỨC THÌ) allowing users to select options and receive immediate grading (green/red highlights), instant 💡 Rationale reveal, detailed option-by-option breakdowns, official Anthropic reference links, realtime sidebar navigation color updates (🟢/🔴), and automatic +10 XP reward per correct answer (+2 XP on attempt).
 - **Question Detail Review & Report Modal Fix (`mock-exam.js`):** Resolved runtime JS exceptions (`ReferenceError: refreshReportModalState is not defined` and missing `window.closeReportModal`) upon completing an exercise or exam. Implemented `refreshReportModalState(totalScore, isPassed)` for rendering bilingual score status & details, and `window.closeReportModal()` to smoothly close score report popup and unveil interactive review arena displaying question options, correct/incorrect badges, rationale, explanation, and official Anthropic reference links.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.

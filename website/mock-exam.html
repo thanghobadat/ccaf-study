@@ -302,9 +302,14 @@
             </div>
           </div>
 
-          <button class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" onclick="startCustomPracticeExam()">
-            🚀 BẮT ĐẦU ÔN TẬP TÙY CHỈNH →
-          </button>
+          <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="flex: 1; min-width: 200px;" onclick="startCustomPracticeExam()">
+              🚀 ÔN BÌNH THƯỜNG (NỘP BÀI MỚI CHẤM) →
+            </button>
+            <button class="btn btn-secondary" style="flex: 1; min-width: 200px; border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6, 182, 212, 0.08);" onclick="window.startInstantPracticeExam()">
+              ⚡ ÔN TỨC THÌ (CHẤM & GIẢI THÍCH NGAY) →
+            </button>
+          </div>
         </div>
 
         <!-- MODE 2: OFFICIAL PEARSON VUE MOCK EXAM CARD -->
@@ -328,6 +333,27 @@
           <button class="btn btn-secondary" style="width: 100%; border-color: var(--accent-amber); color: var(--accent-amber);" onclick="startOfficialMockExam()">
             🏆 BẮT ĐẦU THI THẬT 60 CÂU (120 PHÚT) →
           </button>
+        </div>
+
+        <!-- MODE 3: INSTANT FEEDBACK CARD -->
+        <div class="card" style="padding: 2rem; border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.03); grid-column: 1 / -1;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.3rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+              ⚡ CHẾ ĐỘ 3: ÔN TẬP TỨC THÌ (CHẤM ĐIỂM & GIẢI THÍCH NGAY LẬP TỨC)
+            </h2>
+            <span class="badge badge-d2" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">Instant Feedback Mode</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Chọn câu nào hệ thống sẽ <strong>chấm điểm ĐÚNG/SAI ngay lập tức</strong>, hiển thị ngay khối 💡 <strong>Rationale</strong>, giải thích chi tiết từng lựa chọn (Option A, B, C, D) và link tài liệu chuẩn của Anthropic. Cộng +10 XP trực tiếp cho mỗi câu trả lời đúng!
+          </p>
+          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-cyan), #0284c7); border: none; padding: 0.65rem 1.5rem; font-weight: 700;" onclick="window.startInstantPracticeExam()">
+              ⚡ BẮT ĐẦU ÔN TẬP TỨC THÌ (CHẤM & GIẢI THÍCH NGAY) →
+            </button>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">
+              💡 <em>Sử dụng danh sách Domain/Từ vựng & số lượng câu đã chọn ở Chế độ 1 ở trên.</em>
+            </span>
+          </div>
         </div>
 
       </div>
