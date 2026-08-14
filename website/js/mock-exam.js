@@ -11,9 +11,7 @@ let mockSecondsRemaining = 0;
 let mockExamTimer = null;
 
 window.startInstantPracticeExam = function() {
-  isInstantFeedbackMode = true;
-  revealedQuestions.clear();
-  window.startCustomPracticeExam();
+  window.startCustomPracticeExam(true);
 };
 
 window.switchPracticeSubMode = function(mode) {
@@ -138,7 +136,8 @@ window.renderPracticeTermsGrid = function() {
   }).join('');
 };
 
-window.startCustomPracticeExam = function() {
+window.startCustomPracticeExam = function(isInstant = false) {
+  isInstantFeedbackMode = (isInstant === true);
   const countInput = document.getElementById('practice-count-input');
   let qCount = parseInt(countInput ? countInput.value : '10', 10);
 
@@ -235,9 +234,7 @@ window.startCustomPracticeExam = function() {
   const modePrefix = isInstantFeedbackMode ? 'INSTANT_PRACTICE' : 'PRACTICE';
   currentMockExamLabel = `${modePrefix}_${modeLabel}_${mockExamQuestions.length}Q`;
   isMockSubmitted = false;
-  if (!isInstantFeedbackMode) {
-    revealedQuestions.clear();
-  }
+  revealedQuestions.clear();
   mockExamAnswers = {};
   mockExamFlags.clear();
   currentExamIndex = 0;
@@ -310,7 +307,33 @@ window.startOfficialMockExam = function() {
 
 function startMockTimer() {
   if (mockExamTimer) clearInterval(mockExamTimer);
+  const timerContainer = document.getElementById('mock-timer-container');
+  const instantBadge = document.getElementById('mock-instant-badge');
   const timerEl = document.getElementById('mock-timer-val');
+  const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+
+  if (isInstantFeedbackMode) {
+    if (timerContainer) timerContainer.style.display = 'none';
+    if (instantBadge) {
+      instantBadge.style.display = 'inline-flex';
+      const badgeText = document.getElementById('mock-instant-badge-text');
+      if (badgeText) {
+        badgeText.textContent = curLang === 'EN' ? 'INSTANT FEEDBACK (NO TIME LIMIT)' : 'ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)';
+      }
+    }
+    return;
+  }
+
+  // Active timer mode
+  if (timerContainer) timerContainer.style.display = 'block';
+  if (instantBadge) instantBadge.style.display = 'none';
+
+  if (timerEl) {
+    const hours = Math.floor(mockSecondsRemaining / 3600);
+    const mins = Math.floor((mockSecondsRemaining % 3600) / 60);
+    const secs = mockSecondsRemaining % 60;
+    timerEl.textContent = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
 
   mockExamTimer = setInterval(() => {
     mockSecondsRemaining--;
@@ -872,6 +895,11 @@ window.addEventListener('ccaf_lang_changed', () => {
   window.renderMockHistoryTable();
   const arenaBox = document.getElementById('mock-arena-box');
   if (arenaBox && arenaBox.style.display !== 'none') {
+    const instantBadgeText = document.getElementById('mock-instant-badge-text');
+    if (instantBadgeText) {
+      const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+      instantBadgeText.textContent = curLang === 'EN' ? 'INSTANT FEEDBACK (NO TIME LIMIT)' : 'ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)';
+    }
     updateHeaderBarState();
     renderQuestionGrid();
     renderCurrentQuestion();

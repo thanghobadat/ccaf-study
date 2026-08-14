@@ -335,27 +335,6 @@
           </button>
         </div>
 
-        <!-- MODE 3: INSTANT FEEDBACK CARD -->
-        <div class="card" style="padding: 2rem; border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.03); grid-column: 1 / -1;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-            <h2 style="font-size: 1.3rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
-              ⚡ CHẾ ĐỘ 3: ÔN TẬP TỨC THÌ (CHẤM ĐIỂM & GIẢI THÍCH NGAY LẬP TỨC)
-            </h2>
-            <span class="badge badge-d2" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">Instant Feedback Mode</span>
-          </div>
-          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Chọn câu nào hệ thống sẽ <strong>chấm điểm ĐÚNG/SAI ngay lập tức</strong>, hiển thị ngay khối 💡 <strong>Rationale</strong>, giải thích chi tiết từng lựa chọn (Option A, B, C, D) và link tài liệu chuẩn của Anthropic. Cộng +10 XP trực tiếp cho mỗi câu trả lời đúng!
-          </p>
-          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-cyan), #0284c7); border: none; padding: 0.65rem 1.5rem; font-weight: 700;" onclick="window.startInstantPracticeExam()">
-              ⚡ BẮT ĐẦU ÔN TẬP TỨC THÌ (CHẤM & GIẢI THÍCH NGAY) →
-            </button>
-            <span style="font-size: 0.82rem; color: var(--text-muted);">
-              💡 <em>Sử dụng danh sách Domain/Từ vựng & số lượng câu đã chọn ở Chế độ 1 ở trên.</em>
-            </span>
-          </div>
-        </div>
-
       </div>
 
       <!-- History Table Section -->
@@ -377,9 +356,12 @@
 
       <!-- Top Header Sticky Bar -->
       <div class="mock-header-bar">
-        <div style="display: flex; align-items: center; gap: 1.5rem;">
-          <div style="font-weight: 800; font-size: 1.2rem; color: var(--accent-amber); font-family: monospace;">
+        <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+          <div id="mock-timer-container" style="font-weight: 800; font-size: 1.2rem; color: var(--accent-amber); font-family: monospace;">
             ⏱️ CÒN LẠI: <span id="mock-timer-val">02:00:00</span>
+          </div>
+          <div id="mock-instant-badge" style="display: none; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.92rem; color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid var(--accent-cyan); border-radius: 6px; padding: 0.3rem 0.75rem;">
+            ⚡ <span id="mock-instant-badge-text">ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)</span>
           </div>
 
           <div style="font-size: 0.88rem; color: var(--text-muted);" id="grid-stats-text">

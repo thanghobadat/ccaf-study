@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-14 15:30 (Local Time)*  
+> *Last Updated: 2026-08-14 20:15 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -75,7 +75,7 @@ d:\AI\CCAF\
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
-    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Term-Based Practice Sub-mode
+    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Feedback Mode
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
@@ -84,7 +84,7 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Term-based Practice & Round-robin Repetition Algorithm
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
@@ -99,7 +99,10 @@ d:\AI\CCAF\
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
-- **Instant Feedback Practice Mode (`mock-exam.html` & `mock-exam.js`):** Built 3rd practice mode (⚡ CHẾ ĐỘ 3: ÔN TẬP TỨC THÌ) allowing users to select options and receive immediate grading (green/red highlights), instant 💡 Rationale reveal, detailed option-by-option breakdowns, official Anthropic reference links, realtime sidebar navigation color updates (🟢/🔴), and automatic +10 XP reward per correct answer (+2 XP on attempt).
+- **Instant Feedback Mode UI & Timer Optimization (`mock-exam.html` & `mock-exam.js`):**
+  - Loại bỏ khối Chế độ 3 trùng lặp trên giao diện chọn đề. Thiết kế lại Chế độ 1 Ôn tập tùy chỉnh tích hợp trực tiếp 2 nút chọn: Ôn bình thường & Ôn tức thì.
+  - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`), cho phép người học tập trung nghiên cứu sâu từng câu, rationale và tài liệu chính thức mà không bị áp lực thời gian.
+  - Đồng hồ 120 phút vẫn giữ nguyên hoạt động chuẩn xác cho Chế độ 2 Thi thật 60 câu Pearson VUE.
 - **Question Detail Review & Report Modal Fix (`mock-exam.js`):** Resolved runtime JS exceptions (`ReferenceError: refreshReportModalState is not defined` and missing `window.closeReportModal`) upon completing an exercise or exam. Implemented `refreshReportModalState(totalScore, isPassed)` for rendering bilingual score status & details, and `window.closeReportModal()` to smoothly close score report popup and unveil interactive review arena displaying question options, correct/incorrect badges, rationale, explanation, and official Anthropic reference links.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
@@ -111,4 +114,5 @@ d:\AI\CCAF\
 2. **Planning First:** Always present an Implementation Plan first before executing file edits.
 3. **Summary Rule:** Always summarize accomplishments briefly upon completion.
 4. **Manual Git Push & Memory Sync Only:** NEVER automatically `git push` or edit `project_memory.md` after editing files. ONLY run `git push` and update `project_memory.md` when the user explicitly requests it.
+
 
