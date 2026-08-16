@@ -7,3 +7,8 @@ Thumbs.db
 node_modules/
 .vscode/
 .idea/
+
+# Python
+__pycache__/
+*.pyc
+

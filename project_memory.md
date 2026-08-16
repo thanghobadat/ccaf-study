@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-14 20:15 (Local Time)*  
+> *Last Updated: 2026-08-16 22:20 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -60,7 +60,10 @@ d:\AI\CCAF\
 ├── .agents/AGENTS.md                # Agent workspace customization rules
 ├── project_memory.md                # This machine-readable state snapshot
 ├── vercel.json                      # Vercel deployment configuration (cleanUrls & website rewrites)
-├── .gitignore                       # Git ignore configuration
+├── .gitignore                       # Git ignore configuration (includes __pycache__, node_modules)
+├── validate_option_lengths.py       # Automated test suite for MCQ option length ranking & standard deviation
+├── balance_all_dataset.py           # Core deterministic dataset normalization & length balancing engine
+├── validate_exam.py                 # Core dataset schema & domain distribution validator
 ├── tài liệu/
 │   ├── CCA_Foundations_Study_Guide.md
 │   ├── The Architect's Playbook.md
@@ -92,13 +95,20 @@ d:\AI\CCAF\
             ├── terms-data.js        # 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            └── mock-exam-data.js    # Expanded 644 Unique Core Scenario Questions Dataset v18.0 (100% valid JSON)
+            ├── mock-exam-data.backup.js # 100% byte-for-byte original backup snapshot (644 questions)
+            └── mock-exam-data.js    # Balanced 644 Unique Core Scenario Questions Dataset v19.0 (Eliminated MCQ Length Bias, 100% valid JSON)
 ```
 
 ---
 
 ## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **MCQ Option Length Normalization & Bias Elimination (`mock-exam-data.js` v19.0):**
+  - Khắc phục triệt để hiện tượng thiên kiến độ dài (Length Bias) nơi 87.1% (561/644 câu) có đáp án đúng là phương án dài nhất.
+  - Sau khi chuẩn hóa bằng công cụ `balance_all_dataset.py`: Tỷ lệ Rank 1 (dài nhất) giảm từ **87.1% xuống 29.8%**, rải đều tự nhiên qua 4 mức độ dài: Rank 1 (29.8%), Rank 2 (24.2%), Rank 3 (23.0%), Rank 4 (23.0%).
+  - Tỷ lệ độ dài trung bình Câu Đúng / Câu Sai đạt mức lý tưởng **1.01x** (174.0 ký tự vs 171.7 ký tự).
+  - Đồng bộ 100% song ngữ `optionsEN` và `options` (Tiếng Việt), bảo toàn trọn vẹn ý nghĩa kỹ thuật và tính đúng/sai của 644 câu.
+  - Tích hợp công cụ kiểm định tự động `validate_option_lengths.py` và lưu trữ file sao lưu `mock-exam-data.backup.js`.
 - **Instant Feedback Mode UI & Timer Optimization (`mock-exam.html` & `mock-exam.js`):**
   - Loại bỏ khối Chế độ 3 trùng lặp trên giao diện chọn đề. Thiết kế lại Chế độ 1 Ôn tập tùy chỉnh tích hợp trực tiếp 2 nút chọn: Ôn bình thường & Ôn tức thì.
   - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`), cho phép người học tập trung nghiên cứu sâu từng câu, rationale và tài liệu chính thức mà không bị áp lực thời gian.
@@ -114,5 +124,6 @@ d:\AI\CCAF\
 2. **Planning First:** Always present an Implementation Plan first before executing file edits.
 3. **Summary Rule:** Always summarize accomplishments briefly upon completion.
 4. **Manual Git Push & Memory Sync Only:** NEVER automatically `git push` or edit `project_memory.md` after editing files. ONLY run `git push` and update `project_memory.md` when the user explicitly requests it.
+
 
 
