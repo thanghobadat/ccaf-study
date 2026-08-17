@@ -1,3 +1,5 @@
+const SESSION_STORAGE_KEY = 'ccaf_active_exam_session';
+
 let currentPracticeSubMode = 'DOMAIN'; // 'DOMAIN' or 'TERM'
 let mockExamQuestions = [];
 let mockExamAnswers = {};
@@ -9,6 +11,94 @@ let isInstantFeedbackMode = false;
 let revealedQuestions = new Set();
 let mockSecondsRemaining = 0;
 let mockExamTimer = null;
+
+window.saveActiveExamSession = function() {
+  if (typeof localStorage === 'undefined' || isMockSubmitted || !mockExamQuestions || mockExamQuestions.length === 0) return;
+  try {
+    const sessionData = {
+      questions: mockExamQuestions,
+      answers: mockExamAnswers,
+      flags: Array.from(mockExamFlags),
+      currentIndex: currentExamIndex,
+      label: currentMockExamLabel,
+      isInstant: isInstantFeedbackMode,
+      revealed: Array.from(revealedQuestions),
+      secondsRemaining: mockSecondsRemaining,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+  } catch (e) {
+    console.warn("Could not save active exam session to localStorage:", e);
+  }
+};
+
+window.clearActiveExamSession = function() {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+  } catch (e) {
+    console.warn("Could not clear active exam session from localStorage:", e);
+  }
+};
+
+window.restoreActiveExamSession = function() {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return false;
+
+    const session = JSON.parse(raw);
+    if (!session || !session.questions || !Array.isArray(session.questions) || session.questions.length === 0) {
+      window.clearActiveExamSession();
+      return false;
+    }
+
+    mockExamQuestions = session.questions;
+    mockExamAnswers = session.answers || {};
+    mockExamFlags = new Set(session.flags || []);
+    currentExamIndex = (typeof session.currentIndex === 'number' && session.currentIndex >= 0 && session.currentIndex < mockExamQuestions.length)
+      ? session.currentIndex
+      : 0;
+    currentMockExamLabel = session.label || '';
+    isInstantFeedbackMode = (session.isInstant === true);
+    revealedQuestions = new Set(session.revealed || []);
+    isMockSubmitted = false;
+
+    // Time calculation for timer mode
+    if (!isInstantFeedbackMode) {
+      const elapsed = Math.floor((Date.now() - (session.timestamp || Date.now())) / 1000);
+      mockSecondsRemaining = Math.max(0, (session.secondsRemaining || 0) - elapsed);
+    } else {
+      mockSecondsRemaining = 0;
+    }
+
+    const setupCard = document.getElementById('mock-setup-card');
+    const arenaBox = document.getElementById('mock-arena-box');
+
+    if (setupCard) setupCard.style.display = 'none';
+    if (arenaBox) arenaBox.style.display = 'block';
+
+    updateHeaderBarState();
+    startMockTimer();
+    renderQuestionGrid();
+    renderCurrentQuestion();
+
+    if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+      const curLang = AppStore.getLang();
+      AppStore.showToast(curLang === 'EN' ? "🔄 Resumed your active practice session!" : "🔄 Đã khôi phục bài làm dở của bạn!");
+    }
+
+    return true;
+  } catch (e) {
+    console.error("Error restoring active exam session:", e);
+    window.clearActiveExamSession();
+    return false;
+  }
+};
+
+window.addEventListener('beforeunload', () => {
+  window.saveActiveExamSession();
+});
 
 window.startInstantPracticeExam = function() {
   window.startCustomPracticeExam(true);
@@ -248,6 +338,7 @@ window.startCustomPracticeExam = function(isInstant = false) {
   startMockTimer();
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.saveActiveExamSession();
 };
 
 window.startOfficialMockExam = function() {
@@ -303,6 +394,7 @@ window.startOfficialMockExam = function() {
   startMockTimer();
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.saveActiveExamSession();
 };
 
 function startMockTimer() {
@@ -435,6 +527,7 @@ window.jumpToQuestion = function(idx) {
   currentExamIndex = idx;
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.saveActiveExamSession();
 };
 
 function renderCurrentQuestion() {
@@ -589,6 +682,7 @@ window.selectOption = function(qId, oIdx) {
 
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.saveActiveExamSession();
 };
 
 window.toggleFlagCurrentQuestion = function() {
@@ -603,6 +697,7 @@ window.toggleFlagCurrentQuestion = function() {
   }
   renderQuestionGrid();
   renderCurrentQuestion();
+  window.saveActiveExamSession();
 };
 
 function updateHeaderBarState() {
@@ -671,6 +766,7 @@ function refreshReportModalState(totalScore, isPassed) {
 }
 
 window.cancelMockExam = function() {
+  window.clearActiveExamSession();
   if (mockExamTimer) {
     clearInterval(mockExamTimer);
     mockExamTimer = null;
@@ -703,6 +799,7 @@ window.cancelMockExam = function() {
 window.submitMockExam = function() {
   if (isMockSubmitted) return;
   isMockSubmitted = true;
+  window.clearActiveExamSession();
   if (mockExamTimer) clearInterval(mockExamTimer);
   updateHeaderBarState();
 
@@ -918,14 +1015,18 @@ window.addEventListener('ccaf_lang_changed', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Check for domain query parameter (e.g. ?domain=D1)
-  if (typeof window !== 'undefined' && window.location && window.location.search) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetDomain = urlParams.get('domain');
-    if (targetDomain && ['D1', 'D2', 'D3', 'D4', 'D5'].includes(targetDomain.toUpperCase())) {
-      document.querySelectorAll('.mock-domain-cb').forEach(cb => {
-        cb.checked = (cb.value.toUpperCase() === targetDomain.toUpperCase());
-      });
+  const hasRestored = window.restoreActiveExamSession();
+
+  if (!hasRestored) {
+    // Check for domain query parameter (e.g. ?domain=D1)
+    if (typeof window !== 'undefined' && window.location && window.location.search) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetDomain = urlParams.get('domain');
+      if (targetDomain && ['D1', 'D2', 'D3', 'D4', 'D5'].includes(targetDomain.toUpperCase())) {
+        document.querySelectorAll('.mock-domain-cb').forEach(cb => {
+          cb.checked = (cb.value.toUpperCase() === targetDomain.toUpperCase());
+        });
+      }
     }
   }
 

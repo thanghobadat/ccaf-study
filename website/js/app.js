@@ -9,7 +9,8 @@ const AppStore = {
     PLAN_PROGRESS: 'ccaf_plan_progress',
     QUIZ_RESULTS: 'ccaf_quiz_results',
     THEME: 'ccaf_theme',
-    LANG: 'ccaf_lang'
+    LANG: 'ccaf_lang',
+    ACTIVE_EXAM_SESSION: 'ccaf_active_exam_session'
   },
 
   // State Getters

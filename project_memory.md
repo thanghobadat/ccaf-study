@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-17 09:20 (Local Time)*  
+> *Last Updated: 2026-08-17 17:22 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -118,6 +118,10 @@ d:\AI\CCAF\
   - Khắc phục lỗi thiếu biến toàn cục `MOCK_EXAM_QUESTION_POOL` khiến trang Ôn tập & Thi mô phỏng không nạp được ngân hàng 644 câu hỏi và làm tab Ôn tập Thuật ngữ hiển thị 0 câu.
   - Cập nhật script `balance_all_dataset.py` để tự động đính kèm khai báo `MOCK_EXAM_QUESTION_POOL` và gán vào `window.MOCK_EXAM_QUESTION_POOL`.
   - Thêm tính năng tự động tích chọn Domain từ URL parameter `?domain=DX` khi chuyển từ trang Tổng quan Domain sang Ôn tập.
+- **LocalStorage Exam & Practice Session Persistence (`app.js`, `mock-exam.js`):**
+  - Đã xây dựng hoàn thiện cơ chế tự động lưu và khôi phục trạng thái bài thi/ôn tập dở dang qua khóa `ccaf_active_exam_session` trong `localStorage`.
+  - Bảo toàn 100% dữ liệu khi người dùng reload (F5) hoặc chuyển sang các trang khác (*Lý thuyết*, *Nguyên tắc*, *Thuật ngữ*) rồi quay lại: khôi phục chính xác danh sách câu hỏi, các đáp án đã chọn, cờ cắm (flag), vị trí câu đang làm dở và thời gian còn lại.
+  - Dọn dẹp session an toàn chỉ khi người dùng bấm "Dừng Thi / Hủy Bài" hoặc "Nộp Bài Thi".
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
