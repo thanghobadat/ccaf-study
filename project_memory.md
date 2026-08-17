@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-16 22:20 (Local Time)*  
+> *Last Updated: 2026-08-17 09:20 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -114,6 +114,10 @@ d:\AI\CCAF\
   - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`), cho phép người học tập trung nghiên cứu sâu từng câu, rationale và tài liệu chính thức mà không bị áp lực thời gian.
   - Đồng hồ 120 phút vẫn giữ nguyên hoạt động chuẩn xác cho Chế độ 2 Thi thật 60 câu Pearson VUE.
 - **Question Detail Review & Report Modal Fix (`mock-exam.js`):** Resolved runtime JS exceptions (`ReferenceError: refreshReportModalState is not defined` and missing `window.closeReportModal`) upon completing an exercise or exam. Implemented `refreshReportModalState(totalScore, isPassed)` for rendering bilingual score status & details, and `window.closeReportModal()` to smoothly close score report popup and unveil interactive review arena displaying question options, correct/incorrect badges, rationale, explanation, and official Anthropic reference links.
+- **Fix Mock Exam Dataset Pool Export & Navigation (`mock-exam-data.js`, `balance_all_dataset.py`, `mock-exam.js`):**
+  - Khắc phục lỗi thiếu biến toàn cục `MOCK_EXAM_QUESTION_POOL` khiến trang Ôn tập & Thi mô phỏng không nạp được ngân hàng 644 câu hỏi và làm tab Ôn tập Thuật ngữ hiển thị 0 câu.
+  - Cập nhật script `balance_all_dataset.py` để tự động đính kèm khai báo `MOCK_EXAM_QUESTION_POOL` và gán vào `window.MOCK_EXAM_QUESTION_POOL`.
+  - Thêm tính năng tự động tích chọn Domain từ URL parameter `?domain=DX` khi chuyển từ trang Tổng quan Domain sang Ôn tập.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 

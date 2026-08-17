@@ -27227,3 +27227,8 @@ function generateMockQuestionsPool() {
   }
 ];
 }
+
+const MOCK_EXAM_QUESTION_POOL = generateMockQuestionsPool();
+if (typeof window !== 'undefined') {
+  window.MOCK_EXAM_QUESTION_POOL = MOCK_EXAM_QUESTION_POOL;
+}

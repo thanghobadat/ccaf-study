@@ -918,6 +918,18 @@ window.addEventListener('ccaf_lang_changed', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Check for domain query parameter (e.g. ?domain=D1)
+  if (typeof window !== 'undefined' && window.location && window.location.search) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetDomain = urlParams.get('domain');
+    if (targetDomain && ['D1', 'D2', 'D3', 'D4', 'D5'].includes(targetDomain.toUpperCase())) {
+      document.querySelectorAll('.mock-domain-cb').forEach(cb => {
+        cb.checked = (cb.value.toUpperCase() === targetDomain.toUpperCase());
+      });
+    }
+  }
+
   window.renderPracticeTermsGrid();
   window.renderMockHistoryTable();
 });
+

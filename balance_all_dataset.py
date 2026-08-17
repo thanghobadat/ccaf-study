@@ -205,7 +205,7 @@ def balance_all(input_file, output_file):
     # Write output
     js_content = "/* CCAF Learning Hub - Expanded 644 Core Scenario Questions Dataset\n   Total: 644 100% Unique Core Scenario Questions\n   Covering Domains D1 - D5\n*/\n\nfunction generateMockQuestionsPool() {\n  return "
     js_content += json.dumps(data, indent=2, ensure_ascii=False)
-    js_content += ";\n}\n"
+    js_content += ";\n}\n\nconst MOCK_EXAM_QUESTION_POOL = generateMockQuestionsPool();\nif (typeof window !== 'undefined') {\n  window.MOCK_EXAM_QUESTION_POOL = MOCK_EXAM_QUESTION_POOL;\n}\n"
 
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(js_content)
