@@ -22,12 +22,14 @@
   *Version 2.0 Gold Standard question generation guide: 5 domain breakdowns, 10 batches allocation, 14-field JSON schema, and 3 Gold Standard Principles.*
 - **Doc 4:** `d:\AI\CCAF\tài liệu\CCAF_254_Official_Mock_Exam_Bank.md`  
   *254 unabridged scenario questions from Claude Certification Guide.*
+- **Doc 5:** `d:\AI\CCAF\tài liệu\CCAF_Master_Knowledge_Reference.md`  
+  *Master Knowledge Base: 47 Core Architectural Concepts across 5 Domains with definitions, step-by-step mechanisms, usage criteria, exam anti-patterns, distinctions, code snippets, and intuitive real-world analogies (100% coverage of 254 official questions & 644 mock questions).*
 
 ---
 
 ## 📅 2. 15-DAY DUAL-LANGUAGE STRATEGY
 - **Phase 1 (Days 1 - 10): 🇻🇳 Vietnamese Foundation Sprint**  
-  Nạp 100% bản chất kỹ thuật bằng Tiếng Việt qua 5 Domain Sprints (D1: Ngày 1-3, D2 & D3: Ngày 4-7, D4 & D5: Ngày 8-10).
+  Nạp 100% bản chất kỹ thuật bằng Tiếng Việt qua 5 Domain Sprints (D1: Ngày 1-3, D2 & D3: Ngày 4-7, D4 & D5: Ngày 8-10). Đọc trang **47+ Kiến Thức Cốt Lõi** kèm ví dụ ẩn dụ đời thường để nắm chắc 100% lý thuyết.
 - **Phase 2 (Days 11 - 15): 🇬🇧 English Exam Intensive Sprint**  
   Bật **English Mode** toàn bộ hệ thống để luyện đọc 13 bài EN, 67 Nguyên tắc EN và Thi thật/Thi mô phỏng 100% Tiếng Anh gốc từ Anthropic.
 
@@ -36,11 +38,11 @@
 ## 🎯 3. EXAM WEIGHTINGS & 6 PRODUCTION ARCHETYPES
 
 ### 5 Exam Domains & Weights
-1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits. (116 Questions)
-2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Redundancy schemas. (121 Questions)
-3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`), `CLAUDE.md` hierarchy, Glob/Grep before View, CI/CD pipelines. (153 Questions)
-4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples, JSON Schemas, Explicit Null, CoT `<thinking>`, XML boundaries `<context>`. (169 Questions)
-5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Escalation hooks. (85 Questions)
+1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits, Pre/PostToolUse hooks, Deterministic State Machines, External State Store. (11 Concepts / 116 Questions)
+2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Least-Privilege tool allocation, Output projection in tool chains. (9 Concepts / 121 Questions)
+3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`, `-p`, `--output-format json`), `CLAUDE.md` hierarchy, Plan Mode, Custom Skills `SKILL.md`, `settings.json` allowedTools, Iterative Refinement & TDD verification loop. (9 Concepts / 153 Questions)
+4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples & distribution bias mitigation, JSON Schemas with explicit null (`type: ["string","null"]` + `required`), CoT `<thinking>`, XML boundaries `<context>`, Validation & feedback injection. (9 Concepts / 169 Questions)
+5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Circuit Breaker (Closed->Open->Half-Open), Structured Escalation Payloads, Semantic Search vs Literal Grep, HITL Review Calibration & Confidence Routing, Information Provenance & Citation Chaining. (9 Concepts / 85 Questions)
 
 ### 6 Production Archetypes
 1. Customer Support Resolution Agent
@@ -69,15 +71,17 @@ d:\AI\CCAF\
 │   ├── The Architect's Playbook.md
 │   ├── CCAF_Question_Generation_Guide.md
 │   ├── CCAF_254_Official_Mock_Exam_Bank.md
+│   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
 │   └── generate/                    # 289 Output JSON Question Batches (570 Questions)
-└── website/                         # Web Application Root (Python HTTP server on 8080)
+└── website/                         # Web Application Root (Python HTTP server on 3000)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
+    ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module with Real-World Analogies & Progress Tracking
     ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Feedback Mode
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
@@ -87,17 +91,30 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
+        ├── knowledge.js             # Controller for 47+ Core Concepts (Real-time Search, Domain Filter, TOC Scrollspy, Bookmarks)
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
             ├── terms-data.js        # 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
+            ├── knowledge-data.js    # 47 Structured Core Architectural Concepts Dataset with Real-World Analogies & Code Snippets
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.backup.js # 100% byte-for-byte original backup snapshot (644 questions)
             └── mock-exam-data.js    # Balanced 644 Unique Core Scenario Questions Dataset v19.0 (Eliminated MCQ Length Bias, 100% valid JSON)
 ```
+
+---
+
+## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-08-18**:
+  - Trích xuất toàn diện 47 khái niệm kiến trúc cốt lõi từ 644 câu hỏi mock exam và 254 câu chuẩn CCAF, tạo tài liệu chuẩn mực `tài liệu/CCAF_Master_Knowledge_Reference.md`.
+  - Xây dựng hoàn chỉnh trang web mới `website/knowledge.html` và module dữ liệu `website/js/data/knowledge-data.js` + `website/js/knowledge.js` với 47 concepts, đầy đủ định nghĩa, cơ chế kỹ thuật, bẫy trắc nghiệm, code mẫu và đặc biệt là **💡 Ví dụ ẩn dụ đời thường cực kỳ dễ hiểu**.
+  - Tích hợp điều hướng `🧠 Kiến Thức Cốt Lõi (47+)` vào navbar của tất cả 5 trang HTML.
+  - Kiểm tra cú pháp và tính toàn vẹn 100% đạt chuẩn trên Node.js.
+  - Sẵn sàng triển khai trên Vercel và GitHub repo.
+
 
 ---
 
