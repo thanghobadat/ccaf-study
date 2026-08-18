@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-17 17:22 (Local Time)*  
+> *Last Updated: 2026-08-18 17:18 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -74,14 +74,14 @@ d:\AI\CCAF\
 │   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
 │   └── generate/                    # 289 Output JSON Question Batches (570 Questions)
-└── website/                         # Web Application Root (Python HTTP server on 3000)
+└── website/                         # Web Application Root (Python HTTP server on 8080)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
-    ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module with Real-World Analogies & Progress Tracking
+    ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
     ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Feedback Mode
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
@@ -91,7 +91,7 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
-        ├── knowledge.js             # Controller for 47+ Core Concepts (Real-time Search, Domain Filter, TOC Scrollspy, Bookmarks)
+        ├── knowledge.js             # Controller for 47+ Core Concepts (Mobile Drawer, ScrollSpy, Bookmarks, Real-time Search)
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
@@ -108,47 +108,37 @@ d:\AI\CCAF\
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
-- **2026-08-18**:
-  - Trích xuất toàn diện 47 khái niệm kiến trúc cốt lõi từ 644 câu hỏi mock exam và 254 câu chuẩn CCAF, tạo tài liệu chuẩn mực `tài liệu/CCAF_Master_Knowledge_Reference.md`.
-  - Xây dựng hoàn chỉnh trang web mới `website/knowledge.html` và module dữ liệu `website/js/data/knowledge-data.js` + `website/js/knowledge.js` với 47 concepts, đầy đủ định nghĩa, cơ chế kỹ thuật, bẫy trắc nghiệm, code mẫu và đặc biệt là **💡 Ví dụ ẩn dụ đời thường cực kỳ dễ hiểu**.
-  - Tích hợp điều hướng `🧠 Kiến Thức Cốt Lõi (47+)` vào navbar của tất cả 5 trang HTML.
-  - Kiểm tra cú pháp và tính toàn vẹn 100% đạt chuẩn trên Node.js.
-  - Sẵn sàng triển khai trên Vercel và GitHub repo.
-
+- **2026-08-18 (Mobile Optimization & Live Testing)**:
+  - Tối ưu hóa **Responsive Mobile toàn diện cho trang 47+ Kiến Thức Cốt Lõi (`website/knowledge.html` & `website/js/knowledge.js`)**.
+  - Xây dựng **Mobile TOC Floating Action Button (FAB)** và **Bottom Sheet Drawer** trượt mượt mà, cho phép xem mục lục 44 concept và nhảy nhanh đến bất kỳ thẻ nào trên mobile.
+  - Tinh chỉnh thanh Sticky Filter Bar, thanh tiến độ 100% width, hàng chip Tab Domain vuốt ngang (horizontal swipeable chips), ô tìm kiếm chuẩn 16px chống iOS auto-zoom kèm nút xóa nhanh `✕`.
+  - Tối ưu thẻ bài học (Concept Cards) với Decision Grid 1 cột, khối code cuộn ngang êm ái, nút `⭐ Bookmark` và `✅ Đã hiểu` to rõ dễ bấm bằng ngón tay cái, kèm nút `⬆️ Lên đầu trang` tự động.
+  - Kiểm thử trực tiếp bằng browser subagent trên iPhone 14 (390x844 px) đạt 100% tiêu chuẩn chất lượng.
+  - Thực hiện đồng bộ hóa `project_memory.md` và `git push` theo yêu cầu trực tiếp từ người dùng.
 
 ---
 
-## ⚙️ 5. KEY SYSTEM FEATURES BUILT & VERIFIED
+## ⚙️ 6. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Responsive Mobile Architecture (`knowledge.html`, `style.css`, `knowledge.js`):**
+  - Hỗ trợ hoàn hảo mọi kích thước màn hình: iPhone SE (375px), iPhone 13/14/15 (390px-393px), Android (412px-430px), Tablet (768px-960px) và Desktop.
+  - Tích hợp Mobile TOC Drawer bottom sheet, nút nổi FAB hiển thị tiến độ tức thì, Back-to-top FAB và ScrollSpy 2 chiều.
 - **MCQ Option Length Normalization & Bias Elimination (`mock-exam-data.js` v19.0):**
   - Khắc phục triệt để hiện tượng thiên kiến độ dài (Length Bias) nơi 87.1% (561/644 câu) có đáp án đúng là phương án dài nhất.
   - Sau khi chuẩn hóa bằng công cụ `balance_all_dataset.py`: Tỷ lệ Rank 1 (dài nhất) giảm từ **87.1% xuống 29.8%**, rải đều tự nhiên qua 4 mức độ dài: Rank 1 (29.8%), Rank 2 (24.2%), Rank 3 (23.0%), Rank 4 (23.0%).
   - Tỷ lệ độ dài trung bình Câu Đúng / Câu Sai đạt mức lý tưởng **1.01x** (174.0 ký tự vs 171.7 ký tự).
-  - Đồng bộ 100% song ngữ `optionsEN` và `options` (Tiếng Việt), bảo toàn trọn vẹn ý nghĩa kỹ thuật và tính đúng/sai của 644 câu.
-  - Tích hợp công cụ kiểm định tự động `validate_option_lengths.py` và lưu trữ file sao lưu `mock-exam-data.backup.js`.
 - **Instant Feedback Mode UI & Timer Optimization (`mock-exam.html` & `mock-exam.js`):**
   - Loại bỏ khối Chế độ 3 trùng lặp trên giao diện chọn đề. Thiết kế lại Chế độ 1 Ôn tập tùy chỉnh tích hợp trực tiếp 2 nút chọn: Ôn bình thường & Ôn tức thì.
-  - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`), cho phép người học tập trung nghiên cứu sâu từng câu, rationale và tài liệu chính thức mà không bị áp lực thời gian.
-  - Đồng hồ 120 phút vẫn giữ nguyên hoạt động chuẩn xác cho Chế độ 2 Thi thật 60 câu Pearson VUE.
-- **Question Detail Review & Report Modal Fix (`mock-exam.js`):** Resolved runtime JS exceptions (`ReferenceError: refreshReportModalState is not defined` and missing `window.closeReportModal`) upon completing an exercise or exam. Implemented `refreshReportModalState(totalScore, isPassed)` for rendering bilingual score status & details, and `window.closeReportModal()` to smoothly close score report popup and unveil interactive review arena displaying question options, correct/incorrect badges, rationale, explanation, and official Anthropic reference links.
-- **Fix Mock Exam Dataset Pool Export & Navigation (`mock-exam-data.js`, `balance_all_dataset.py`, `mock-exam.js`):**
-  - Khắc phục lỗi thiếu biến toàn cục `MOCK_EXAM_QUESTION_POOL` khiến trang Ôn tập & Thi mô phỏng không nạp được ngân hàng 644 câu hỏi và làm tab Ôn tập Thuật ngữ hiển thị 0 câu.
-  - Cập nhật script `balance_all_dataset.py` để tự động đính kèm khai báo `MOCK_EXAM_QUESTION_POOL` và gán vào `window.MOCK_EXAM_QUESTION_POOL`.
-  - Thêm tính năng tự động tích chọn Domain từ URL parameter `?domain=DX` khi chuyển từ trang Tổng quan Domain sang Ôn tập.
+  - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`).
 - **LocalStorage Exam & Practice Session Persistence (`app.js`, `mock-exam.js`):**
-  - Đã xây dựng hoàn thiện cơ chế tự động lưu và khôi phục trạng thái bài thi/ôn tập dở dang qua khóa `ccaf_active_exam_session` trong `localStorage`.
-  - Bảo toàn 100% dữ liệu khi người dùng reload (F5) hoặc chuyển sang các trang khác (*Lý thuyết*, *Nguyên tắc*, *Thuật ngữ*) rồi quay lại: khôi phục chính xác danh sách câu hỏi, các đáp án đã chọn, cờ cắm (flag), vị trí câu đang làm dở và thời gian còn lại.
-  - Dọn dẹp session an toàn chỉ khi người dùng bấm "Dừng Thi / Hủy Bài" hoặc "Nộp Bài Thi".
+  - Cơ chế tự động lưu và khôi phục trạng thái bài thi/ôn tập dở dang qua khóa `ccaf_active_exam_session` trong `localStorage`.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.
 - **Git Repository Status:** Synced to `https://github.com/thanghobadat/ccaf-study.git` on branch `main`.
 
 ---
 
-## 🚨 6. AGENT WORKFLOW MANDATES (MUST OBEY ON RESUME)
+## 🚨 7. AGENT WORKFLOW MANDATES (MUST OBEY ON RESUME)
 1. **Always read `d:\AI\CCAF\rule.md` first** before taking any action.
 2. **Planning First:** Always present an Implementation Plan first before executing file edits.
 3. **Summary Rule:** Always summarize accomplishments briefly upon completion.
 4. **Manual Git Push & Memory Sync Only:** NEVER automatically `git push` or edit `project_memory.md` after editing files. ONLY run `git push` and update `project_memory.md` when the user explicitly requests it.
-
-
-

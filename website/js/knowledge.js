@@ -1,6 +1,7 @@
 /**
  * CCAF Learning Hub - Knowledge Base Logic
  * Quản lý hiển thị, tìm kiếm, lọc Domain và tiến độ học tập 44+ Concepts
+ * Hỗ trợ tối ưu Responsive Mobile & Mobile TOC Drawer
  */
 
 let activeDomain = 'ALL';
@@ -19,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderKnowledgeList();
   setupEventListeners();
   setupScrollSpy();
+  setupMobileDrawer();
+  setupBackToTop();
+  setupSearchClear();
 });
 
 // Load tiến độ từ localStorage
@@ -136,16 +140,10 @@ function getFilteredConcepts() {
   });
 }
 
-// Render Sidebar Mục Lục
-function renderSidebar() {
-  const sidebarNav = document.getElementById('sidebar-toc-list');
-  if (!sidebarNav) return;
-
-  const filtered = getFilteredConcepts();
-  
+// Helper tạo HTML cây mục lục
+function buildTocHtml(filtered) {
   if (filtered.length === 0) {
-    sidebarNav.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Không có mục phù hợp.</div>`;
-    return;
+    return `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.75rem 0.5rem; text-align: center;">Không có mục phù hợp với bộ lọc.</div>`;
   }
 
   const grouped = {};
@@ -181,21 +179,53 @@ function renderSidebar() {
       </div>
     `;
   }
+  return html;
+}
 
-  sidebarNav.innerHTML = html;
-
-  sidebarNav.querySelectorAll('.toc-item').forEach(link => {
+// Helper gắn sự kiện click cho các link TOC
+function attachTocListeners(container) {
+  if (!container) return;
+  container.querySelectorAll('.toc-item').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = link.getAttribute('data-target');
       const targetEl = document.getElementById(targetId);
+      
+      // Đóng Mobile Drawer nếu đang mở
+      closeMobileDrawer();
+
       if (targetEl) {
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         targetEl.classList.add('highlight-glow');
-        setTimeout(() => targetEl.classList.remove('highlight-glow'), 2000);
+        setTimeout(() => targetEl.classList.remove('highlight-glow'), 2200);
       }
     });
   });
+}
+
+// Render Sidebar Mục Lục (cả Desktop lẫn Mobile Drawer)
+function renderSidebar() {
+  const desktopSidebarNav = document.getElementById('sidebar-toc-list');
+  const mobileSidebarNav = document.getElementById('mobile-toc-list');
+  const filtered = getFilteredConcepts();
+  const tocHtml = buildTocHtml(filtered);
+
+  // Cập nhật số đếm tiêu đề
+  const desktopCountEl = document.getElementById('sidebar-total-count');
+  if (desktopCountEl) desktopCountEl.innerText = `${filtered.length} Mục`;
+
+  const drawerCountEl = document.getElementById('drawer-total-count');
+  if (drawerCountEl) drawerCountEl.innerText = `${filtered.length} Mục`;
+
+  if (desktopSidebarNav) {
+    desktopSidebarNav.innerHTML = tocHtml;
+    attachTocListeners(desktopSidebarNav);
+  }
+
+  if (mobileSidebarNav) {
+    mobileSidebarNav.innerHTML = tocHtml;
+    attachTocListeners(mobileSidebarNav);
+  }
 }
 
 // Render Danh Sách Thẻ Kiến Thức
@@ -329,15 +359,21 @@ function updateStats() {
   if (countEl) countEl.innerText = `${doneCount}/${total}`;
 
   const percentEl = document.getElementById('stat-percent-val');
-  if (percentEl) percentEl.innerText = `${percent}%`;
+  if (percentEl) percentEl.innerText = `(${percent}%)`;
 
   const barEl = document.getElementById('progress-bar-fill');
   if (barEl) barEl.style.width = `${percent}%`;
 
   const bookmarkBtn = document.getElementById('toggle-bookmark-filter-btn');
   if (bookmarkBtn) {
-    bookmarkBtn.innerText = showBookmarkedOnly ? `⭐ Xem tất cả (${total})` : `⭐ Đã đánh dấu (${bookmarkedConcepts.size})`;
+    bookmarkBtn.innerText = showBookmarkedOnly ? `⭐ Xem tất cả (${total})` : `⭐ Đã lưu (${bookmarkedConcepts.size})`;
     bookmarkBtn.classList.toggle('active', showBookmarkedOnly);
+  }
+
+  // Cập nhật badge trên nút Mobile FAB
+  const fabBadgeEl = document.getElementById('mobile-toc-fab-badge');
+  if (fabBadgeEl) {
+    fabBadgeEl.innerText = `${doneCount}/${total}`;
   }
 }
 
@@ -348,6 +384,8 @@ function resetFilters() {
   showBookmarkedOnly = false;
   const searchInput = document.getElementById('knowledge-search-input');
   if (searchInput) searchInput.value = '';
+  const clearBtn = document.getElementById('knowledge-search-clear-btn');
+  if (clearBtn) clearBtn.classList.remove('visible');
   renderDomainFilters();
   renderSidebar();
   renderKnowledgeList();
@@ -356,9 +394,14 @@ function resetFilters() {
 // Setup các sự kiện
 function setupEventListeners() {
   const searchInput = document.getElementById('knowledge-search-input');
+  const clearBtn = document.getElementById('knowledge-search-clear-btn');
+
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
+      if (clearBtn) {
+        clearBtn.classList.toggle('visible', searchQuery.trim().length > 0);
+      }
       renderSidebar();
       renderKnowledgeList();
     });
@@ -388,15 +431,91 @@ function setupEventListeners() {
   }
 }
 
-// Scrollspy cho Sidebar
+// Setup Mobile TOC Drawer
+function setupMobileDrawer() {
+  const fabBtn = document.getElementById('mobile-toc-fab');
+  const closeBtn = document.getElementById('mobile-toc-close-btn');
+  const backdrop = document.getElementById('mobile-toc-backdrop');
+
+  if (fabBtn) {
+    fabBtn.addEventListener('click', openMobileDrawer);
+  }
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMobileDrawer);
+  }
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMobileDrawer);
+  }
+
+  // Đóng khi nhấn phím Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeMobileDrawer();
+    }
+  });
+}
+
+function openMobileDrawer() {
+  const drawer = document.getElementById('mobile-toc-drawer');
+  const backdrop = document.getElementById('mobile-toc-backdrop');
+  if (drawer) drawer.classList.add('open');
+  if (backdrop) backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileDrawer() {
+  const drawer = document.getElementById('mobile-toc-drawer');
+  const backdrop = document.getElementById('mobile-toc-backdrop');
+  if (drawer) drawer.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Setup Back to Top Floating Button
+function setupBackToTop() {
+  const topBtn = document.getElementById('back-to-top-fab');
+  if (!topBtn) return;
+
+  topBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+}
+
+// Setup nút xóa tìm kiếm
+function setupSearchClear() {
+  const clearBtn = document.getElementById('knowledge-search-clear-btn');
+  const searchInput = document.getElementById('knowledge-search-input');
+  if (!clearBtn || !searchInput) return;
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearBtn.classList.remove('visible');
+    searchInput.focus();
+    renderSidebar();
+    renderKnowledgeList();
+  });
+}
+
+// Scrollspy cho Sidebar & Hiển thị Back-To-Top
 function setupScrollSpy() {
   window.addEventListener('scroll', () => {
+    // Hiển thị/ẩn nút Back-to-Top
+    const topBtn = document.getElementById('back-to-top-fab');
+    if (topBtn) {
+      topBtn.classList.toggle('visible', window.scrollY > 280);
+    }
+
+    // Scrollspy highlight
     const cards = document.querySelectorAll('.concept-card');
     let currentId = '';
     
     cards.forEach(card => {
       const rect = card.getBoundingClientRect();
-      if (rect.top <= 160 && rect.bottom >= 160) {
+      if (rect.top <= 180 && rect.bottom >= 180) {
         currentId = card.id;
       }
     });
@@ -406,7 +525,7 @@ function setupScrollSpy() {
         link.classList.toggle('active-reading', link.getAttribute('data-target') === currentId);
       });
     }
-  });
+  }, { passive: true });
 }
 
 // Copy Code Helper
