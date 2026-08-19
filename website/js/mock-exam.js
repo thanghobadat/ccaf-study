@@ -1,6 +1,8 @@
 const SESSION_STORAGE_KEY = 'ccaf_active_exam_session';
 
-let currentPracticeSubMode = 'DOMAIN'; // 'DOMAIN' or 'TERM'
+let currentPracticeSubMode = 'DOMAIN'; // 'DOMAIN' or 'CONCEPT'
+let currentConceptFilterDomain = 'ALL';
+const conceptQuestionsCache = new Map();
 let mockExamQuestions = [];
 let mockExamAnswers = {};
 let mockExamFlags = new Set();
@@ -104,24 +106,41 @@ window.startInstantPracticeExam = function() {
   window.startCustomPracticeExam(true);
 };
 
+window.filterConceptsByDomain = function(domain) {
+  currentConceptFilterDomain = domain;
+  const chips = ['all', 'd1', 'd2', 'd3', 'd4', 'd5'];
+  chips.forEach(c => {
+    const btn = document.getElementById(`chip-concept-${c}`);
+    if (btn) {
+      if (c.toUpperCase() === domain.toUpperCase() || (c === 'all' && domain === 'ALL')) {
+        btn.className = 'btn btn-primary';
+      } else {
+        btn.className = 'btn btn-secondary';
+      }
+    }
+  });
+  window.renderPracticeConceptsGrid();
+};
+
 window.switchPracticeSubMode = function(mode) {
+  if (mode === 'TERM') mode = 'CONCEPT';
   currentPracticeSubMode = mode;
   const domainTab = document.getElementById('tab-practice-domain');
-  const termTab = document.getElementById('tab-practice-term');
+  const conceptTab = document.getElementById('tab-practice-concept') || document.getElementById('tab-practice-term');
   const domainBox = document.getElementById('practice-domain-box');
-  const termBox = document.getElementById('practice-term-box');
+  const conceptBox = document.getElementById('practice-concept-box') || document.getElementById('practice-term-box');
 
   if (mode === 'DOMAIN') {
     if (domainTab) domainTab.className = 'btn btn-primary';
-    if (termTab) termTab.className = 'btn btn-secondary';
+    if (conceptTab) conceptTab.className = 'btn btn-secondary';
     if (domainBox) domainBox.style.display = 'block';
-    if (termBox) termBox.style.display = 'none';
+    if (conceptBox) conceptBox.style.display = 'none';
   } else {
     if (domainTab) domainTab.className = 'btn btn-secondary';
-    if (termTab) termTab.className = 'btn btn-primary';
+    if (conceptTab) conceptTab.className = 'btn btn-primary';
     if (domainBox) domainBox.style.display = 'none';
-    if (termBox) termBox.style.display = 'block';
-    window.renderPracticeTermsGrid();
+    if (conceptBox) conceptBox.style.display = 'block';
+    window.renderPracticeConceptsGrid();
   }
 };
 
@@ -131,100 +150,128 @@ window.toggleMockDomains = function(selectState) {
   });
 };
 
-window.toggleMockTerms = function(selectState) {
-  document.querySelectorAll('.mock-term-cb').forEach(cb => {
+window.toggleMockConcepts = function(selectState) {
+  document.querySelectorAll('.mock-concept-cb').forEach(cb => {
     cb.checked = selectState;
   });
 };
 
-const TERM_KEYWORDS_MAP = {
-  'term-d1-prerequisite-gate': ['prerequisite gate', 'prerequisite check', 'deterministic prerequisite', 'cổng kiểm soát điều kiện tiên quyết', 'tiên quyết'],
-  'term-d1-sdk-hooks': ['pretooluse', 'posttooluse', 'sdk hook', 'lifecycle hook', 'interceptor hook'],
-  'term-d1-coordinator-worker': ['coordinator-worker', 'coordinator worker', 'sub-agent delegation', 'agent công nhân'],
-  'term-d1-state-recovery': ['state recovery', 'turn limit', 'session recovery', 'phục hồi trạng thái'],
-  'term-d1-hitl-escalation': ['human-in-the-loop', 'hitl', 'escalation hook', 'can thiệp con người'],
-  'term-d1-idempotency-gate': ['idempotency gate', 'idempotent', 'non-idempotent', 'đẳng quản'],
-  'term-d1-asymmetric-retry': ['asymmetric retry', 'exponential backoff', 'thử lại bất đối xứng'],
-  'term-d1-state-machine': ['state machine', 'stop_reason', 'máy trạng thái'],
-  'term-d1-rollback-checkpoint': ['rollback', 'transaction checkpoint', 'khôi phục điểm kiểm soát'],
-  'term-d2-granular-tool': ['granular tool', 'single-purpose tool', 'công cụ đơn chức năng'],
-  'term-d2-resilient-schema': ['resilient schema', 'resilient tool schema', 'input validation', 'schema kiên cường'],
-  'term-d2-mcp-transport': ['mcp transport', 'stdio', 'sse transport', 'giao thức stdio'],
-  'term-d2-tool-error-feedback': ['tool error handling', 'structured error response', 'phản hồi lỗi cấu trúc'],
-  'term-d2-tool-choice': ['tool_choice', 'tool choice', 'hạn chế chọn công cụ'],
-  'term-d2-tool-poisoning': ['tool poisoning', 'prompt injection', 'nhiễm độc công cụ'],
-  'term-d3-cli-permissions': ['dangerously-skip-permissions', 'cli permission', 'cờ quyền cli'],
-  'term-d3-claude-md-hierarchy': ['claude.md', 'hierarchy', 'hệ thống claude.md'],
-  'term-d3-glob-grep-navigation': ['glob tool', 'grep tool', 'glob before view', 'định vị tập tin'],
-  'term-d3-cicd-pipeline': ['ci/cd', 'github actions', 'pr review', 'tự động hóa pr'],
-  'term-d3-headless-mode': ['headless mode', 'non-interactive', 'chế độ không giao diện'],
-  'term-d4-structured-output': ['structured output', 'json schema', 'đầu ra cấu trúc'],
-  'term-d4-temperature-control': ['temperature = 0', 'temperature', 'kiểm soát nhiệt độ'],
-  'term-d4-few-shot-prompting': ['few-shot', 'exemplar', 'ví dụ mẫu'],
-  'term-d4-cot-thinking': ['chain-of-thought', '<thinking>', 'tư duy từng bước'],
-  'term-d4-xml-boundaries': ['xml tag', 'xml boundaries', '<context>', 'thẻ xml'],
-  'term-d4-conditional-directives': ['conditional directive', 'system prompt instruction', 'chỉ thị điều kiện'],
-  'term-d5-lost-in-the-middle': ['lost-in-the-middle', 'lost in the middle', 'attention dilution', 'lạc ở giữa'],
-  'term-d5-prompt-caching': ['prompt caching', 'ephemeral cache', 'bộ nhớ đệm câu lệnh'],
-  'term-d5-message-batches': ['message batches', 'batches api', 'xử lý theo lô'],
-  'term-d5-context-pruning': ['context pruning', 'sliding window', 'cắt tỉa bối cảnh'],
-  'term-d5-state-summarization': ['summarization compaction', 'state compaction', 'nén tóm tắt']
-};
+// Backward compatibility alias
+window.toggleMockTerms = window.toggleMockConcepts;
 
-window.getMatchingQuestionsForTermId = function(termId) {
+window.getMatchingQuestionsForConceptId = function(conceptId) {
   if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') return [];
+  if (conceptQuestionsCache.has(conceptId)) {
+    return conceptQuestionsCache.get(conceptId);
+  }
+
+  let conceptObj = null;
+  if (typeof CCAF_KNOWLEDGE_DATA !== 'undefined') {
+    conceptObj = CCAF_KNOWLEDGE_DATA.find(c => c.id === conceptId);
+  }
+
+  if (!conceptObj) return [];
+
+  const cDom = conceptObj.domain;
+  const cTitle = conceptObj.title || '';
   
-  let targetCount = 0;
-  let termDomain = '';
-  if (typeof TERMS_DATA !== 'undefined') {
-    const termObj = TERMS_DATA.find(t => t.id === termId);
-    if (termObj) {
-      termDomain = termObj.domain;
-      const matchNum = (termObj.frequency || '').match(/(\d+)\s*câu/);
-      if (matchNum) targetCount = parseInt(matchNum[1], 10);
+  // Extract clean keywords from title
+  const cleanTitle = cTitle.replace(/[\(\)\&\/\,\–\—\-\:\`\']/g, ' ');
+  const keywords = cleanTitle.split(/\s+/).map(w => w.toLowerCase()).filter(w => 
+    w.length > 2 && !['and', 'the', 'for', 'with', 'pattern', 'architecture', 'trong', 'cốt', 'lõi', 'của', 'khi', 'nào', 'dùng', 'cái'].includes(w)
+  );
+
+  const scored = [];
+  for (const q of MOCK_EXAM_QUESTION_POOL) {
+    if (q.domain !== cDom) continue;
+    
+    const ts = (q.taskStatement || '').toLowerCase();
+    const qText = ((q.question || '') + ' ' + (q.questionEN || '') + ' ' + (q.explanation || '') + ' ' + (q.rationale || '')).toLowerCase();
+    
+    let score = 0;
+    for (const kw of keywords) {
+      if (ts.includes(kw)) {
+        score += kw.length > 6 ? 4 : 2;
+      } else if (qText.includes(kw)) {
+        score += 1;
+      }
+    }
+
+    // Additional relevance bonus for concept sub-index in taskStatement
+    if (ts.includes(`concept-${conceptObj.index}`) || ts.includes(`${conceptObj.index}.`)) {
+      score += 3;
+    }
+
+    if (score > 0) {
+      scored.push({ q, score });
     }
   }
 
-  const kws = TERM_KEYWORDS_MAP[termId] || [];
-  
-  const scored = MOCK_EXAM_QUESTION_POOL.map(q => {
-    const text = (q.question + ' ' + (q.questionEN||'') + ' ' + (q.explanation||'') + ' ' + (q.taskStatement||'') + ' ' + (q.rationale||'')).toLowerCase();
-    let score = 0;
-    kws.forEach(kw => {
-      if (text.includes(kw)) score += kw.length > 8 ? 3 : 1;
-    });
-    if (termDomain && q.domain === termDomain) score += 0.5;
-    return { q, score };
-  }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
-
+  scored.sort((a, b) => b.score - a.score);
   let pool = scored.map(item => item.q);
 
-  if (targetCount > 0 && pool.length > targetCount) {
-    pool = pool.slice(0, targetCount);
+  // Fallback: If keyword match is sparse, supplement with domain pool
+  if (pool.length < 5) {
+    const domainPool = MOCK_EXAM_QUESTION_POOL.filter(q => q.domain === cDom);
+    const existingIds = new Set(pool.map(q => q.id));
+    for (const dq of domainPool) {
+      if (!existingIds.has(dq.id)) {
+        pool.push(dq);
+        if (pool.length >= 10) break;
+      }
+    }
   }
 
+  conceptQuestionsCache.set(conceptId, pool);
   return pool;
 };
 
-window.renderPracticeTermsGrid = function() {
-  const container = document.getElementById('practice-terms-grid');
+// Backward compatibility alias
+window.getMatchingQuestionsForTermId = window.getMatchingQuestionsForConceptId;
+
+window.renderPracticeConceptsGrid = function() {
+  const container = document.getElementById('practice-concepts-grid') || document.getElementById('practice-terms-grid');
   if (!container) return;
 
-  if (typeof TERMS_DATA === 'undefined') {
-    container.innerHTML = '<div style="font-size:0.82rem; color:var(--text-muted);">⚠️ Chưa tải được từ điển thuật ngữ.</div>';
+  if (typeof CCAF_KNOWLEDGE_DATA === 'undefined') {
+    container.innerHTML = '<div style="font-size:0.82rem; color:var(--text-muted);">⚠️ Chưa tải được bộ dữ liệu 47+ Kiến Thức Cốt Lõi.</div>';
     return;
   }
 
-  container.innerHTML = TERMS_DATA.map(t => {
-    const matchCount = window.getMatchingQuestionsForTermId(t.id).length;
+  let list = CCAF_KNOWLEDGE_DATA;
+  if (currentConceptFilterDomain && currentConceptFilterDomain !== 'ALL') {
+    list = list.filter(c => c.domain === currentConceptFilterDomain);
+  }
+
+  const domainColors = {
+    'D1': 'var(--accent-purple)',
+    'D2': 'var(--accent-cyan)',
+    'D3': 'var(--accent-green)',
+    'D4': 'var(--accent-amber)',
+    'D5': 'var(--accent-rose)'
+  };
+
+  container.innerHTML = list.map(c => {
+    const matchCount = window.getMatchingQuestionsForConceptId(c.id).length;
+    const domColor = domainColors[c.domain] || 'var(--accent-purple)';
+    const idxStr = c.index < 10 ? '0' + c.index : c.index;
     return `
-      <label class="domain-cb-card" style="padding: 0.45rem 0.6rem; font-size: 0.8rem; cursor: pointer;">
-        <input type="checkbox" class="mock-term-cb" value="${t.id}" checked style="transform: scale(1.1); margin-right: 0.35rem;">
-        <span><strong style="color: var(--accent-cyan);">${t.domain}</strong> ${t.nameEN} <em style="color: var(--text-muted); font-size: 0.75rem;">(${matchCount} câu)</em></span>
+      <label class="domain-cb-card" style="padding: 0.45rem 0.65rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; transition: background 0.15s ease;">
+        <div style="display: flex; align-items: center; gap: 0.45rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+          <input type="checkbox" class="mock-concept-cb mock-term-cb" value="${c.id}" checked style="transform: scale(1.1); margin-right: 0.1rem; flex-shrink: 0;">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="[${c.domain} #${idxStr}] ${c.title}">
+            <strong style="color: ${domColor}; font-family: monospace;">[${c.domain} #${idxStr}]</strong> 
+            <span>${c.title}</span>
+          </span>
+        </div>
+        <span class="badge" style="font-size: 0.72rem; padding: 0.15rem 0.4rem; flex-shrink: 0; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);">${matchCount}Q</span>
       </label>
     `;
   }).join('');
 };
+
+// Backward compatibility alias
+window.renderPracticeTermsGrid = window.renderPracticeConceptsGrid;
 
 window.startCustomPracticeExam = function(isInstant = false) {
   isInstantFeedbackMode = (isInstant === true);
@@ -241,23 +288,24 @@ window.startCustomPracticeExam = function(isInstant = false) {
   let pool = [];
   let modeLabel = '';
 
-  if (currentPracticeSubMode === 'TERM') {
-    const checkedTermIds = Array.from(document.querySelectorAll('.mock-term-cb:checked')).map(cb => cb.value);
-    if (checkedTermIds.length === 0) {
-      AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Thuật ngữ để ôn tập!");
+  if (currentPracticeSubMode === 'CONCEPT' || currentPracticeSubMode === 'TERM') {
+    const checkedConceptIds = Array.from(document.querySelectorAll('.mock-concept-cb:checked, .mock-term-cb:checked')).map(cb => cb.value);
+    const uniqueIds = Array.from(new Set(checkedConceptIds));
+    if (uniqueIds.length === 0) {
+      AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Chủ đề Kiến Thức để ôn tập!");
       return;
     }
 
     const matchedMap = new Map();
-    checkedTermIds.forEach(tId => {
-      const qList = window.getMatchingQuestionsForTermId(tId);
+    uniqueIds.forEach(cId => {
+      const qList = window.getMatchingQuestionsForConceptId(cId);
       qList.forEach(q => {
         if (!matchedMap.has(q.id)) matchedMap.set(q.id, q);
       });
     });
 
     pool = Array.from(matchedMap.values());
-    modeLabel = `TERMS_${checkedTermIds.length}T`;
+    modeLabel = `CONCEPTS_${uniqueIds.length}C`;
   } else {
     const checkedDoms = Array.from(document.querySelectorAll('.mock-domain-cb:checked')).map(cb => cb.value);
     if (checkedDoms.length === 0) {

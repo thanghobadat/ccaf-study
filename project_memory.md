@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-18 17:18 (Local Time)*  
+> *Last Updated: 2026-08-19 16:51 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -82,7 +82,7 @@ d:\AI\CCAF\
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
     ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
-    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + Custom Practice + Instant Feedback Mode
+    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + 47+ Core Concepts Practice + Instant Feedback Mode
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
@@ -92,7 +92,7 @@ d:\AI\CCAF\
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
         ├── knowledge.js             # Controller for 47+ Core Concepts (Mobile Drawer, ScrollSpy, Bookmarks, Real-time Search)
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Clean Practice, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, 47+ Core Concepts Practice Mode, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
@@ -108,6 +108,13 @@ d:\AI\CCAF\
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-08-19 (47+ Core Concepts Practice Mode Migration & Live Testing)**:
+  - Chuyển đổi toàn diện cơ chế **Ôn tập theo Thuật ngữ cũ (40 terms)** thành **Ôn tập Chuyên sâu theo 47+ Kiến Thức Cốt Lõi (Core Concepts)** trong `website/mock-exam.html` và `website/js/mock-exam.js`.
+  - Tích hợp **Domain Filter Chips** (`Tất cả Domain`, `D1`, `D2`, `D3`, `D4`, `D5`) cho phép duyệt và lọc nhanh 47 Concept trực quan.
+  - Xây dựng thuật toán ánh xạ câu hỏi thông minh dựa trên `domain`, `taskStatement` prefix và keywords của từng Concept, đảm bảo 100% Concept có bộ câu hỏi ôn tập tương ứng.
+  - Kiểm thử tự động bằng Browser subagent trên cả 2 chế độ Ôn bình thường & Ôn tức thì (Instant feedback) đạt chuẩn 100%.
+  - Đánh giá chất lượng bộ 644 câu hỏi: Đạt 100% giải thích chi tiết từng option, song ngữ EN/VI, độ sâu stem trung bình 501 ký tự (vượt trội so với 286 ký tự của đề 254 câu gốc).
+  - Đồng bộ `project_memory.md` và `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-18 (Mobile Optimization & Live Testing)**:
   - Tối ưu hóa **Responsive Mobile toàn diện cho trang 47+ Kiến Thức Cốt Lõi (`website/knowledge.html` & `website/js/knowledge.js`)**.
   - Xây dựng **Mobile TOC Floating Action Button (FAB)** và **Bottom Sheet Drawer** trượt mượt mà, cho phép xem mục lục 44 concept và nhảy nhanh đến bất kỳ thẻ nào trên mobile.
@@ -120,6 +127,9 @@ d:\AI\CCAF\
 
 ## ⚙️ 6. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Core Concepts Practice Mode (`mock-exam.html`, `mock-exam.js`):**
+  - Tích hợp 47+ Master Core Concepts vào giao diện chọn đề ôn tập.
+  - Phân loại Domain Chips nhanh, đếm số câu hỏi thực chiến cho từng Concept, hỗ trợ song song Ôn bình thường và Ôn tức thì không giới hạn thời gian.
 - **Responsive Mobile Architecture (`knowledge.html`, `style.css`, `knowledge.js`):**
   - Hỗ trợ hoàn hảo mọi kích thước màn hình: iPhone SE (375px), iPhone 13/14/15 (390px-393px), Android (412px-430px), Tablet (768px-960px) và Desktop.
   - Tích hợp Mobile TOC Drawer bottom sheet, nút nổi FAB hiển thị tiến độ tức thì, Back-to-top FAB và ScrollSpy 2 chiều.
