@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-19 16:51 (Local Time)*  
+> *Last Updated: 2026-08-19 17:02 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -80,7 +80,6 @@ d:\AI\CCAF\
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
-    ├── terms.html                   # CCAF Architecture Terms Hub (40 Canonical Terms across 644Q dataset)
     ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
     ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + 47+ Core Concepts Practice + Instant Feedback Mode
     ├── css/
@@ -90,14 +89,12 @@ d:\AI\CCAF\
         ├── domains.js               # Domain overview renderer & specs filter
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
-        ├── terms.js                 # Render & Real-time Filter/Search Engine for 40 CCAF Terms
         ├── knowledge.js             # Controller for 47+ Core Concepts (Mobile Drawer, ScrollSpy, Bookmarks, Real-time Search)
         ├── mock-exam.js             # Proctored 60Q Simulator Engine, 47+ Core Concepts Practice Mode, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
             ├── principles.js        # 67 Core Principles data (IDs 1-67) bilingual EN+VI
-            ├── terms-data.js        # 40 CCAF Architectural Terms Dataset with Domain-first badges & frequency stats
             ├── knowledge-data.js    # 47 Structured Core Architectural Concepts Dataset with Real-World Analogies & Code Snippets
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
@@ -108,6 +105,10 @@ d:\AI\CCAF\
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-08-19 (Terms Page Removal & Global Navbar Cleanup)**:
+  - Xoá bỏ hoàn toàn trang **Từ Điển Thuật Ngữ cũ (`terms.html`)**, script điều khiển `website/js/terms.js`, và dữ liệu `website/js/data/terms-data.js`.
+  - Đồng bộ cập nhật thanh điều hướng (navbar) trên tất cả 5 trang chính (`domains.html`, `learn.html`, `principles.html`, `knowledge.html`, `mock-exam.html`), làm sạch các import script thừa.
+  - Cập nhật `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-19 (47+ Core Concepts Practice Mode Migration & Live Testing)**:
   - Chuyển đổi toàn diện cơ chế **Ôn tập theo Thuật ngữ cũ (40 terms)** thành **Ôn tập Chuyên sâu theo 47+ Kiến Thức Cốt Lõi (Core Concepts)** trong `website/mock-exam.html` và `website/js/mock-exam.js`.
   - Tích hợp **Domain Filter Chips** (`Tất cả Domain`, `D1`, `D2`, `D3`, `D4`, `D5`) cho phép duyệt và lọc nhanh 47 Concept trực quan.
