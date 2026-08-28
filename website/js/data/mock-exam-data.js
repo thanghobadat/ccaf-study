@@ -27229,6 +27229,12 @@ function generateMockQuestionsPool() {
 }
 
 const MOCK_EXAM_QUESTION_POOL = generateMockQuestionsPool();
+const MOCK_EXAM_POOL_V1 = MOCK_EXAM_QUESTION_POOL;
 if (typeof window !== 'undefined') {
   window.MOCK_EXAM_QUESTION_POOL = MOCK_EXAM_QUESTION_POOL;
+  window.MOCK_EXAM_POOL_V1 = MOCK_EXAM_POOL_V1;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { generateMockQuestionsPool, MOCK_EXAM_POOL_V1, MOCK_EXAM_QUESTION_POOL };
 }

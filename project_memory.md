@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-19 17:02 (Local Time)*  
+> *Last Updated: 2026-08-29 00:12 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -10,7 +10,7 @@
 
 ### 🌐 Web Links
 - **Reference Web:** `https://ccaflearning.vercel.app/` (Original 5-domain community reference site).
-- **Active Local Web:** `http://localhost:8080` (Current live platform running locally at `d:\AI\CCAF\website` via `python -m http.server 8080`).
+- **Active Local Web:** `http://localhost:8899` (Current live platform running locally at `d:\AI\CCAF\website`).
 - **GitHub Repository:** `https://github.com/thanghobadat/ccaf-study.git` (Remote origin repo).
 
 ### 📄 Documentation Files (Root Knowledge)
@@ -38,11 +38,11 @@
 ## 🎯 3. EXAM WEIGHTINGS & 6 PRODUCTION ARCHETYPES
 
 ### 5 Exam Domains & Weights
-1. **Domain 1: Agent Architecture & Orchestration (27%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits, Pre/PostToolUse hooks, Deterministic State Machines, External State Store. (11 Concepts / 116 Questions)
-2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Least-Privilege tool allocation, Output projection in tool chains. (9 Concepts / 121 Questions)
-3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`, `-p`, `--output-format json`), `CLAUDE.md` hierarchy, Plan Mode, Custom Skills `SKILL.md`, `settings.json` allowedTools, Iterative Refinement & TDD verification loop. (9 Concepts / 153 Questions)
-4. **Domain 4: Prompt Engineering & Structured Output (20%)** — Few-shot examples & distribution bias mitigation, JSON Schemas with explicit null (`type: ["string","null"]` + `required`), CoT `<thinking>`, XML boundaries `<context>`, Validation & feedback injection. (9 Concepts / 169 Questions)
-5. **Domain 5: Context Management & Reliability (15%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Circuit Breaker (Closed->Open->Half-Open), Structured Escalation Payloads, Semantic Search vs Literal Grep, HITL Review Calibration & Confidence Routing, Information Provenance & Citation Chaining. (9 Concepts / 85 Questions)
+1. **Domain 1: Agent Architecture & Orchestration (26%)** — Agent SDK, Coordinator-Worker, Task tool, Flat Hierarchy, State recovery, Turn limits, Pre/PostToolUse hooks, Deterministic State Machines, External State Store.
+2. **Domain 2: Tool Design & MCP Integration (18%)** — Granular tools, Resilient schemas, MCP Server/Client (stdio vs SSE), Least-Privilege tool allocation, Output projection in tool chains.
+3. **Domain 3: Claude Code Configuration & Workflows (20%)** — CLI flags (`--dangerously-skip-permissions`, `-p`, `--output-format json`), `CLAUDE.md` hierarchy, Plan Mode, Custom Skills `SKILL.md`, `settings.json` allowedTools, Iterative Refinement & TDD verification loop.
+4. **Domain 4: Prompt Engineering & Structured Output (18%)** — Few-shot examples & distribution bias mitigation, JSON Schemas with explicit null (`type: ["string","null"]` + `required`), CoT `<thinking>`, XML boundaries `<context>`, Validation & feedback injection.
+5. **Domain 5: Context Management & Reliability (18%)** — Context Pruning, Lost-in-the-middle, Message Batches API (50% cost saving), Circuit Breaker (Closed->Open->Half-Open), Structured Escalation Payloads, Semantic Search vs Literal Grep, HITL Review Calibration & Confidence Routing, Information Provenance & Citation Chaining.
 
 ### 6 Production Archetypes
 1. Customer Support Resolution Agent
@@ -73,15 +73,16 @@ d:\AI\CCAF\
 │   ├── CCAF_254_Official_Mock_Exam_Bank.md
 │   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
-│   └── generate/                    # 289 Output JSON Question Batches (570 Questions)
-└── website/                         # Web Application Root (Python HTTP server on 8080)
+│   └── generate/
+│       └── ver2/                    # 10 TXT files & merged mock-exam-data_ver2.js (1,000 Questions)
+└── website/                         # Web Application Root (Python HTTP server on 8899)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
     ├── domains.html                 # 5 Domain Comprehensive Overview & Technical Specs module
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
-    ├── mock-exam.html               # 60Q Clean Gold Standard Exam Simulator + 47+ Core Concepts Practice + Instant Feedback Mode
+    ├── mock-exam.html               # 60Q Simulator + Dataset Switcher (V1/V2/BOTH: 1,644+ Qs) + Core Concepts Practice + Instant Feedback
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
@@ -90,7 +91,7 @@ d:\AI\CCAF\
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── knowledge.js             # Controller for 47+ Core Concepts (Mobile Drawer, ScrollSpy, Bookmarks, Real-time Search)
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine, 47+ Core Concepts Practice Mode, Instant Feedback (Untimed) & Round-robin Repetition Algorithm
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Dataset Switcher (V1/V2/BOTH), 47+ Concepts Practice Mode, Instant Feedback
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
@@ -98,13 +99,23 @@ d:\AI\CCAF\
             ├── knowledge-data.js    # 47 Structured Core Architectural Concepts Dataset with Real-World Analogies & Code Snippets
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
-            ├── mock-exam-data.backup.js # 100% byte-for-byte original backup snapshot (644 questions)
-            └── mock-exam-data.js    # Balanced 644 Unique Core Scenario Questions Dataset v19.0 (Eliminated MCQ Length Bias, 100% valid JSON)
+            ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
+            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Blueprint-Standard Dataset (MOCK_EXAM_POOL_V2)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-08-29 (Dataset V2 Integration & Multi-Dataset Switcher for Mode 1 Practice)**:
+  - Gộp thành công 10 file text trong thư mục `ver2` thành file JavaScript hoàn chỉnh [mock-exam-data_ver2.js](file:///d:/AI/CCAF/t%C3%A0i%20li%E1%BB%87u/generate/ver2/mock-exam-data_ver2.js) (1,000 câu hỏi chuẩn hóa toàn diện theo CCAF Blueprint, 250 câu/domain weightings, cân bằng đáp án tuyệt đối 25% A/B/C/D).
+  - Tích hợp bộ đề V2 vào hệ thống website tại [mock-exam-data_ver2.js](file:///d:/AI/CCAF/website/js/data/mock-exam-data_ver2.js) dưới định danh `window.MOCK_EXAM_POOL_V2`.
+  - Nâng cấp **Chế độ 1: Ôn tập tùy chỉnh** trên [mock-exam.html](file:///d:/AI/CCAF/website/mock-exam.html) & [mock-exam.js](file:///d:/AI/CCAF/website/js/mock-exam.js) với bộ chuyển đổi 3 nguồn đề:
+    1. 📘 **Bộ 1**: 644 câu hỏi tình huống chuyên sâu
+    2. 🚀 **Bộ 2**: 1,000 câu hỏi chuẩn hóa Blueprint CCAF
+    3. ⚡ **Kết Hợp**: Siêu ngân hàng 1,644 câu hỏi không trùng lặp
+  - Đồng bộ cập nhật số lượng câu hỏi per-domain (D1..D5) và số câu hỏi khớp per-concept (47+ Core Concepts) theo thời gian thực khi chuyển đổi bộ đề.
+  - Đã kiểm thử tự động toàn diện qua Node.js & Browser subagent.
+  - Đồng bộ `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-19 (Terms Page Removal & Global Navbar Cleanup)**:
   - Xoá bỏ hoàn toàn trang **Từ Điển Thuật Ngữ cũ (`terms.html`)**, script điều khiển `website/js/terms.js`, và dữ liệu `website/js/data/terms-data.js`.
   - Đồng bộ cập nhật thanh điều hướng (navbar) trên tất cả 5 trang chính (`domains.html`, `learn.html`, `principles.html`, `knowledge.html`, `mock-exam.html`), làm sạch các import script thừa.
@@ -114,33 +125,22 @@ d:\AI\CCAF\
   - Tích hợp **Domain Filter Chips** (`Tất cả Domain`, `D1`, `D2`, `D3`, `D4`, `D5`) cho phép duyệt và lọc nhanh 47 Concept trực quan.
   - Xây dựng thuật toán ánh xạ câu hỏi thông minh dựa trên `domain`, `taskStatement` prefix và keywords của từng Concept, đảm bảo 100% Concept có bộ câu hỏi ôn tập tương ứng.
   - Kiểm thử tự động bằng Browser subagent trên cả 2 chế độ Ôn bình thường & Ôn tức thì (Instant feedback) đạt chuẩn 100%.
-  - Đánh giá chất lượng bộ 644 câu hỏi: Đạt 100% giải thích chi tiết từng option, song ngữ EN/VI, độ sâu stem trung bình 501 ký tự (vượt trội so với 286 ký tự của đề 254 câu gốc).
+  - Đánh giá chất lượng bộ 644 câu hỏi: Đạt 100% giải thích chi tiết từng option, song ngữ EN/VI, độ sâu stem trung bình 501 ký tự.
   - Đồng bộ `project_memory.md` và `git push` theo yêu cầu trực tiếp từ người dùng.
-- **2026-08-18 (Mobile Optimization & Live Testing)**:
-  - Tối ưu hóa **Responsive Mobile toàn diện cho trang 47+ Kiến Thức Cốt Lõi (`website/knowledge.html` & `website/js/knowledge.js`)**.
-  - Xây dựng **Mobile TOC Floating Action Button (FAB)** và **Bottom Sheet Drawer** trượt mượt mà, cho phép xem mục lục 44 concept và nhảy nhanh đến bất kỳ thẻ nào trên mobile.
-  - Tinh chỉnh thanh Sticky Filter Bar, thanh tiến độ 100% width, hàng chip Tab Domain vuốt ngang (horizontal swipeable chips), ô tìm kiếm chuẩn 16px chống iOS auto-zoom kèm nút xóa nhanh `✕`.
-  - Tối ưu thẻ bài học (Concept Cards) với Decision Grid 1 cột, khối code cuộn ngang êm ái, nút `⭐ Bookmark` và `✅ Đã hiểu` to rõ dễ bấm bằng ngón tay cái, kèm nút `⬆️ Lên đầu trang` tự động.
-  - Kiểm thử trực tiếp bằng browser subagent trên iPhone 14 (390x844 px) đạt 100% tiêu chuẩn chất lượng.
-  - Thực hiện đồng bộ hóa `project_memory.md` và `git push` theo yêu cầu trực tiếp từ người dùng.
 
 ---
 
 ## ⚙️ 6. KEY SYSTEM FEATURES BUILT & VERIFIED
 
+- **Multi-Dataset Practice Engine (`mock-exam.html`, `mock-exam.js`, `mock-exam-data_ver2.js`):**
+  - Hỗ trợ linh hoạt 3 nguồn đề thi: Bộ 1 (644 câu), Bộ 2 (1,000 câu), và Kết hợp cả 2 bộ (1,644 câu không trùng lặp).
+  - Tự động cập nhật số câu hỏi theo Domain và số câu hỏi theo 47+ Chủ đề kiến thức cốt lõi.
 - **Core Concepts Practice Mode (`mock-exam.html`, `mock-exam.js`):**
   - Tích hợp 47+ Master Core Concepts vào giao diện chọn đề ôn tập.
   - Phân loại Domain Chips nhanh, đếm số câu hỏi thực chiến cho từng Concept, hỗ trợ song song Ôn bình thường và Ôn tức thì không giới hạn thời gian.
 - **Responsive Mobile Architecture (`knowledge.html`, `style.css`, `knowledge.js`):**
   - Hỗ trợ hoàn hảo mọi kích thước màn hình: iPhone SE (375px), iPhone 13/14/15 (390px-393px), Android (412px-430px), Tablet (768px-960px) và Desktop.
   - Tích hợp Mobile TOC Drawer bottom sheet, nút nổi FAB hiển thị tiến độ tức thì, Back-to-top FAB và ScrollSpy 2 chiều.
-- **MCQ Option Length Normalization & Bias Elimination (`mock-exam-data.js` v19.0):**
-  - Khắc phục triệt để hiện tượng thiên kiến độ dài (Length Bias) nơi 87.1% (561/644 câu) có đáp án đúng là phương án dài nhất.
-  - Sau khi chuẩn hóa bằng công cụ `balance_all_dataset.py`: Tỷ lệ Rank 1 (dài nhất) giảm từ **87.1% xuống 29.8%**, rải đều tự nhiên qua 4 mức độ dài: Rank 1 (29.8%), Rank 2 (24.2%), Rank 3 (23.0%), Rank 4 (23.0%).
-  - Tỷ lệ độ dài trung bình Câu Đúng / Câu Sai đạt mức lý tưởng **1.01x** (174.0 ký tự vs 171.7 ký tự).
-- **Instant Feedback Mode UI & Timer Optimization (`mock-exam.html` & `mock-exam.js`):**
-  - Loại bỏ khối Chế độ 3 trùng lặp trên giao diện chọn đề. Thiết kế lại Chế độ 1 Ôn tập tùy chỉnh tích hợp trực tiếp 2 nút chọn: Ôn bình thường & Ôn tức thì.
-  - Loại bỏ đồng hồ đếm ngược khi làm bài Ôn tức thì, thay bằng huy hiệu `⚡ ÔN TẬP TỨC THÌ (KHÔNG GIỚI HẠN THỜI GIAN)` (`⚡ INSTANT FEEDBACK (NO TIME LIMIT)`).
 - **LocalStorage Exam & Practice Session Persistence (`app.js`, `mock-exam.js`):**
   - Cơ chế tự động lưu và khôi phục trạng thái bài thi/ôn tập dở dang qua khóa `ccaf_active_exam_session` trong `localStorage`.
 - **Rule 4 Enforced:** Manual Git Push & Project Memory Sync executed upon explicit user request.

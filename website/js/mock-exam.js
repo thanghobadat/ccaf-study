@@ -157,12 +157,98 @@ window.toggleMockConcepts = function(selectState) {
 };
 
 // Backward compatibility alias
+// Backward compatibility alias
 window.toggleMockTerms = window.toggleMockConcepts;
 
+let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'BOTH'
+
+window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) {
+  const v1 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V1) || (typeof MOCK_EXAM_POOL_V1 !== 'undefined' ? MOCK_EXAM_POOL_V1 : []);
+  const v2 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V2) || (typeof MOCK_EXAM_POOL_V2 !== 'undefined' ? MOCK_EXAM_POOL_V2 : []);
+  const fallback = (typeof window !== 'undefined' && window.MOCK_EXAM_QUESTION_POOL) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []);
+
+  if (datasetCode === 'V1') {
+    return v1.length ? v1 : fallback;
+  }
+  if (datasetCode === 'V2') {
+    return v2.length ? v2 : fallback;
+  }
+  if (datasetCode === 'BOTH') {
+    if (v1.length && v2.length) {
+      return [...v2, ...v1];
+    }
+    return v2.length ? v2 : (v1.length ? v1 : fallback);
+  }
+  return v2.length ? v2 : (v1.length ? v1 : fallback);
+};
+
+window.updateDomainCheckboxLabels = function() {
+  const pool = window.getPracticeQuestionPool();
+  const counts = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
+  for (const q of pool) {
+    if (counts[q.domain] !== undefined) {
+      counts[q.domain]++;
+    }
+  }
+
+  const domainTitles = {
+    D1: 'Architecture',
+    D2: 'Tool/MCP',
+    D3: 'Workflows',
+    D4: 'Prompting',
+    D5: 'Context'
+  };
+
+  ['D1', 'D2', 'D3', 'D4', 'D5'].forEach(dom => {
+    const el = document.getElementById(`domain-lbl-${dom.toLowerCase()}`);
+    if (el) {
+      el.innerHTML = `<strong>${dom} (${counts[dom]} câu)</strong> ${domainTitles[dom]}`;
+    }
+  });
+
+  const badgeEl = document.getElementById('practice-pool-badge');
+  if (badgeEl) {
+    badgeEl.textContent = `${pool.length.toLocaleString()} câu`;
+  }
+};
+
+window.switchPracticeDataset = function(datasetCode) {
+  if (!['V1', 'V2', 'BOTH'].includes(datasetCode)) datasetCode = 'V2';
+  currentPracticeDataset = datasetCode;
+
+  // Update button active styles
+  const btnV1 = document.getElementById('btn-dataset-v1');
+  const btnV2 = document.getElementById('btn-dataset-v2');
+  const btnBoth = document.getElementById('btn-dataset-both');
+
+  if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+
+  // Update domain checkbox labels
+  window.updateDomainCheckboxLabels();
+
+  // Clear concept question cache & re-render concept grid
+  conceptQuestionsCache.clear();
+  window.renderPracticeConceptsGrid();
+
+  if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+    const names = {
+      'V1': 'Bộ 1 (644 câu chuyên sâu)',
+      'V2': 'Bộ 2 (1,000 câu chuẩn Blueprint CCAF)',
+      'BOTH': 'Kết hợp cả 2 bộ (1,644 câu hỏi)'
+    };
+    AppStore.showToast(`📚 Đã chuyển nguồn sang: ${names[datasetCode]}`);
+  }
+};
+
 window.getMatchingQuestionsForConceptId = function(conceptId) {
-  if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') return [];
-  if (conceptQuestionsCache.has(conceptId)) {
-    return conceptQuestionsCache.get(conceptId);
+  const currentPool = window.getPracticeQuestionPool();
+  if (!currentPool || currentPool.length === 0) return [];
+
+  const cacheKey = `${currentPracticeDataset}_${conceptId}`;
+  if (conceptQuestionsCache.has(cacheKey)) {
+    return conceptQuestionsCache.get(cacheKey);
   }
 
   let conceptObj = null;
@@ -182,7 +268,7 @@ window.getMatchingQuestionsForConceptId = function(conceptId) {
   );
 
   const scored = [];
-  for (const q of MOCK_EXAM_QUESTION_POOL) {
+  for (const q of currentPool) {
     if (q.domain !== cDom) continue;
     
     const ts = (q.taskStatement || '').toLowerCase();
@@ -212,7 +298,7 @@ window.getMatchingQuestionsForConceptId = function(conceptId) {
 
   // Fallback: If keyword match is sparse, supplement with domain pool
   if (pool.length < 5) {
-    const domainPool = MOCK_EXAM_QUESTION_POOL.filter(q => q.domain === cDom);
+    const domainPool = currentPool.filter(q => q.domain === cDom);
     const existingIds = new Set(pool.map(q => q.id));
     for (const dq of domainPool) {
       if (!existingIds.has(dq.id)) {
@@ -222,7 +308,7 @@ window.getMatchingQuestionsForConceptId = function(conceptId) {
     }
   }
 
-  conceptQuestionsCache.set(conceptId, pool);
+  conceptQuestionsCache.set(cacheKey, pool);
   return pool;
 };
 
@@ -280,7 +366,8 @@ window.startCustomPracticeExam = function(isInstant = false) {
 
   if (isNaN(qCount) || qCount < 1) qCount = 10;
 
-  if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') {
+  const currentPool = window.getPracticeQuestionPool();
+  if (!currentPool || currentPool.length === 0) {
     AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
     return;
   }
@@ -305,15 +392,15 @@ window.startCustomPracticeExam = function(isInstant = false) {
     });
 
     pool = Array.from(matchedMap.values());
-    modeLabel = `CONCEPTS_${uniqueIds.length}C`;
+    modeLabel = `${currentPracticeDataset}_CONCEPTS_${uniqueIds.length}C`;
   } else {
     const checkedDoms = Array.from(document.querySelectorAll('.mock-domain-cb:checked')).map(cb => cb.value);
     if (checkedDoms.length === 0) {
       AppStore.showToast("⚠️ Vui lòng tích chọn ít nhất 1 Domain để ôn tập!");
       return;
     }
-    pool = MOCK_EXAM_QUESTION_POOL.filter(q => checkedDoms.includes(q.domain));
-    modeLabel = `DOMAINS_${checkedDoms.join('_')}`;
+    pool = currentPool.filter(q => checkedDoms.includes(q.domain));
+    modeLabel = `${currentPracticeDataset}_DOMAINS_${checkedDoms.join('_')}`;
   }
 
   if (pool.length === 0) {
@@ -1062,13 +1149,100 @@ window.addEventListener('ccaf_lang_changed', () => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const hasRestored = window.restoreActiveExamSession();
+window.startTopicSpecificPracticeExam = function(topics = ['3.2', '3.3', '3.5', '3.6'], isInstant = true) {
+  if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') {
+    if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+      AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
+    }
+    return;
+  }
 
-  if (!hasRestored) {
-    // Check for domain query parameter (e.g. ?domain=D1)
-    if (typeof window !== 'undefined' && window.location && window.location.search) {
-      const urlParams = new URLSearchParams(window.location.search);
+  isInstantFeedbackMode = (isInstant === true);
+  
+  // Filter questions matching any of the topics in taskStatement or id
+  const targetTopics = Array.isArray(topics) ? topics : topics.split(/[\,\s]+/).filter(Boolean);
+  
+  const matched = MOCK_EXAM_QUESTION_POOL.filter(q => {
+    const ts = (q.taskStatement || '').toLowerCase();
+    const qId = (q.id || '').toLowerCase();
+    return targetTopics.some(t => {
+      const lowerT = t.toLowerCase().trim();
+      return ts.includes(lowerT) || qId.includes(lowerT) || qId.includes(`-${lowerT}-`);
+    });
+  });
+
+  if (matched.length === 0) {
+    if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+      AppStore.showToast("⚠️ Không tìm thấy câu hỏi phù hợp cho chủ đề: " + targetTopics.join(', '));
+    }
+    return;
+  }
+
+  // Deduplicate base pool by question text & id
+  const basePool = [];
+  const baseIds = new Set();
+  const baseTexts = new Set();
+  for (const q of matched) {
+    const cleanText = q.question.replace(/^\[.*?\]\s*/, '');
+    if (!baseIds.has(q.id) && !baseTexts.has(cleanText)) {
+      baseIds.add(q.id);
+      baseTexts.add(cleanText);
+      basePool.push(q);
+    }
+  }
+
+  // Shuffle questions
+  const shuffled = [...basePool].sort(() => Math.random() - 0.5);
+
+  mockExamQuestions = shuffled.map((item, idx) => ({
+    ...item,
+    uniqueId: `${item.id}_topic_${idx}`
+  }));
+
+  const modePrefix = isInstantFeedbackMode ? 'INSTANT_TOPICS' : 'TOPICS';
+  currentMockExamLabel = `${modePrefix}_${targetTopics.join('_')}_${mockExamQuestions.length}Q`;
+  isMockSubmitted = false;
+  revealedQuestions.clear();
+  mockExamAnswers = {};
+  mockExamFlags.clear();
+  currentExamIndex = 0;
+  updateHeaderBarState();
+
+  mockSecondsRemaining = Math.max(5 * 60, Math.round(mockExamQuestions.length * 2 * 60));
+
+  const setupCard = document.getElementById('mock-setup-card');
+  const arenaBox = document.getElementById('mock-arena-box');
+  if (setupCard) setupCard.style.display = 'none';
+  if (arenaBox) arenaBox.style.display = 'block';
+
+  startMockTimer();
+  renderQuestionGrid();
+  renderCurrentQuestion();
+  window.saveActiveExamSession();
+
+  if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+    const curLang = AppStore.getLang();
+    AppStore.showToast(curLang === 'EN' 
+      ? `🎯 Loaded ${mockExamQuestions.length} questions for topics ${targetTopics.join(', ')}!` 
+      : `🎯 Đã nạp ${mockExamQuestions.length} câu hỏi cho các chuyên đề: ${targetTopics.join(', ')}!`);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  let autoStarted = false;
+
+  // Check URL query parameters for topic filtering or instant mode
+  if (typeof window !== 'undefined' && window.location && window.location.search) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const topicsParam = urlParams.get('topics') || urlParams.get('subtopics');
+    const isInstant = urlParams.get('mode') === 'instant' || urlParams.get('instant') === 'true' || urlParams.get('instant') === '1';
+
+    if (topicsParam) {
+      const topicList = topicsParam.split(',').map(s => s.trim()).filter(Boolean);
+      window.clearActiveExamSession();
+      window.startTopicSpecificPracticeExam(topicList, isInstant);
+      autoStarted = true;
+    } else {
       const targetDomain = urlParams.get('domain');
       if (targetDomain && ['D1', 'D2', 'D3', 'D4', 'D5'].includes(targetDomain.toUpperCase())) {
         document.querySelectorAll('.mock-domain-cb').forEach(cb => {
@@ -1078,7 +1252,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  if (!autoStarted) {
+    window.restoreActiveExamSession();
+  }
+
+  window.updateDomainCheckboxLabels();
   window.renderPracticeTermsGrid();
   window.renderMockHistoryTable();
 });
+
 
