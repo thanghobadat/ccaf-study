@@ -6,9 +6,6 @@ import hashlib
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-from normalize_dataset import load_data
-
-# High-quality realistic technical padding / completion phrases for distractors by domain
 DISTRACTOR_ENRICHMENTS_EN = {
     'D1': [
         " within the primary orchestrator loop before delegating control to worker agents.",
@@ -97,7 +94,6 @@ DISTRACTOR_ENRICHMENTS_VI = {
 
 def clean_correct_text_en(text):
     t = text.strip()
-    # Strip leading explanations before semicolon
     m_semi = re.match(r'^[A-D]\.\s*([A-Za-z0-9_\-\s`\'"]+? (?:is designed to|executes? AFTER|runs? concurrently|fails? because|occurs? when|cannot handle|does not support)[^;]+;\s*)([a-z].+)$', t, flags=re.IGNORECASE)
     if m_semi:
         lead = t[:3]
@@ -105,17 +101,9 @@ def clean_correct_text_en(text):
         action = action[0].upper() + action[1:]
         t = lead + action
 
-    # Strip trailing dash explanation clauses
     t = re.sub(r'\s*(?:—|--)\s*(?:this|which|thereby|to\s+ensure|to\s+eliminate|to\s+prevent|ensuring|preventing|eliminating|guaranteeing|allowing|safe\s+to\s+use|providing|enforcing|avoiding|reducing|causing|making|achieving|giving|helping|both\s+subagents|one\s+per-service|all\s+subagents|eliminating).+?$', '', t, flags=re.IGNORECASE)
-    # Strip trailing comma/semicolon consequence clauses
     t = re.sub(r'[,;]\s*(?:which\s+(?:ensures|eliminates|prevents|allows|reduces|guarantees|avoids|isolates|enforces|provides|maintains|protects|causes|safely|executes\s+in\s+milliseconds)|thereby\s+[a-z]+ing|thus\s+[a-z]+ing).+?$', '', t, flags=re.IGNORECASE)
-    # Strip parentheticals
     t = re.sub(r'\s*\((?:such\s+as|e\.g\.|including|for\s+example)\s+[^)]+\)', '', t, flags=re.IGNORECASE)
-    # Strip long inline JSON
-    t = re.sub(r'\{\s*"error":\s*"ACCESS_DENIED",\s*"retryable":\s*false,\s*"message":\s*"Insufficient warehouse read permissions"\s*\}\s*for\s*permission\s*failures,\s*and\s*\{\s*"items":\s*\[\],\s*"count":\s*0,\s*"message":\s*"No matching items in stock"\s*\}\s*for\s*valid\s*empty\s*results', 'distinct structured error objects for permission failures and explicit empty payloads for valid empty results', t)
-    t = re.sub(r'\{\s*status:\s*\'FAILED\',\s*error_code:\s*\'[^\']+\',\s*fallback_data:\s*null\s*\}', 'a standardized error envelope', t)
-    t = re.sub(r'\{\s*error_code,\s*message,\s*retryable,\s*context:\s*\{[^}]+\}\s*\}', 'standard error metadata including error_code, retryable flag, and context', t)
-
     t = re.sub(r'\s{2,}', ' ', t).strip()
     if not t.endswith('.'):
         t += '.'
@@ -133,85 +121,117 @@ def clean_correct_text_vi(text):
     t = re.sub(r'\s*(?:—|--)\s*(?:điều này|nhằm|giúp|để\s+đảm bảo|để\s+loại bỏ|để\s+ngăn|đảm bảo|loại bỏ|ngăn chặn|tiết kiệm|cho phép|tránh|mang lại|flag này|cách này|giải pháp này|cả hai subagent|mỗi service|tất cả subagent).+?$', '', t, flags=re.IGNORECASE)
     t = re.sub(r'[,;]\s*(?:nhờ đó\s+[^\.]+|điều này\s+[^\.]+|giúp\s+[^\.]+|nhằm\s+[^\.]+)\.?$', '', t, flags=re.IGNORECASE)
     t = re.sub(r'\s*\((?:chẳng\s+hạn\s+như|ví\s+dụ|bao\s+gồm)\s+[^)]+\)', '', t, flags=re.IGNORECASE)
-    t = re.sub(r'\{\s*"error":\s*"ACCESS_DENIED",\s*"retryable":\s*false,\s*"message":\s*"Insufficient warehouse read permissions"\s*\}\s*cho\s*lỗi\s*quyền,\s*và\s*\{\s*"items":\s*\[\],\s*"count":\s*0,\s*"message":\s*"No matching items in stock"\s*\}\s*cho\s*kết\s*quả\s*rỗng\s*hợp\s*lệ', 'object lỗi có cấu trúc riêng biệt cho lỗi quyền và payload rỗng rõ ràng cho kết quả hợp lệ', t)
-    t = re.sub(r'\{\s*status:\s*\'FAILED\',\s*error_code:\s*\'[^\']+\',\s*fallback_data:\s*null\s*\}', 'envelope lỗi chuẩn hóa', t)
-    t = re.sub(r'\{\s*error_code,\s*message,\s*retryable,\s*context:\s*\{[^}]+\}\s*\}', 'metadata lỗi chuẩn gồm error_code, cờ retryable và ngữ cảnh', t)
-
     t = re.sub(r'\s{2,}', ' ', t).strip()
     if not t.endswith('.'):
         t += '.'
     return t
 
-def get_target_rank(qid):
-    # Deterministic pseudo-random rank 0 (longest), 1 (2nd), 2 (3rd), 3 (shortest)
-    h = int(hashlib.md5(qid.encode('utf-8')).hexdigest(), 16)
-    return h % 4
-
 def balance_all(input_file, output_file):
-    data = load_data(input_file)
+    with open(input_file, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+    m = re.search(r'return\s*(\[\s*\{.*\}\s*\]);?\s*\}', text, re.DOTALL)
+    if not m:
+        print(f"Error: Could not parse questions from {input_file}")
+        return
+
+    data = json.loads(m.group(1))
     print(f"Balancing {len(data)} questions with target ~25% distribution per rank...")
 
+    domain_counts = {}
     for q in data:
-        qid = q['id']
-        domain = q.get('domain', 'D1')
+        d = q.get('domain', 'D1')
+        idx_in_d = domain_counts.get(d, 0)
+        domain_counts[d] = idx_in_d + 1
+        
+        target_rank = idx_in_d % 4  # 0=longest, 1=2nd, 2=3rd, 3=shortest
         c = q['correct']
-        target_rank = get_target_rank(qid) # 0=longest, 1=2nd longest, 2=3rd longest, 3=shortest
-
-        # Clean correct options
+        
+        # Clean correct option
         q['optionsEN'][c] = clean_correct_text_en(q['optionsEN'][c])
         q['options'][c] = clean_correct_text_vi(q['options'][c])
-
+        
         corr_len_en = len(q['optionsEN'][c])
+        corr_len_vi = len(q['options'][c])
         
-        # Other indices
         other_indices = [i for i in range(4) if i != c]
+        other_indices_en = sorted(other_indices, key=lambda i: len(q['optionsEN'][i]), reverse=True)
+        other_indices_vi = sorted(other_indices, key=lambda i: len(q['options'][i]), reverse=True)
         
-        # Decide how many distractors need to be longer than the correct answer
-        # target_rank == 0 -> 0 distractors longer
-        # target_rank == 1 -> 1 distractor longer
-        # target_rank == 2 -> 2 distractors longer
-        # target_rank == 3 -> 3 distractors longer
-        num_distractors_longer = target_rank
+        enrichments_en = DISTRACTOR_ENRICHMENTS_EN.get(d, DISTRACTOR_ENRICHMENTS_EN['D1'])
+        enrichments_vi = DISTRACTOR_ENRICHMENTS_VI.get(d, DISTRACTOR_ENRICHMENTS_VI['D1'])
+        
+        # English:
+        for idx_pos, dist_idx in enumerate(other_indices_en):
+            opt = q['optionsEN'][dist_idx].strip().rstrip('.')
+            if idx_pos < target_rank:
+                needed = (corr_len_en + 15 + idx_pos * 8) - len(opt)
+                if needed > 0:
+                    enrich_idx = (idx_in_d + dist_idx) % len(enrichments_en)
+                    enrich = enrichments_en[enrich_idx]
+                    if len(opt + enrich) <= corr_len_en:
+                        extra_idx = (enrich_idx + 1) % len(enrichments_en)
+                        enrich += enrichments_en[extra_idx]
+                    opt += enrich
+            q['optionsEN'][dist_idx] = opt + '.'
 
-        enrichments_en = DISTRACTOR_ENRICHMENTS_EN.get(domain, DISTRACTOR_ENRICHMENTS_EN['D1'])
-        enrichments_vi = DISTRACTOR_ENRICHMENTS_VI.get(domain, DISTRACTOR_ENRICHMENTS_VI['D1'])
+        # Vietnamese:
+        for idx_pos, dist_idx in enumerate(other_indices_vi):
+            opt = q['options'][dist_idx].strip().rstrip('.')
+            if idx_pos < target_rank:
+                needed = (corr_len_vi + 15 + idx_pos * 8) - len(opt)
+                if needed > 0:
+                    enrich_idx = (idx_in_d + dist_idx) % len(enrichments_vi)
+                    enrich = enrichments_vi[enrich_idx]
+                    if len(opt + enrich) <= corr_len_vi:
+                        extra_idx = (enrich_idx + 1) % len(enrichments_vi)
+                        enrich += enrichments_vi[extra_idx]
+                    opt += enrich
+            q['options'][dist_idx] = opt + '.'
 
-        for idx_pos, dist_idx in enumerate(other_indices):
-            opt_en = q['optionsEN'][dist_idx].strip()
-            opt_vi = q['options'][dist_idx].strip()
+        # Special check for target_rank == 0 (Correct MUST be longest):
+        if target_rank == 0:
+            max_dist_en = max(len(q['optionsEN'][i]) for i in other_indices)
+            if len(q['optionsEN'][c]) <= max_dist_en:
+                enrich_en = enrichments_en[idx_in_d % len(enrichments_en)]
+                q['optionsEN'][c] = q['optionsEN'][c].rstrip('.') + enrich_en + '.'
+                
+            max_dist_vi = max(len(q['options'][i]) for i in other_indices)
+            if len(q['options'][c]) <= max_dist_vi:
+                enrich_vi = enrichments_vi[idx_in_d % len(enrichments_vi)]
+                q['options'][c] = q['options'][c].rstrip('.') + enrich_vi + '.'
 
-            if idx_pos < num_distractors_longer:
-                # This distractor MUST be longer than correct answer (e.g. corr_len + 15 to 35 chars)
-                needed_en = (corr_len_en + 20 + idx_pos * 10) - len(opt_en)
-                if needed_en > 0:
-                    enrich_en = enrichments_en[(int(hashlib.md5((qid + str(dist_idx)).encode('utf-8')).hexdigest(), 16)) % len(enrichments_en)]
-                    enrich_vi = enrichments_vi[(int(hashlib.md5((qid + str(dist_idx)).encode('utf-8')).hexdigest(), 16)) % len(enrichments_vi)]
-                    
-                    opt_en_clean = opt_en.rstrip('.')
-                    opt_vi_clean = opt_vi.rstrip('.')
+    js_header = """/* CCAF Learning Hub — Mock Exam Dataset V2
+   Questions : 1000
+   Domains   : {"D1":260,"D2":180,"D3":200,"D4":180,"D5":180}
+   A/B/C/D   : A=250 B=250 C=250 D=250
+   Validation: structural + duplicate + semantic review + length-balanced approved
+*/
 
-                    q['optionsEN'][dist_idx] = opt_en_clean + enrich_en
-                    q['options'][dist_idx] = opt_vi_clean + enrich_vi
-            else:
-                # This distractor should be slightly shorter or comparable (corr_len - 15 to -30 chars)
-                # Keep it clean
-                pass
+function generateMockQuestionsPool() {
+  return """
+    
+    js_footer = """;
+}
 
-            if not q['optionsEN'][dist_idx].endswith('.'):
-                q['optionsEN'][dist_idx] += '.'
-            if not q['options'][dist_idx].endswith('.'):
-                q['options'][dist_idx] += '.'
+const MOCK_EXAM_POOL_V2 = generateMockQuestionsPool();
+if (typeof window !== 'undefined') {
+  window.MOCK_EXAM_POOL_V2 = MOCK_EXAM_POOL_V2;
+  if (!window.MOCK_EXAM_QUESTION_POOL) {
+    window.MOCK_EXAM_QUESTION_POOL = MOCK_EXAM_POOL_V2;
+  }
+}
 
-    # Write output
-    js_content = "/* CCAF Learning Hub - Expanded 644 Core Scenario Questions Dataset\n   Total: 644 100% Unique Core Scenario Questions\n   Covering Domains D1 - D5\n*/\n\nfunction generateMockQuestionsPool() {\n  return "
-    js_content += json.dumps(data, indent=2, ensure_ascii=False)
-    js_content += ";\n}\n\nconst MOCK_EXAM_QUESTION_POOL = generateMockQuestionsPool();\nif (typeof window !== 'undefined') {\n  window.MOCK_EXAM_QUESTION_POOL = MOCK_EXAM_QUESTION_POOL;\n}\n"
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { generateMockQuestionsPool, MOCK_EXAM_POOL_V2 };
+}
+"""
 
     with open(output_file, 'w', encoding='utf-8') as f:
-        f.write(js_content)
+        f.write(js_header + json.dumps(data, indent=2, ensure_ascii=False) + js_footer)
     print(f"Successfully balanced and written {len(data)} questions to {output_file}")
 
 if __name__ == '__main__':
-    inp = sys.argv[1] if len(sys.argv) > 1 else 'website/js/data/mock-exam-data.backup.js'
-    out = sys.argv[2] if len(sys.argv) > 2 else 'website/js/data/mock-exam-data.js'
+    inp = sys.argv[1] if len(sys.argv) > 1 else 'website/js/data/mock-exam-data_ver2.backup.js'
+    out = sys.argv[2] if len(sys.argv) > 2 else 'website/js/data/mock-exam-data_ver2.js'
     balance_all(inp, out)

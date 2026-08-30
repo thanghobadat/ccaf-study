@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-29 00:12 (Local Time)*  
+> *Last Updated: 2026-08-30 13:48 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -100,12 +100,21 @@ d:\AI\CCAF\
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
-            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Blueprint-Standard Dataset (MOCK_EXAM_POOL_V2)
+            ├── mock-exam-data_ver2.backup.js # Backup of original V2 dataset before length balancing
+            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Blueprint-Standard Dataset (Length-balanced ~25% per rank)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-08-30 (Option Length Balancing & Length-Bias Elimination on Dataset V2 - 1,000 Questions)**:
+  - Phát hiện và xử lý triệt để hiện tượng thiên kiến phương án dài nhất (Length Bias) trên bộ đề V2 (1,000 câu).
+  - Tạo backup an toàn tại [mock-exam-data_ver2.backup.js](file:///d:/AI/CCAF/website/js/data/mock-exam-data_ver2.backup.js).
+  - Tối ưu hóa thuật toán cân bằng độ dài trong [balance_all_dataset.py](file:///d:/AI/CCAF/balance_all_dataset.py) với cơ chế 4 bậc độ dài (4-Rank Balancing).
+  - Đưa tỷ lệ câu đúng là phương án dài nhất (Rank 1) từ 51.8% (EN) và 57.8% (VI) về mức chuẩn xác lý tưởng **25.0% (250/1,000 câu)** trên cả EN và VI, và đạt đúng **25.0% cho từng Domain D1–D5**.
+  - Phân bổ đều các bậc độ dài khác: Rank 2 (18.9% - 20.6%), Rank 3 (24.0% - 25.2%), Rank 4 (29.2% - 32.1%).
+  - Kiểm tra tính toàn vẹn dữ liệu bằng [validate_option_lengths.py](file:///d:/AI/CCAF/validate_option_lengths.py).
+  - Đồng bộ `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-29 (Dataset V2 Integration & Multi-Dataset Switcher for Mode 1 Practice)**:
   - Gộp thành công 10 file text trong thư mục `ver2` thành file JavaScript hoàn chỉnh [mock-exam-data_ver2.js](file:///d:/AI/CCAF/t%C3%A0i%20li%E1%BB%87u/generate/ver2/mock-exam-data_ver2.js) (1,000 câu hỏi chuẩn hóa toàn diện theo CCAF Blueprint, 250 câu/domain weightings, cân bằng đáp án tuyệt đối 25% A/B/C/D).
   - Tích hợp bộ đề V2 vào hệ thống website tại [mock-exam-data_ver2.js](file:///d:/AI/CCAF/website/js/data/mock-exam-data_ver2.js) dưới định danh `window.MOCK_EXAM_POOL_V2`.
