@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-08-30 13:48 (Local Time)*  
+> *Last Updated: 2026-09-01 08:38 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -100,13 +100,18 @@ d:\AI\CCAF\
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
-            ├── mock-exam-data_ver2.backup.js # Backup of original V2 dataset before length balancing
-            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Blueprint-Standard Dataset (Length-balanced ~25% per rank)
+            ├── mock-exam-data_ver2.backup.js # Backup of original V2 dataset
+            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Clean Blueprint-Standard Dataset (Natural Phrasing)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-09-01 (Dataset V2 Phrasing Restoration & Clean 1,000 Questions Reinstatement)**:
+  - Khôi phục bộ 1,000 câu chuẩn nguyên bản từ `mock-exam-data_ver2.backup.js` sang `mock-exam-data_ver2.js`, loại bỏ toàn bộ các câu bị chắp vá cụm từ đệm khó hiểu.
+  - Đảm bảo câu văn tự nhiên, mạch lạc, chính xác 100% về kiến thức kỹ thuật Anthropic.
+  - Kiểm thử tự động trên Node.js và Browser Subagent (1,000 câu load hoàn hảo trên giao diện thi thử và ôn tập).
+  - Cập nhật `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-30 (Option Length Balancing & Length-Bias Elimination on Dataset V2 - 1,000 Questions)**:
   - Phát hiện và xử lý triệt để hiện tượng thiên kiến phương án dài nhất (Length Bias) trên bộ đề V2 (1,000 câu).
   - Tạo backup an toàn tại [mock-exam-data_ver2.backup.js](file:///d:/AI/CCAF/website/js/data/mock-exam-data_ver2.backup.js).
