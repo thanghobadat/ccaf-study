@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-01 08:38 (Local Time)*  
+> *Last Updated: 2026-09-02 23:48 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -24,6 +24,8 @@
   *254 unabridged scenario questions from Claude Certification Guide.*
 - **Doc 5:** `d:\AI\CCAF\tài liệu\CCAF_Master_Knowledge_Reference.md`  
   *Master Knowledge Base: 47 Core Architectural Concepts across 5 Domains with definitions, step-by-step mechanisms, usage criteria, exam anti-patterns, distinctions, code snippets, and intuitive real-world analogies (100% coverage of 254 official questions & 644 mock questions).*
+- **Doc 6:** `d:\AI\CCAF\tài liệu\data_ccaf_master_533.json`  
+  *533 Authentic Bilingual Questions Master Dataset (Anthropic Official 254 + LNQuyen 155 + VieHub 127).*
 
 ---
 
@@ -57,12 +59,12 @@
 ## 🗂️ 4. FILE TREE & CODEBASE MAP
 
 ```
-d:\AI\CCAF\
+d:\AI\CCAF/
 ├── rule.md                          # Mandatory project rules (Planning First, Summary Rule, Rule 4 Manual Push)
 ├── .agents/AGENTS.md                # Agent workspace customization rules
 ├── project_memory.md                # This machine-readable state snapshot
 ├── vercel.json                      # Vercel deployment configuration (cleanUrls & website rewrites)
-├── .gitignore                       # Git ignore configuration (includes __pycache__, node_modules)
+├── .gitignore                       # Git ignore configuration (includes __pycache__, node_modules, scratch/)
 ├── validate_option_lengths.py       # Automated test suite for MCQ option length ranking & standard deviation
 ├── balance_all_dataset.py           # Core deterministic dataset normalization & length balancing engine
 ├── validate_exam.py                 # Core dataset schema & domain distribution validator
@@ -73,8 +75,7 @@ d:\AI\CCAF\
 │   ├── CCAF_254_Official_Mock_Exam_Bank.md
 │   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
-│   └── generate/
-│       └── ver2/                    # 10 TXT files & merged mock-exam-data_ver2.js (1,000 Questions)
+│   └── data_ccaf_master_533.json            # 533 Authentic Bilingual Questions Master Dataset
 └── website/                         # Web Application Root (Python HTTP server on 8899)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
@@ -82,7 +83,7 @@ d:\AI\CCAF\
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
-    ├── mock-exam.html               # 60Q Simulator + Dataset Switcher (V1/V2/BOTH: 1,644+ Qs) + Core Concepts Practice + Instant Feedback
+    ├── mock-exam.html               # 60Q Simulator + Dataset Switcher (V1: 644Q, V2: 533Q, BOTH: 1,177Q) + Core Concepts Practice + Instant Feedback
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
@@ -100,13 +101,24 @@ d:\AI\CCAF\
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
-            ├── mock-exam-data_ver2.backup.js # Backup of original V2 dataset
-            └── mock-exam-data_ver2.js # Dataset V2: 1,000 Questions Clean Blueprint-Standard Dataset (Natural Phrasing)
+            └── mock-exam-data_merged.js # Dataset V2: 533 Authentic Questions Master Pool (MOCK_EXAM_POOL_MERGED)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-09-02 (Authentic 533-Question Master Bank Integration & 1,000-Question Deprecation)**:
+  - Tích hợp thành công bộ đề Master 533 câu thực chiến song ngữ chuẩn xác cao (`mock-exam-data_merged.js` & `tài liệu/data_ccaf_master_533.json`) kết hợp từ: Anthropic Official 254 Bank (251 câu), LNQuyen (155 câu), và VieHub (127 câu).
+  - Rà soát và dịch lại toàn bộ 58 câu VieHub bị lệch bản dịch từ các phiên trước, đảm bảo tính đối xứng song ngữ 1:1 tuyệt đối giữa EN và VI (câu hỏi, options, lời giải thích và đáp án).
+  - Làm sạch toàn bộ tiền tố định danh `[ccaf-xxx]` còn sót lại.
+  - Loại bỏ hoàn toàn bộ đề 1,000 câu sinh thô (`mock-exam-data_ver2.js` và backup), giải phóng hơn 8MB dung lượng tải trang.
+  - Cập nhật giao diện `mock-exam.html` và engine `mock-exam.js`:
+    - Bộ 1: Nền Tảng (644 câu).
+    - Bộ 2: Đề Thi Thực Chiến Chuẩn Anthropic (533 câu - mặc định).
+    - Kết Hợp: 1,177 câu hỏi tình huống toàn diện.
+    - Chế độ Thi Thật Mô Phỏng 60 Câu Pearson VUE (120 phút) ưu tiên rút đề chuẩn xác từ Bộ 533 câu với tỷ lệ phân bổ 5 Domain chuẩn Anthropic (16, 11, 12, 12, 9).
+  - Khởi chạy web server cục bộ `http://localhost:8899` ổn định.
+  - Cập nhật `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-09-01 (Dataset V2 Phrasing Restoration & Clean 1,000 Questions Reinstatement)**:
   - Khôi phục bộ 1,000 câu chuẩn nguyên bản từ `mock-exam-data_ver2.backup.js` sang `mock-exam-data_ver2.js`, loại bỏ toàn bộ các câu bị chắp vá cụm từ đệm khó hiểu.
   - Đảm bảo câu văn tự nhiên, mạch lạc, chính xác 100% về kiến thức kỹ thuật Anthropic.
@@ -146,9 +158,10 @@ d:\AI\CCAF\
 
 ## ⚙️ 6. KEY SYSTEM FEATURES BUILT & VERIFIED
 
-- **Multi-Dataset Practice Engine (`mock-exam.html`, `mock-exam.js`, `mock-exam-data_ver2.js`):**
-  - Hỗ trợ linh hoạt 3 nguồn đề thi: Bộ 1 (644 câu), Bộ 2 (1,000 câu), và Kết hợp cả 2 bộ (1,644 câu không trùng lặp).
-  - Tự động cập nhật số câu hỏi theo Domain và số câu hỏi theo 47+ Chủ đề kiến thức cốt lõi.
+- **Multi-Dataset Practice Engine (`mock-exam.html`, `mock-exam.js`, `mock-exam-data_merged.js`):**
+  - Hỗ trợ linh hoạt 3 nguồn đề thi: Bộ 1 (644 câu nền tảng), Bộ 2 (533 câu thực chiến chuẩn Anthropic), và Kết hợp cả 2 bộ (1,177 câu không trùng lặp).
+  - Tự động cập nhật số câu hỏi theo Domain và số câu hỏi theo 47+ Chủ đề kiến thức cốt lõi theo nguồn đề đang chọn.
+  - Chế độ Thi Thật Mô Phỏng 60 Câu Pearson VUE tự động rút từ Bộ 533 câu thực chiến.
 - **Core Concepts Practice Mode (`mock-exam.html`, `mock-exam.js`):**
   - Tích hợp 47+ Master Core Concepts vào giao diện chọn đề ôn tập.
   - Phân loại Domain Chips nhanh, đếm số câu hỏi thực chiến cho từng Concept, hỗ trợ song song Ôn bình thường và Ôn tức thì không giới hạn thời gian.

@@ -14,6 +14,10 @@ let revealedQuestions = new Set();
 let mockSecondsRemaining = 0;
 let mockExamTimer = null;
 
+window.getActiveExamQuestions = function() {
+  return mockExamQuestions;
+};
+
 window.saveActiveExamSession = function() {
   if (typeof localStorage === 'undefined' || isMockSubmitted || !mockExamQuestions || mockExamQuestions.length === 0) return;
   try {
@@ -164,8 +168,8 @@ let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'BOTH'
 
 window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) {
   const v1 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V1) || (typeof MOCK_EXAM_POOL_V1 !== 'undefined' ? MOCK_EXAM_POOL_V1 : []);
-  const v2 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V2) || (typeof MOCK_EXAM_POOL_V2 !== 'undefined' ? MOCK_EXAM_POOL_V2 : []);
-  const fallback = (typeof window !== 'undefined' && window.MOCK_EXAM_QUESTION_POOL) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []);
+  const v2 = (typeof window !== 'undefined' && (window.MOCK_EXAM_POOL_MERGED || window.MOCK_EXAM_POOL_V2)) || (typeof MOCK_EXAM_POOL_MERGED !== 'undefined' ? MOCK_EXAM_POOL_MERGED : []);
+  const fallback = v2.length ? v2 : ((typeof window !== 'undefined' && window.MOCK_EXAM_QUESTION_POOL) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []));
 
   if (datasetCode === 'V1') {
     return v1.length ? v1 : fallback;
@@ -234,9 +238,9 @@ window.switchPracticeDataset = function(datasetCode) {
 
   if (typeof AppStore !== 'undefined' && AppStore.showToast) {
     const names = {
-      'V1': 'Bộ 1 (644 câu chuyên sâu)',
-      'V2': 'Bộ 2 (1,000 câu chuẩn Blueprint CCAF)',
-      'BOTH': 'Kết hợp cả 2 bộ (1,644 câu hỏi)'
+      'V1': 'Bộ 1: Nền Tảng (644 câu)',
+      'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
+      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)'
     };
     AppStore.showToast(`📚 Đã chuyển nguồn sang: ${names[datasetCode]}`);
   }
@@ -477,7 +481,8 @@ window.startCustomPracticeExam = function(isInstant = false) {
 };
 
 window.startOfficialMockExam = function() {
-  if (typeof MOCK_EXAM_QUESTION_POOL === 'undefined') {
+  const officialPool = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_MERGED) || (typeof MOCK_EXAM_POOL_MERGED !== 'undefined' ? MOCK_EXAM_POOL_MERGED : null) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []);
+  if (!officialPool || officialPool.length === 0) {
     AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
     return;
   }
@@ -494,7 +499,7 @@ window.startOfficialMockExam = function() {
 
   // Draw 60 UNIQUE questions matching official domain weight distribution (D1: 16Q, D2: 11Q, D3: 12Q, D4: 12Q, D5: 9Q)
   const drawUniqueDomain = (domCode, count) => {
-    const subPool = MOCK_EXAM_QUESTION_POOL.filter(q => q.domain === domCode).sort(() => Math.random() - 0.5);
+    const subPool = officialPool.filter(q => q.domain === domCode).sort(() => Math.random() - 0.5);
     const picked = [];
     const pickedIds = new Set();
     const pickedTexts = new Set();

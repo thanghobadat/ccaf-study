@@ -11,4 +11,5 @@ node_modules/
 # Python
 __pycache__/
 *.pyc
-
+# Scratch & Temporary
+scratch/
