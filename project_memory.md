@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-02 23:48 (Local Time)*  
+> *Last Updated: 2026-09-03 22:55 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -107,6 +107,16 @@ d:\AI\CCAF/
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-09-03 (Bilingual Alignment Fix for ccaf-323 & Official254 Bank)**:
+  - Rà soát và sửa triệt để lỗi lệch nội dung song ngữ giữa bản Tiếng Anh (EN) và Tiếng Việt (VI) cho câu hỏi trọng tâm `ccaf-323` (`q-3-1-018` - PreCompact Hook).
+  - Loại bỏ hoàn toàn các phương án dịch giả định ("chế") chứa từ khóa Windows/Linux/C++ còn sót lại trong ngân hàng Official254, chuẩn hóa 100% bản dịch theo tài liệu chuẩn của Anthropic cho 4 câu:
+    - `ccaf-323`: Cấu hình hook `PreCompact` để sao lưu transcript trước khi lệnh `/compact` tóm tắt ngữ cảnh.
+    - `ccaf-238`: Quản lý token MCP Server nội bộ qua biến môi trường `${TICKETING_API_TOKEN}` trong `.mcp.json`.
+    - `ccaf-239`: Tối ưu mô tả tool Snowflake MCP (`query_database`) để làm rõ ưu thế cấu trúc và phân trang so với Bash CLI.
+    - `ccaf-337`: Cấu hình cô lập quy chuẩn React Native qua file `.claude/rules/react-native.md` với `paths: ["src/mobile/**/*"]`.
+  - Đồng bộ hóa thành công dữ liệu sang cả 2 file: `tài liệu/data_ccaf_master_533.json` và `website/js/data/mock-exam-data_merged.js`.
+  - Kiểm thử tự động bằng Python script (`check_bogus.py`) và Node.js (`node -c`) đạt 100% pass, không còn câu hỏi nào chứa dữ liệu placeholder.
+  - Cập nhật `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-09-02 (Authentic 533-Question Master Bank Integration & 1,000-Question Deprecation)**:
   - Tích hợp thành công bộ đề Master 533 câu thực chiến song ngữ chuẩn xác cao (`mock-exam-data_merged.js` & `tài liệu/data_ccaf_master_533.json`) kết hợp từ: Anthropic Official 254 Bank (251 câu), LNQuyen (155 câu), và VieHub (127 câu).
   - Rà soát và dịch lại toàn bộ 58 câu VieHub bị lệch bản dịch từ các phiên trước, đảm bảo tính đối xứng song ngữ 1:1 tuyệt đối giữa EN và VI (câu hỏi, options, lời giải thích và đáp án).

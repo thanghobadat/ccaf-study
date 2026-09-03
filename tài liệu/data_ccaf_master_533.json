@@ -9559,7 +9559,7 @@
     "difficulty": "application",
     "scenarioId": "s-q-2-4-005",
     "questionEN": "A platform engineering team wants to share an MCP server for their internal ticketing system across all developers using Claude Code. The server requires an API token unique to each developer. Where should the MCP server be configured, and how should credentials be managed?",
-    "question": "Khi nào một hệ thống nên ưu tiên sử dụng MCP transport Server-Sent Events (SSE) thay vì stdio?",
+    "question": "Một nhóm kỹ thuật nền tảng muốn chia sẻ một MCP server cho hệ thống ticketing nội bộ cho tất cả các lập trình viên sử dụng Claude Code. Server này yêu cầu một API token riêng cho từng lập trình viên. MCP server nên được cấu hình ở đâu và thông tin xác thực (credentials) nên được quản lý như thế nào?",
     "optionsEN": [
       "A. Add the server to .mcp.json in the project root with each developer's API token hard-coded in the configuration.",
       "B. Add the server to .mcp.json using ${TICKETING_API_TOKEN} expansion so each developer sets their own token.",
@@ -9567,20 +9567,20 @@
       "D. Create a shared .env file in the repository with all developer tokens and reference it from .mcp.json."
     ],
     "options": [
-      "A. Khi MCP server được lưu trữ từ xa trên một máy chủ đám mây độc lập và phục vụ nhiều client qua mạng HTTP.",
-      "B. Khi cần hiệu năng truyền dữ liệu nhị phân tốc độ cao nhất.",
-      "C. Khi client chạy trên hệ điều hành Windows.",
-      "D. Khi không có kết nối internet."
+      "A. Thêm server vào file `.mcp.json` tại thư mục gốc của dự án với API token của từng lập trình viên được hard-code trực tiếp trong cấu hình.",
+      "B. Thêm server vào file `.mcp.json` sử dụng cú pháp mở rộng biến môi trường `${TICKETING_API_TOKEN}` để mỗi lập trình viên tự thiết lập token của riêng mình.",
+      "C. Yêu cầu mỗi lập trình viên tự thêm server vào file cấu hình cá nhân `~/.claude.json` với API token của họ.",
+      "D. Tạo một file `.env` dùng chung trong repository chứa tất cả token của các lập trình viên và tham chiếu đến nó từ `.mcp.json`."
     ],
     "correct": 1,
     "optionExplanations": [
-      "Option A ❌ (SAI): Hard-coding individual tokens in .mcp.json commits credentials to version control, which is a security risk. Each developer has a different token, so a single hard-coded value would not work for the team.",
-      "Option B ✅ (ĐÚNG): Project-level .mcp.json is version-controlled and shared, making the server available to everyone. Environment variable expansion keeps individual credentials out of version control while letting each developer authenticate with their own token.",
-      "Option C ❌ (SAI): User-level ~/.claude.json is for personal or experimental servers. A team-wide integration should be in project-level .mcp.json so it is version-controlled and consistently available to all developers.",
-      "Option D ❌ (SAI): A shared .env file with all developer tokens still commits credentials to version control and creates a single file containing every team member's secrets, compounding the security risk."
+      "Option A ❌ (SAI): Hard-code token cá nhân vào file cấu hình dự án dùng chung có nguy cơ rò rỉ token qua Git.",
+      "Option B ✅ (ĐÚNG): Cấu hình trong `.mcp.json` với cú pháp mở rộng biến môi trường `${TICKETING_API_TOKEN}` giúp chia sẻ cấu hình server đồng bộ mà vẫn giữ thông tin xác thực an toàn ở môi trường cá nhân.",
+      "Option C ❌ (SAI): Cấu hình ở cấp cá nhân `~/.claude.json` làm trùng lặp định nghĩa server cho từng người và mất đi tính quản lý tập trung ở cấp dự án.",
+      "Option D ❌ (SAI): Lưu tất cả token của các lập trình viên vào một file `.env` dùng chung trong Git vi phạm nghiêm trọng các thực tiễn bảo mật."
     ],
     "rationale": "Project-level .mcp.json is version-controlled and shared with the team, making the server available to everyone. Environment variable expansion keeps individual credentials out of version control whilst allowing each developer to authenticate with their own token.",
-    "explanation": "SSE transport được thiết kế cho các kịch bản client-server từ xa qua mạng HTTP, cho phép MCP server chạy tập trung trên hạ tầng đám mây.",
+    "explanation": "✅ Đáp án đúng: B\n\n💡 Giải thích:\nFile `.mcp.json` ở cấp dự án được quản lý phiên bản qua Git và chia sẻ đồng nhất cho cả nhóm, giúp mọi người đều có sẵn cấu hình server. Việc sử dụng cú pháp mở rộng biến môi trường `${VAR}` đảm bảo thông tin xác thực nhạy cảm của từng cá nhân không bị commit vào Git.",
     "sources": [
       {
         "label": "Lesson 2.4: MCP Server Integration (Environment variable expansion)",
@@ -9606,7 +9606,7 @@
     "difficulty": "application",
     "scenarioId": "s-q-2-4-006",
     "questionEN": "An MCP server exposes a `query_database` tool for Snowflake. Agents ignore it and run SQL via the built-in Bash tool against the Snowflake CLI, even though the MCP tool returns structured results with column types and pagination that Bash does not. What is the most likely cause and fix?",
-    "question": "File cấu hình `.mcp.json` đặt ở thư mục gốc của dự án có ưu điểm gì so với file `~/.claude.json` đặt ở thư mục home của người dùng?",
+    "question": "Một MCP server cung cấp tool `query_database` cho cơ sở dữ liệu Snowflake. Các agent thường bỏ qua tool này và tự chạy lệnh SQL thông qua tool Bash tích hợp sẵn gọi Snowflake CLI, mặc dù tool MCP trả về kết quả có cấu trúc với kiểu cột và hỗ trợ phân trang (pagination) mà Bash không có. Nguyên nhân khả dĩ nhất và cách khắc phục là gì?",
     "optionsEN": [
       "A. The MCP server is not properly connected. Restart the MCP server and verify the connection with a test query.",
       "B. Enhance the sparse description to spell out the tool's structured output and pagination advantages over Bash.",
@@ -9614,20 +9614,20 @@
       "D. Add a system prompt instruction telling the agent to always use query_database instead of Bash for SQL queries."
     ],
     "options": [
-      "A. Nó có thể được commit vào hệ thống quản lý phiên bản (Git) để chia sẻ cấu hình công cụ đồng nhất cho toàn bộ thành viên trong nhóm phát triển.",
-      "B. Nó có quyền thực thi với đặc quyền root cao hơn.",
-      "C. Nó giúp mã hóa toàn bộ dữ liệu dự án tự động.",
-      "D. Nó chỉ hoạt động trên hệ điều hành Linux."
+      "A. MCP server kết nối chưa đúng cách. Khởi động lại MCP server và kiểm tra lại kết nối bằng một truy vấn thử nghiệm.",
+      "B. Bổ sung mô tả còn sơ sài của tool để nêu rõ các lợi thế về đầu ra có cấu trúc và tính năng phân trang so với Bash.",
+      "C. Vô hiệu hóa hoàn toàn tool Bash để ép agent phải sử dụng tool MCP cho mọi thao tác.",
+      "D. Thêm chỉ thị vào system prompt yêu cầu agent luôn phải sử dụng `query_database` thay vì Bash cho các truy vấn SQL."
     ],
     "correct": 1,
     "optionExplanations": [
-      "Option A ❌ (SAI): If the server were disconnected, the tool would not appear in the available tools list at all. The agent is choosing not to use it, which is a description problem, not a connectivity problem.",
-      "Option B ✅ (ĐÚNG): When MCP tool descriptions are sparse, agents default to the familiar Bash tool. Enhancing the description to explain the structured results, column types, and pagination gives the agent enough to prefer the MCP tool for database queries.",
-      "Option C ❌ (SAI): Disabling Bash removes a critical general-purpose tool needed for many operations beyond database queries. The fix should make the MCP tool more attractive for its specific use case, not remove other tools.",
-      "Option D ❌ (SAI): Whilst a system prompt instruction could work as a short-term fix, it is brittle and does not scale. The root cause is the sparse description. Enhancing the description is the sustainable fix that works across all agents and contexts."
+      "Option A ❌ (SAI): Nếu MCP server bị lỗi kết nối, agent sẽ gặp lỗi khi gọi chứ không phải chủ động bỏ qua để chọn Bash ngay từ đầu.",
+      "Option B ✅ (ĐÚNG): Làm sắc nét mô tả tool để làm rõ ưu thế về dữ liệu có cấu trúc và phân trang giúp mô hình nhận biết và chọn đúng tool MCP thay vì Bash.",
+      "Option C ❌ (SAI): Vô hiệu hóa Bash là giải pháp cực đoan, làm mất đi các tính năng dòng lệnh thiết yếu khác của agent.",
+      "Option D ❌ (SAI): Thêm chỉ dẫn vào system prompt là giải pháp chắp vá; nguyên tắc chuẩn của Anthropic là tối ưu trực tiếp mô tả của chính công cụ đó."
     ],
     "rationale": "When MCP tool descriptions are sparse, agents prefer familiar built-in tools like Bash. Enhancing the description to explain capabilities — structured results, column types, pagination — gives the agent enough information to prefer the MCP tool for database queries.",
-    "explanation": "File `.mcp.json` ở cấp dự án (project-level) được kiểm soát phiên bản qua Git, đảm bảo mọi lập trình viên và môi trường CI/CD đều dùng chung cấu hình MCP đồng bộ.",
+    "explanation": "✅ Đáp án đúng: B\n\n💡 Giải thích:\nKhi mô tả của tool MCP quá sơ sài, agent thường có xu hướng ưu tiên chọn các tool quen thuộc tích hợp sẵn như Bash. Việc nâng cấp phần mô tả để làm rõ các năng lực vượt trội (kết quả có cấu trúc, kiểu dữ liệu từng cột, phân trang) cung cấp cho mô hình lý do rõ ràng để ưu tiên chọn tool MCP thay vì Bash.",
     "sources": [
       {
         "label": "Lesson 2.4: MCP Server Integration (Enhancing MCP descriptions)",
@@ -12982,7 +12982,7 @@
     "difficulty": "application",
     "scenarioId": "s-q-3-1-018",
     "questionEN": "A documentation team wants to archive the full conversation transcript to a log file every time Claude Code runs /compact, so that context lost during compaction can be reviewed later. Which hook configuration achieves this?",
-    "question": "Sự khác biệt căn bản giữa hook PreToolUse và hook PostToolUse trong hệ thống Claude Code là gì?",
+    "question": "Một nhóm tài liệu muốn lưu trữ toàn bộ bản ghi hội thoại (conversation transcript) vào một file log mỗi khi Claude Code chạy lệnh `/compact`, để có thể xem lại ngữ cảnh bị mất trong quá trình nén sau này. Cấu hình hook nào thực hiện được điều này?",
     "optionsEN": [
       "A. A PostToolUse hook on Write that snapshots the transcript whenever a file is written, on the assumption /compact will eventually run",
       "B. A PreCompact hook that writes the current transcript to a timestamped log file before /compact summarises the conversation",
@@ -12990,20 +12990,20 @@
       "D. A PostToolUse hook on all tools that appends each tool result to a running log file, creating a continuous archive"
     ],
     "options": [
-      "A. PreToolUse chạy trước khi lệnh gọi tool được thực thi (thích hợp để kiểm tra quyền, validate tham số, ghi audit log); PostToolUse chạy sau khi tool đã thực thi xong (thích hợp để làm sạch dữ liệu, chuẩn hóa kết quả, chạy linter).",
-      "B. PreToolUse chỉ dùng cho Windows, PostToolUse chỉ dùng cho Linux.",
-      "C. PostToolUse chạy nhanh hơn PreToolUse.",
-      "D. PreToolUse chỉ áp dụng cho ngôn ngữ C++."
+      "A. Một hook PostToolUse trên tool Write để chụp snapshot transcript mỗi khi có file được ghi, dựa trên giả định rằng /compact cuối cùng cũng sẽ chạy.",
+      "B. Một hook PreCompact ghi transcript hiện tại vào một file log có gắn mốc thời gian (timestamp) trước khi /compact tóm tắt cuộc hội thoại.",
+      "C. Một hook PreToolUse được cấu hình trên một tool tích hợp sẵn tên là 'Compact', khớp theo tên tool 'Compact'.",
+      "D. Một hook PostToolUse trên tất cả các tool để nối từng kết quả của tool vào một file log đang chạy, tạo thành một kho lưu trữ liên tục."
     ],
     "correct": 1,
     "optionExplanations": [
-      "Option A ❌ (SAI): Write and compaction are unrelated. PostToolUse on Write would fire on every file write whether or not /compact is about to run, producing noise rather than a transcript at the right moment. The dedicated PreCompact event is the correct hook.",
-      "Option B ✅ (ĐÚNG): PreCompact is a first-class hook event in Claude Code that fires immediately before /compact (or auto-compaction) runs. The hook receives the full pre-compaction transcript path and can copy or process it before summarisation discards detail. This is the documented mechanism for exactly this use case.",
-      "Option C ❌ (SAI): There is no 'Compact' tool exposed to PreToolUse. Compaction is a Claude Code lifecycle operation, not a model-invoked tool, so it has its own dedicated PreCompact event rather than being hooked via PreToolUse.",
-      "Option D ❌ (SAI): Logging every tool result creates enormous log files and does not capture conversation context (reasoning, planning, user messages). The targeted PreCompact event captures the full transcript at the critical moment without per-tool noise."
+      "Option A ❌ (SAI): Thao tác ghi file và nén ngữ cảnh không liên quan đến nhau. Hook PostToolUse trên Write sẽ kích hoạt sau mọi lần ghi file bất kể lệnh /compact có chạy hay không, gây lãng phí tài nguyên và tạo log thừa.",
+      "Option B ✅ (ĐÚNG): PreCompact là sự kiện hook chuẩn trong Claude Code được kích hoạt ngay trước khi /compact tóm tắt hội thoại, cho phép sao chép nguyên vẹn transcript chi tiết trước khi bị tóm tắt.",
+      "Option C ❌ (SAI): Không có tool tích hợp nào tên là 'Compact' trong cơ chế gọi tool. Compaction là một thao tác vòng đời của Claude Code chứ không phải là tool do mô hình gọi.",
+      "Option D ❌ (SAI): Ghi log mọi kết quả tool tạo ra file log khổng lồ nhưng lại không nắm bắt được ngữ cảnh hội thoại đầy đủ (suy luận, lập kế hoạch, tin nhắn người dùng)."
     ],
     "rationale": "PreCompact is a first-class hook event in Claude Code that fires immediately before /compact (or auto-compaction) runs. The hook receives the full pre-compaction transcript path and can copy or process it before summarisation discards detail. This is the documented mechanism for exactly this use case.",
-    "explanation": "PreToolUse chặn trước khi hành động diễn ra (chốt chặn an toàn); PostToolUse xử lý kết quả sau khi hành động hoàn thành (chuẩn hóa đầu ra, kiểm tra chất lượng).",
+    "explanation": "✅ Đáp án đúng: B\n\n💡 Giải thích:\n`PreCompact` là một sự kiện hook chính thức (first-class hook) trong Claude Code, kích hoạt ngay trước khi `/compact` hoặc quá trình tự động nén (auto-compaction) diễn ra. Hook này nhận đường dẫn đầy đủ của file transcript trước khi nén để sao lưu trước khi quá trình tóm tắt làm mất chi tiết.",
     "sources": [
       {
         "label": "Claude Code: Hooks",
@@ -13580,7 +13580,7 @@
     "difficulty": "application",
     "scenarioId": "s-q-3-3-009",
     "questionEN": "A developer working on a React Native project notices that Claude Code applies web-specific React conventions (e.g., using div elements) when editing mobile components in the src/mobile/ directory, despite having mobile-specific conventions documented. The root CLAUDE.md contains general React standards, and there is no directory-level or rules-based configuration for mobile. What is the best fix?",
-    "question": "Lợi ích cốt lõi của việc chuyển đổi các quy tắc chuyên biệt từ một file CLAUDE.md khổng lồ sang các file rule riêng biệt trong `.claude/rules/` là gì?",
+    "question": "Một lập trình viên phát triển dự án React Native nhận thấy Claude Code áp dụng các quy chuẩn React cho web (ví dụ dùng thẻ div) khi chỉnh sửa các component mobile trong thư mục `src/mobile/`, mặc dù dự án đã có tài liệu về các quy chuẩn cho mobile. File root `CLAUDE.md` chỉ chứa các tiêu chuẩn React chung, và chưa có cấu hình theo thư mục hay quy tắc riêng cho mobile. Cách khắc phục tốt nhất là gì?",
     "optionsEN": [
       "A. Add mobile-specific conventions to the root CLAUDE.md alongside the existing web React standards",
       "B. Create a .claude/rules/react-native.md file with paths: [\"src/mobile/**/*\"] containing the mobile-specific conventions",
@@ -13588,20 +13588,20 @@
       "D. Create a CLAUDE.md file in src/mobile/ and remove all React standards from the root CLAUDE.md"
     ],
     "options": [
-      "A. Giúp file chạy nhanh hơn về mặt tốc độ đọc ổ cứng.",
-      "B. Giảm thiểu hiện tượng loãng chú ý (attention dilution) và tiết kiệm chi phí token bằng cách chỉ nạp các quy tắc thực sự liên quan đến file đang được chỉnh sửa.",
-      "C. Cho phép mã hóa các quy tắc bảo mật.",
-      "D. Bắt buộc Claude phải dịch code sang ngôn ngữ khác."
+      "A. Thêm các quy chuẩn cho mobile vào file root `CLAUDE.md` bên cạnh các tiêu chuẩn web React hiện có.",
+      "B. Tạo file `.claude/rules/react-native.md` với cấu hình `paths: [\"src/mobile/**/*\"]` chứa các quy chuẩn chuyên biệt cho mobile.",
+      "C. Thay thế hoàn toàn các quy chuẩn web React trong file root `CLAUDE.md` bằng các quy chuẩn mobile React Native.",
+      "D. Tạo một file `CLAUDE.md` trong `src/mobile/` và xóa bỏ toàn bộ các tiêu chuẩn React khỏi root `CLAUDE.md`."
     ],
     "correct": 1,
     "optionExplanations": [
-      "Option A ❌ (SAI): Adding mobile conventions to the root CLAUDE.md would load them for every session, including when editing web components, API handlers, or any other file. This wastes tokens and could cause confusion when both web and mobile conventions are present simultaneously.",
-      "Option B ✅ (ĐÚNG): A rules file with a path restriction to src/mobile/ ensures mobile conventions load only when editing mobile components. This keeps the root CLAUDE.md focused on universal standards while providing targeted, token-efficient mobile guidance.",
-      "Option C ❌ (SAI): Replacing web conventions with mobile conventions would break guidance for the web portion of the codebase. Both web and mobile conventions are needed, but scoped to their respective file paths.",
-      "Option D ❌ (SAI): A directory-level CLAUDE.md in src/mobile/ would work for that directory, but removing React standards from the root CLAUDE.md would leave web components without guidance. The correct approach preserves root-level standards and adds path-scoped mobile rules."
+      "Option A ❌ (SAI): Thêm quy chuẩn mobile vào root CLAUDE.md khiến cả hai bộ quy tắc web và mobile tồn tại song song, dễ gây mâu thuẫn và làm loãng ngữ cảnh khi chỉnh sửa code web.",
+      "Option B ✅ (ĐÚNG): Sử dụng `.claude/rules/` với trường `paths` là giải pháp chuẩn mực để cô lập quy chuẩn theo đúng phạm vi thư mục mobile.",
+      "Option C ❌ (SAI): Thay thế toàn bộ sẽ làm mất các quy chuẩn web cần thiết khi làm việc với các phần code web khác.",
+      "Option D ❌ (SAI): Xóa bỏ tiêu chuẩn khỏi root CLAUDE.md sẽ làm mất quy ước chung cho toàn bộ dự án."
     ],
     "rationale": "A rules file with a path restriction to src/mobile/ ensures mobile conventions load only when editing mobile components. This keeps the root CLAUDE.md focused on universal standards while providing targeted, token-efficient mobile guidance.",
-    "explanation": "Phân bổ quy tắc theo đường dẫn giúp context window của mỗi phiên luôn sạch sẽ, tập trung tối đa sự chú ý của model vào các quy tắc thực sự áp dụng cho file đang sửa.",
+    "explanation": "✅ Đáp án đúng: B\n\n💡 Giải thích:\nFile quy tắc chuyên biệt trong `.claude/rules/` kết hợp với giới hạn đường dẫn `paths: [\"src/mobile/**/*\"]` đảm bảo các quy ước của mobile chỉ được nạp khi chỉnh sửa code trong thư mục `src/mobile/`, ngăn chặn việc làm ô nhiễm ngữ cảnh web hoặc phải quản lý cấu trúc phân cấp CLAUDE.md phức tạp.",
     "sources": [
       {
         "label": "Lesson 3.3: Path-Specific Rules (Rule file examples)",
