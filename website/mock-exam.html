@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🏆 Đấu Trường Thi Thật & Ôn Tập Mô Phỏng CCAF — CCAF Learning Hub</title>
-  <link rel="stylesheet" href="css/style.css?v=10.0">
+  <link rel="stylesheet" href="css/style.css?v=14.0">
   <style>
     .mock-header-bar {
       position: sticky;
@@ -439,9 +439,13 @@
         <!-- Right: Question Grid Navigator Sidebar -->
         <div class="mock-grid-sidebar">
           <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-primary);">BẢNG CÂU HỎI</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;" id="question-grid-legend">
-            🔵 Đang xem | 🟢 Đã làm | 🟡 Cắm cờ | ⚪ Chưa làm
-          </p>
+          <div id="question-grid-legend" class="grid-legend-flags">
+            <span class="flag-count-badge badge-review" title="Đánh dấu câu này cần xem lại dù đúng hay sai (Đè lên tất cả cờ khác)">🚩 Cần xem lại: <strong>0</strong></span>
+            <span class="flag-count-badge badge-sure" title="1. Chắc chắn đúng">🟢 Chắc đúng: <strong>0</strong></span>
+            <span class="flag-count-badge badge-split" title="2. Hiểu đề nhưng thấy có 2 hoặc 3 câu đúng, chọn 1 câu nhưng còn phân vân">🟡 Phân vân 2-3 câu: <strong>0</strong></span>
+            <span class="flag-count-badge badge-partial" title="3. Hiểu 1 ít câu hỏi và câu trả lời, chọn đại 1 đáp án cho là đúng nhất">🟠 Hiểu 1 ít: <strong>0</strong></span>
+            <span class="flag-count-badge badge-blind" title="4. Không hiểu gì cả, chọn đại">🟣 Không hiểu gì: <strong>0</strong></span>
+          </div>
 
           <div class="question-grid-layout" id="question-nav-grid">
             <!-- Dynamically rendered buttons -->
@@ -512,6 +516,6 @@
   <script src="js/data/mock-exam-data.js?v=131.0"></script>
   <script src="js/data/mock-exam-data_merged.js?v=1.0"></script>
   <script src="js/data/knowledge-data.js"></script>
-  <script src="js/mock-exam.js?v=133.0"></script>
+  <script src="js/mock-exam.js?v=138.0"></script>
 </body>
 </html>

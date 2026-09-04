@@ -5,7 +5,8 @@ let currentConceptFilterDomain = 'ALL';
 const conceptQuestionsCache = new Map();
 let mockExamQuestions = [];
 let mockExamAnswers = {};
-let mockExamFlags = {}; // key: qKey -> 'SURE' | 'UNSURE' | 'GUESS'
+let mockExamFlags = {}; // key: qKey -> 'SURE' | 'SPLIT' | 'PARTIAL' | 'BLIND'
+let mockExamReviewFlags = {}; // key: qKey -> boolean (true: Cần xem lại dù đúng hay sai, đè lên cờ khác)
 let currentExamIndex = 0;
 let currentMockExamLabel = '';
 let isMockSubmitted = false;
@@ -40,6 +41,7 @@ window.saveActiveExamSession = function() {
       questions: mockExamQuestions,
       answers: mockExamAnswers,
       flags: mockExamFlags,
+      reviewFlags: mockExamReviewFlags,
       currentIndex: currentExamIndex,
       label: currentMockExamLabel,
       isInstant: isInstantFeedbackMode,
@@ -79,15 +81,21 @@ window.restoreActiveExamSession = function() {
     if (session.flags) {
       if (Array.isArray(session.flags)) {
         mockExamFlags = {};
-        session.flags.forEach(f => { mockExamFlags[f] = 'UNSURE'; });
+        session.flags.forEach(f => { mockExamFlags[f] = 'SPLIT'; });
       } else if (typeof session.flags === 'object') {
-        mockExamFlags = session.flags;
+        mockExamFlags = {};
+        Object.entries(session.flags).forEach(([k, v]) => {
+          if (v === 'UNSURE') mockExamFlags[k] = 'SPLIT';
+          else if (v === 'GUESS') mockExamFlags[k] = 'BLIND';
+          else mockExamFlags[k] = v;
+        });
       } else {
         mockExamFlags = {};
       }
     } else {
       mockExamFlags = {};
     }
+    mockExamReviewFlags = (session.reviewFlags && typeof session.reviewFlags === 'object') ? session.reviewFlags : {};
     currentExamIndex = (typeof session.currentIndex === 'number' && session.currentIndex >= 0 && session.currentIndex < mockExamQuestions.length)
       ? session.currentIndex
       : 0;
@@ -532,6 +540,7 @@ window.startCustomPracticeExam = function(isInstant = false) {
   revealedQuestions.clear();
   mockExamAnswers = {};
   mockExamFlags = {};
+  mockExamReviewFlags = {};
   currentExamIndex = 0;
   updateHeaderBarState();
 
@@ -560,6 +569,7 @@ window.startOfficialMockExam = function() {
   revealedQuestions.clear();
   mockExamAnswers = {};
   mockExamFlags = {};
+  mockExamReviewFlags = {};
   mockSecondsRemaining = 120 * 60;
   currentExamIndex = 0;
   currentMockExamLabel = `OFFICIAL_MOCK_60Q_${currentOfficialDataset}`;
@@ -659,16 +669,41 @@ function renderQuestionGrid() {
   const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
   const legendEl = document.getElementById('question-grid-legend');
 
+  let sureCount = 0;
+  let splitCount = 0;
+  let partialCount = 0;
+  let blindCount = 0;
+  let reviewCount = 0;
+  Object.values(mockExamFlags).forEach(flag => {
+    if (flag === 'SURE') sureCount++;
+    else if (flag === 'SPLIT' || flag === 'UNSURE') splitCount++;
+    else if (flag === 'PARTIAL') partialCount++;
+    else if (flag === 'BLIND' || flag === 'GUESS') blindCount++;
+  });
+
+  mockExamQuestions.forEach(q => {
+    const qKey = q.uniqueId || q.id;
+    if (mockExamReviewFlags[qKey]) reviewCount++;
+  });
+
   if (legendEl) {
-    if (isMockSubmitted) {
-      legendEl.innerHTML = curLang === 'EN' 
-        ? '🔵 Active | 🟢 Correct | 🔴 Incorrect | ⚪ Skipped | 🟢 Sure | 🟡 Unsure | 🟣 Guess'
-        : '🔵 Đang xem | 🟢 Câu đúng | 🔴 Câu sai | ⚪ Chưa làm | 🟢 Chắc đúng | 🟡 Phân vân | 🟣 Chọn đại';
-    } else {
-      legendEl.innerHTML = curLang === 'EN'
-        ? '🔵 Active | 🟢 Answered | ⚪ Unanswered | 🟢 Sure | 🟡 Unsure | 🟣 Guess'
-        : '🔵 Đang xem | 🟢 Đã làm | ⚪ Chưa làm | 🟢 Chắc đúng | 🟡 Phân vân | 🟣 Chọn đại';
-    }
+    legendEl.innerHTML = `
+      <span class="flag-count-badge badge-review" title="${curLang === 'EN' ? 'Review Later (Overrides other flags)' : 'Đánh dấu câu này cần xem lại dù đúng hay sai (Đè lên tất cả cờ khác)'}">
+        🚩 ${curLang === 'EN' ? 'Review' : 'Cần xem lại'}: <strong>${reviewCount}</strong>
+      </span>
+      <span class="flag-count-badge badge-sure" title="${curLang === 'EN' ? 'Sure / High Confidence' : '1. Chắc chắn đúng'}">
+        🟢 ${curLang === 'EN' ? 'Sure' : 'Chắc đúng'}: <strong>${sureCount}</strong>
+      </span>
+      <span class="flag-count-badge badge-split" title="${curLang === 'EN' ? 'Understand question, torn between 2-3 options' : '2. Hiểu đề nhưng thấy có 2 hoặc 3 câu đúng, chọn 1 câu nhưng còn phân vân'}">
+        🟡 ${curLang === 'EN' ? 'Split' : 'Phân vân 2-3 câu'}: <strong>${splitCount}</strong>
+      </span>
+      <span class="flag-count-badge badge-partial" title="${curLang === 'EN' ? 'Partially understand, guessed most plausible' : '3. Hiểu 1 ít câu hỏi và câu trả lời, chọn đại 1 đáp án cho là đúng nhất'}">
+        🟠 ${curLang === 'EN' ? 'Partial' : 'Hiểu 1 ít'}: <strong>${partialCount}</strong>
+      </span>
+      <span class="flag-count-badge badge-blind" title="${curLang === 'EN' ? 'No clue, pure blind guess' : '4. Không hiểu gì cả, chọn đại'}">
+        🟣 ${curLang === 'EN' ? 'Blind' : 'Không hiểu gì'}: <strong>${blindCount}</strong>
+      </span>
+    `;
   }
 
   let correctCount = 0;
@@ -703,22 +738,30 @@ function renderQuestionGrid() {
       if (isAnswered) btnClass += ' answered-nav';
     }
 
-    let flagBadgeHtml = '';
-    let flagTitle = '';
+    const isReview = Boolean(mockExamReviewFlags[qKey]);
+    const reviewBadgeHtml = isReview ? '<span class="grid-nav-review-badge">🚩</span>' : '';
+    const reviewTitle = isReview ? (curLang === 'EN' ? ' [🚩 Review Required]' : ' [🚩 Cần xem lại]') : '';
+
+    let confidenceBadgeHtml = '';
+    let confTitle = '';
     if (flagType === 'SURE') {
-      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-sure">🟢</span>';
-      flagTitle = ' [🟢 Chắc chắn đúng]';
-    } else if (flagType === 'UNSURE') {
-      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-unsure">🟡</span>';
-      flagTitle = ' [🟡 Còn phân vân]';
-    } else if (flagType === 'GUESS') {
-      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-guess">🟣</span>';
-      flagTitle = ' [🟣 Chọn đại]';
+      confidenceBadgeHtml = '<span class="grid-nav-flag-badge flag-sure">🟢</span>';
+      confTitle = curLang === 'EN' ? ' [🟢 Sure]' : ' [🟢 1. Chắc chắn đúng]';
+    } else if (flagType === 'SPLIT' || flagType === 'UNSURE') {
+      confidenceBadgeHtml = '<span class="grid-nav-flag-badge flag-split">🟡</span>';
+      confTitle = curLang === 'EN' ? ' [🟡 Split Options]' : ' [🟡 2. Hiểu đề, phân vân 2-3 câu]';
+    } else if (flagType === 'PARTIAL') {
+      confidenceBadgeHtml = '<span class="grid-nav-flag-badge flag-partial">🟠</span>';
+      confTitle = curLang === 'EN' ? ' [🟠 Partial Understanding]' : ' [🟠 3. Hiểu 1 ít, chọn đại]';
+    } else if (flagType === 'BLIND' || flagType === 'GUESS') {
+      confidenceBadgeHtml = '<span class="grid-nav-flag-badge flag-blind">🟣</span>';
+      confTitle = curLang === 'EN' ? ' [🟣 Blind Guess]' : ' [🟣 4. Không hiểu gì cả, chọn đại]';
     }
 
     return `
-      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})${flagTitle}">
-        ${flagBadgeHtml}
+      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})${confTitle}${reviewTitle}">
+        ${reviewBadgeHtml}
+        ${confidenceBadgeHtml}
         ${idx + 1}
       </button>
     `;
@@ -729,17 +772,17 @@ function renderQuestionGrid() {
     const ans = mockExamAnswers[k];
     return isMultiQuestion(q) ? (Array.isArray(ans) && ans.length > 0) : (ans !== undefined && ans !== null);
   }).length;
-  const flaggedCount = Object.keys(mockExamFlags).length;
   const statsEl = document.getElementById('grid-stats-text');
   if (statsEl) {
+    const flagSummary = `🚩 ${reviewCount} | 🟢 ${sureCount} | 🟡 ${splitCount} | 🟠 ${partialCount} | 🟣 ${blindCount}`;
     if (isMockSubmitted || isInstantFeedbackMode) {
       statsEl.textContent = curLang === 'EN' 
-        ? `Correct: ${correctCount}/${mockExamQuestions.length} | Incorrect: ${wrongCount} | Skipped: ${unansweredCount} | Flagged: ${flaggedCount}`
-        : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | Gắn cờ: ${flaggedCount}`;
+        ? `Correct: ${correctCount}/${mockExamQuestions.length} | Incorrect: ${wrongCount} | Skipped: ${unansweredCount} | ${flagSummary}`
+        : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | ${flagSummary}`;
     } else {
       statsEl.textContent = curLang === 'EN' 
-        ? `Answered: ${answeredCount}/${mockExamQuestions.length} | Flagged: ${flaggedCount}`
-        : `Đã làm: ${answeredCount}/${mockExamQuestions.length} | Gắn cờ: ${flaggedCount}`;
+        ? `Answered: ${answeredCount}/${mockExamQuestions.length} | ${flagSummary}`
+        : `Đã làm: ${answeredCount}/${mockExamQuestions.length} | ${flagSummary}`;
     }
   }
 }
@@ -810,17 +853,28 @@ function renderCurrentQuestion() {
         </div>
         
         <div class="flag-btn-group">
-          <button type="button" class="flag-choice-btn ${currentFlag === 'SURE' ? 'active-sure' : ''}" onclick="window.setQuestionConfidenceFlag('SURE')" title="${currentLang === 'EN' ? 'Sure / High Confidence' : 'Chắc chắn đúng'}">
+          <button type="button" class="flag-choice-btn ${currentFlag === 'SURE' ? 'active-sure' : ''}" onclick="window.setQuestionConfidenceFlag('SURE')" title="${currentLang === 'EN' ? 'Sure / High Confidence' : '1. Chắc chắn đúng'}">
             <span>🟢</span>
             <span>${currentLang === 'EN' ? 'Sure' : 'Chắc đúng'}</span>
           </button>
-          <button type="button" class="flag-choice-btn ${currentFlag === 'UNSURE' ? 'active-unsure' : ''}" onclick="window.setQuestionConfidenceFlag('UNSURE')" title="${currentLang === 'EN' ? 'Unsure / Doubt' : 'Còn phân vân'}">
+          <button type="button" class="flag-choice-btn ${(currentFlag === 'SPLIT' || currentFlag === 'UNSURE') ? 'active-split' : ''}" onclick="window.setQuestionConfidenceFlag('SPLIT')" title="${currentLang === 'EN' ? 'Understand question, torn between 2-3 options' : '2. Hiểu đề nhưng thấy có 2 hoặc 3 câu đúng, chọn 1 câu nhưng còn phân vân'}">
             <span>🟡</span>
-            <span>${currentLang === 'EN' ? 'Unsure' : 'Phân vân'}</span>
+            <span>${currentLang === 'EN' ? 'Split 2-3' : 'Phân vân 2-3 câu'}</span>
           </button>
-          <button type="button" class="flag-choice-btn ${currentFlag === 'GUESS' ? 'active-guess' : ''}" onclick="window.setQuestionConfidenceFlag('GUESS')" title="${currentLang === 'EN' ? 'Wild Guess' : 'Chọn đại'}">
+          <button type="button" class="flag-choice-btn ${currentFlag === 'PARTIAL' ? 'active-partial' : ''}" onclick="window.setQuestionConfidenceFlag('PARTIAL')" title="${currentLang === 'EN' ? 'Partially understand, guessed most plausible' : '3. Hiểu 1 ít câu hỏi và câu trả lời, chọn đại 1 đáp án cho là đúng nhất'}">
+            <span>🟠</span>
+            <span>${currentLang === 'EN' ? 'Partial' : 'Hiểu 1 ít'}</span>
+          </button>
+          <button type="button" class="flag-choice-btn ${(currentFlag === 'BLIND' || currentFlag === 'GUESS') ? 'active-blind' : ''}" onclick="window.setQuestionConfidenceFlag('BLIND')" title="${currentLang === 'EN' ? 'No clue, pure blind guess' : '4. Không hiểu gì cả, chọn đại'}">
             <span>🟣</span>
-            <span>${currentLang === 'EN' ? 'Guess' : 'Chọn đại'}</span>
+            <span>${currentLang === 'EN' ? 'Blind' : 'Không hiểu gì'}</span>
+          </button>
+
+          <span class="flag-divider"></span>
+
+          <button type="button" class="flag-choice-btn flag-review-btn ${mockExamReviewFlags[qKey] ? 'active-review' : ''}" onclick="window.toggleQuestionReviewFlag()" title="${currentLang === 'EN' ? 'Mark this question for review (Overrides other flags)' : 'Đánh dấu câu này cần xem lại dù đúng hay sai (Đè lên tất cả cờ khác)'}">
+            <span>🚩</span>
+            <span>${currentLang === 'EN' ? 'Review' : 'Cần xem lại'}</span>
           </button>
         </div>
       </div>
@@ -872,10 +926,10 @@ function renderCurrentQuestion() {
           const cardStyle = `display: flex !important; align-items: center !important; gap: 0.85rem !important; background: ${cardBg} !important; border: ${cardBorder} !important; padding: 1rem 1.25rem !important; border-radius: 12px !important; cursor: pointer !important; font-size: 0.95rem !important; color: ${cardColor} !important; margin-bottom: 0.75rem !important; box-shadow: ${cardShadow} !important; transition: all 0.2s ease !important;`;
 
           return `
-            <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption('${qKey}', ${oIdx})">
+            <div class="${optClass}" role="${isMulti ? 'checkbox' : 'radio'}" aria-checked="${isOptSelected}" style="${cardStyle}" onclick="window.selectOption('${qKey}', ${oIdx})">
               <input type="${inputType}" name="mock_q_${qKey}" ${isOptSelected ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
               <span>${opt}</span>
-            </label>
+            </div>
           `;
         }).join('')}
       </div>
@@ -940,12 +994,14 @@ window.selectOption = function(qId, oIdx) {
   const q = mockExamQuestions.find(item => (item.uniqueId || item.id) === qId);
   if (!q) return;
 
+  oIdx = parseInt(oIdx, 10);
   const isMulti = isMultiQuestion(q);
 
   if (isMulti) {
     if (isInstantFeedbackMode && revealedQuestions.has(qId)) return;
     let cur = mockExamAnswers[qId];
     if (!Array.isArray(cur)) cur = [];
+    cur = cur.map(x => parseInt(x, 10));
     if (cur.includes(oIdx)) {
       cur = cur.filter(x => x !== oIdx);
     } else {
@@ -1030,8 +1086,23 @@ window.setQuestionConfidenceFlag = function(flagType) {
   window.saveActiveExamSession();
 };
 
+window.toggleQuestionReviewFlag = function() {
+  const q = mockExamQuestions[currentExamIndex];
+  if (!q) return;
+
+  const qKey = q.uniqueId || q.id;
+  if (mockExamReviewFlags[qKey]) {
+    delete mockExamReviewFlags[qKey];
+  } else {
+    mockExamReviewFlags[qKey] = true;
+  }
+  renderQuestionGrid();
+  renderCurrentQuestion();
+  window.saveActiveExamSession();
+};
+
 window.toggleFlagCurrentQuestion = function() {
-  window.setQuestionConfidenceFlag('UNSURE');
+  window.setQuestionConfidenceFlag('SPLIT');
 };
 
 function updateHeaderBarState() {
@@ -1109,6 +1180,7 @@ window.cancelMockExam = function() {
   isMockSubmitted = false;
   mockExamAnswers = {};
   mockExamFlags = {};
+  mockExamReviewFlags = {};
   mockExamQuestions = [];
   currentExamIndex = 0;
   updateHeaderBarState();
@@ -1206,15 +1278,48 @@ window.submitMockExam = function() {
     if (flagContainer) {
       const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
       const flagStats = {
-        SURE: { total: 0, correct: 0, label: curLang === 'EN' ? 'Sure / High Confidence' : 'Chắc chắn đúng', icon: '🟢', color: '#10b981' },
-        UNSURE: { total: 0, correct: 0, label: curLang === 'EN' ? 'Unsure / Doubt' : 'Còn phân vân', icon: '🟡', color: '#f59e0b' },
-        GUESS: { total: 0, correct: 0, label: curLang === 'EN' ? 'Wild Guess' : 'Chọn đại', icon: '🟣', color: '#a855f7' },
-        NONE: { total: 0, correct: 0, label: curLang === 'EN' ? 'No Flag' : 'Không cắm cờ', icon: '⚪', color: 'var(--text-muted)' }
+        SURE: { 
+          total: 0, 
+          correct: 0, 
+          label: curLang === 'EN' ? 'Sure / High Confidence' : 'Chắc chắn đúng', 
+          icon: '🟢', 
+          color: '#10b981' 
+        },
+        SPLIT: { 
+          total: 0, 
+          correct: 0, 
+          label: curLang === 'EN' ? 'Understand question, torn between 2-3 options' : 'Hiểu đề nhưng thấy có 2 hoặc 3 câu đúng, chọn 1 câu nhưng còn phân vân', 
+          icon: '🟡', 
+          color: '#f59e0b' 
+        },
+        PARTIAL: { 
+          total: 0, 
+          correct: 0, 
+          label: curLang === 'EN' ? 'Partially understand, guessed most plausible' : 'Hiểu 1 ít câu hỏi và câu trả lời, chọn đại 1 đáp án cho là đúng nhất', 
+          icon: '🟠', 
+          color: '#f97316' 
+        },
+        BLIND: { 
+          total: 0, 
+          correct: 0, 
+          label: curLang === 'EN' ? 'No clue, pure blind guess' : 'Không hiểu gì cả, chọn đại', 
+          icon: '🟣', 
+          color: '#a855f7' 
+        },
+        NONE: { 
+          total: 0, 
+          correct: 0, 
+          label: curLang === 'EN' ? 'No Flag' : 'Không cắm cờ', 
+          icon: '⚪', 
+          color: 'var(--text-muted)' 
+        }
       };
 
       mockExamQuestions.forEach(q => {
         const qKey = q.uniqueId || q.id;
-        const f = mockExamFlags[qKey] || 'NONE';
+        let f = mockExamFlags[qKey] || 'NONE';
+        if (f === 'UNSURE') f = 'SPLIT';
+        if (f === 'GUESS') f = 'BLIND';
         if (flagStats[f]) {
           flagStats[f].total++;
           if (isAnswerCorrect(q, mockExamAnswers[qKey])) {
@@ -1223,8 +1328,33 @@ window.submitMockExam = function() {
         }
       });
 
-      const displayKeys = ['SURE', 'UNSURE', 'GUESS'];
+      const displayKeys = ['SURE', 'SPLIT', 'PARTIAL', 'BLIND'];
       if (flagStats.NONE.total > 0) displayKeys.push('NONE');
+
+      let reviewCount = 0;
+      let reviewCorrectCount = 0;
+      mockExamQuestions.forEach(q => {
+        const qKey = q.uniqueId || q.id;
+        if (mockExamReviewFlags[qKey]) {
+          reviewCount++;
+          if (isAnswerCorrect(q, mockExamAnswers[qKey])) {
+            reviewCorrectCount++;
+          }
+        }
+      });
+
+      let reviewHtml = '';
+      if (reviewCount > 0) {
+        reviewHtml = `
+          <div style="margin-top: 0.75rem; padding: 0.55rem 0.85rem; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="display: flex; align-items: center; gap: 0.45rem; color: #ef4444; font-weight: 700;">
+              <span>🚩</span>
+              <span>${curLang === 'EN' ? 'Marked for Review (Right or Wrong):' : 'Câu cần xem lại (dù đúng hay sai):'}</span>
+            </span>
+            <strong style="color: #ef4444; font-size: 0.95rem;">${reviewCount} câu <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: normal; margin-left: 0.35rem;">(${curLang === 'EN' ? `${reviewCorrectCount} correct` : `đúng ${reviewCorrectCount}/${reviewCount}`})</span></strong>
+          </div>
+        `;
+      }
 
       flagContainer.innerHTML = displayKeys.map(k => {
         const item = flagStats[k];
@@ -1241,7 +1371,7 @@ window.submitMockExam = function() {
             </span>
           </div>
         `;
-      }).join('');
+      }).join('') + reviewHtml;
     }
     
     // Scroll smooth to top so modal is in full view
@@ -1315,6 +1445,7 @@ window.viewMockHistoryDetail = function(historyId) {
   mockExamQuestions = item.questions;
   mockExamAnswers = item.userAnswers || {};
   mockExamFlags = {};
+  mockExamReviewFlags = {};
   currentExamIndex = 0;
   isMockSubmitted = true;
   currentMockExamLabel = item.domains;
@@ -1419,6 +1550,7 @@ window.startTopicSpecificPracticeExam = function(topics = ['3.2', '3.3', '3.5', 
   revealedQuestions.clear();
   mockExamAnswers = {};
   mockExamFlags = {};
+  mockExamReviewFlags = {};
   currentExamIndex = 0;
   updateHeaderBarState();
 
@@ -1456,6 +1588,30 @@ document.addEventListener('DOMContentLoaded', () => {
       window.clearActiveExamSession();
       window.startTopicSpecificPracticeExam(topicList, isInstant);
       autoStarted = true;
+    } else if (urlParams.get('q')) {
+      const qParam = urlParams.get('q');
+      const pool = (typeof window.getPracticeQuestionPool === 'function') 
+        ? (window.getPracticeQuestionPool('V2') || window.getPracticeQuestionPool('V1') || [])
+        : [];
+      const foundQ = pool.find(item => item.id === qParam);
+      if (foundQ) {
+        window.clearActiveExamSession();
+        mockExamQuestions = [{ ...foundQ, uniqueId: `${foundQ.id}_url_0` }];
+        mockExamAnswers = {};
+        mockExamFlags = {};
+        mockExamReviewFlags = {};
+        currentExamIndex = 0;
+        isMockSubmitted = false;
+        isInstantFeedbackMode = (urlParams.get('instant') !== 'false');
+        revealedQuestions.clear();
+        currentMockExamLabel = `DIRECT_${foundQ.id}`;
+        document.getElementById('mock-setup-card').style.display = 'none';
+        document.getElementById('mock-arena-box').style.display = 'block';
+        startMockTimer();
+        renderQuestionGrid();
+        renderCurrentQuestion();
+        autoStarted = true;
+      }
     } else {
       const targetDomain = urlParams.get('domain');
       if (targetDomain && ['D1', 'D2', 'D3', 'D4', 'D5'].includes(targetDomain.toUpperCase())) {

@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-04 19:42 (Local Time)*  
+> *Last Updated: 2026-09-04 23:12 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -178,6 +178,25 @@ d:\AI\CCAF/
   - Kiểm thử tự động bằng Browser subagent trên cả 2 chế độ Ôn bình thường & Ôn tức thì (Instant feedback) đạt chuẩn 100%.
   - Đánh giá chất lượng bộ 644 câu hỏi: Đạt 100% giải thích chi tiết từng option, song ngữ EN/VI, độ sâu stem trung bình 501 ký tự.
   - Đồng bộ `project_memory.md` và `git push` theo yêu cầu trực tiếp từ người dùng.
+- **2026-09-04 (Multi-select Fix, 4-Level Confidence Flags, Independent Review Flag & Dual Badge Display)**:
+  - **Khắc phục triệt để lỗi chọn nhiều đáp án (Multi-select Questions)**: Sửa lỗi xung đột synthetic click event khi thẻ `<label>` bọc `<input>` bằng cách chuyển sang thẻ `<div role="checkbox">` kèm `pointer-events: none` trên checkbox input trong `website/js/mock-exam.js`.
+  - **Hệ thống Đánh giá Độ Tự Tin 4 Trạng Thái**:
+    - 🟢 `SURE`: Chắc chắn đúng.
+    - 🟡 `SPLIT`: Hiểu đề nhưng thấy có 2 hoặc 3 câu đúng, chọn 1 câu nhưng còn phân vân.
+    - 🟠 `PARTIAL`: Hiểu 1 ít câu hỏi và câu trả lời, chọn đại 1 đáp án cho là đúng nhất.
+    - 🟣 `BLIND`: Không hiểu gì cả, chọn đại.
+  - **Cờ Riêng Biệt "🚩 Cần Xem Lại" (Review Flag)**:
+    - Cơ chế độc lập với cờ tự tin, cho phép đánh dấu câu hỏi cần ôn tập lại dù làm đúng hay sai.
+  - **Hiển thị Kép Đồng Thời (Dual Badge Co-existence)**:
+    - Bố trí 2 góc trên đầu mỗi ô số Bảng câu hỏi: Góc trái là cờ `🚩` (Cần xem lại), góc phải là cờ độ tự tin (🟢, 🟡, 🟠, 🟣), ở giữa là số câu hỏi. Cả hai cờ cùng hiển thị đồng thời, không che khuất nhau.
+  - **Bộ Đếm Thời Gian Thực & Làm Sạch Legend**:
+    - Bỏ sạch mô tả 3 trạng thái cũ (`Active`, `Answered`, `Unanswered`).
+    - Bổ sung 5 pill badge đếm số lượng thời gian thực cho `🚩`, `🟢`, `🟡`, `🟠`, `🟣` ở cả Sidebar Legend và thanh Header Bar.
+  - **Báo Cáo Điểm Số Hoàn Chỉnh (Score Report Modal)**:
+    - Giữ lại bảng thống kê Domain (số câu đúng/tổng, tỷ lệ %).
+    - Bổ sung bảng phân tích độ chính xác theo 4 cấp độ tự tin kèm tỷ lệ % và câu chữ đầy đủ 100%.
+    - Bổ sung khối thẻ riêng biệt màu đỏ thống kê các câu được đánh dấu `🚩 Cần xem lại`.
+  - **Kiểm thử tự động & Trực tiếp trên trình duyệt**: Đạt 100% PASS trên các test script và Browser Subagent.
 
 ---
 
@@ -187,6 +206,11 @@ d:\AI\CCAF/
   - Hỗ trợ linh hoạt 3 nguồn đề thi: Bộ 1 (644 câu nền tảng), Bộ 2 (533 câu thực chiến chuẩn Anthropic), và Kết hợp cả 2 bộ (1,177 câu không trùng lặp).
   - Tự động cập nhật số câu hỏi theo Domain và số câu hỏi theo 47+ Chủ đề kiến thức cốt lõi theo nguồn đề đang chọn.
   - Chế độ Thi Thật Mô Phỏng 60 Câu Pearson VUE tự động rút từ Bộ 533 câu thực chiến.
+- **Interactive Confidence & Review Flagging Architecture (`mock-exam.html`, `mock-exam.js`, `style.css`):**
+  - Hệ thống 4 cờ độ tự tin (🟢 Chắc chắn đúng, 🟡 Phân vân 2-3 câu, 🟠 Hiểu 1 ít, 🟣 Không hiểu gì) kèm cờ độc lập 🚩 Cần xem lại.
+  - Bố cục Dual Badge đối xứng trên lưới câu hỏi: Góc trái 🚩, góc phải 🟢/🟡/🟠/🟣.
+  - Bộ đếm thời gian thực cập nhật tức thì trên Header và Sidebar legend.
+  - Score Report Modal thống kê chi tiết tỷ lệ làm đúng theo từng cấp độ tự tin và tổng số câu cần xem lại.
 - **Core Concepts Practice Mode (`mock-exam.html`, `mock-exam.js`):**
   - Tích hợp 47+ Master Core Concepts vào giao diện chọn đề ôn tập.
   - Phân loại Domain Chips nhanh, đếm số câu hỏi thực chiến cho từng Concept, hỗ trợ song song Ôn bình thường và Ôn tức thì không giới hạn thời gian.
