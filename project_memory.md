@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-03 22:55 (Local Time)*  
+> *Last Updated: 2026-09-04 19:42 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -134,6 +134,21 @@ d:\AI\CCAF/
   - Đảm bảo câu văn tự nhiên, mạch lạc, chính xác 100% về kiến thức kỹ thuật Anthropic.
   - Kiểm thử tự động trên Node.js và Browser Subagent (1,000 câu load hoàn hảo trên giao diện thi thử và ôn tập).
   - Cập nhật `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
+- **2026-09-04 (Multi-Select Support, Mode 2 Official Dataset Switcher, 3 Confidence Flags & Score Report Overhaul)**:
+  - **Multi-Select Question Support**: Nâng cấp toàn diện engine thi thử và ôn tập để hỗ trợ các câu hỏi chọn nhiều đáp án (`multiple: true` hoặc `correct: [idx1, idx2...]`). Render checkbox, bộ đếm đáp án đã chọn (`selectedCount/targetCount`), nút xác nhận đáp án ở chế độ tức thì, và kiểm tra tính đúng đắn theo mảng.
+  - **Official Mock Exam Dataset Switcher (Mode 2 - 60Q / 120 Mins)**: Bổ sung bộ chuyển đổi nguồn đề thi thật 60 câu giữa Bộ 1 (644 câu), Bộ 2 (533 câu) và Kết hợp (1,177 câu) đồng nhất như bên Ôn tập. Giữ vững tỷ lệ trọng số 5 Domain chuẩn Pearson VUE (D1: 16Q, D2: 11Q, D3: 12Q, D4: 12Q, D5: 9Q) không trùng lặp.
+  - **Question Header Clutter Removal**: Loại bỏ các thông tin rườm rà (chữ `APPLICATION`, tên TaskStatement, mã `• D4`), chỉ giữ lại duy nhất nhãn số thứ tự câu `Question X / Y` (hoặc `Câu X / Y`) và badge số đáp án cần chọn.
+  - **3-Flag Confidence System**: Thay thế cờ review cũ bằng 3 cờ độ tự tin:
+    - 🟢 Chắc chắn đúng (`SURE`)
+    - 🟡 Còn phân vân (`UNSURE`)
+    - 🟣 Chọn đại (`GUESS`)
+    - Cờ được ghim ở góc trên bên phải của ô câu hỏi trên Grid Navigator và LUÔN LUÔN HIỂN THỊ cả trước và sau khi nộp bài. Nền nút phản ánh đúng trạng thái làm bài (đúng xanh lá, sai đỏ, xám chưa làm, xanh ngọc đã làm).
+  - **Score Report Overhaul**:
+    - Giữ lại phần thống kê số câu đúng theo 5 Domain: `Domain: X/Y câu (Z%)`.
+    - Loại bỏ chẩn đoán TaskStatement rườm rà.
+    - Bổ sung bảng báo cáo chi tiết độ tự tin theo từng cờ: hiển thị số câu đúng / tổng số câu (ví dụ: Chắc chắn đúng 8/9, Còn phân vân 2/5, Chọn đại 1/4).
+  - Kiểm thử cú pháp Node.js, kịch bản tự động hóa và Browser Subagent đạt 100% chuẩn xác.
+  - Đồng bộ `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-08-30 (Option Length Balancing & Length-Bias Elimination on Dataset V2 - 1,000 Questions)**:
   - Phát hiện và xử lý triệt để hiện tượng thiên kiến phương án dài nhất (Length Bias) trên bộ đề V2 (1,000 câu).
   - Tạo backup an toàn tại [mock-exam-data_ver2.backup.js](file:///d:/AI/CCAF/website/js/data/mock-exam-data_ver2.backup.js).

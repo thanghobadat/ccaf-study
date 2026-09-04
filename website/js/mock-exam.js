@@ -5,7 +5,7 @@ let currentConceptFilterDomain = 'ALL';
 const conceptQuestionsCache = new Map();
 let mockExamQuestions = [];
 let mockExamAnswers = {};
-let mockExamFlags = new Set();
+let mockExamFlags = {}; // key: qKey -> 'SURE' | 'UNSURE' | 'GUESS'
 let currentExamIndex = 0;
 let currentMockExamLabel = '';
 let isMockSubmitted = false;
@@ -13,6 +13,21 @@ let isInstantFeedbackMode = false;
 let revealedQuestions = new Set();
 let mockSecondsRemaining = 0;
 let mockExamTimer = null;
+
+function isMultiQuestion(q) {
+  return Boolean(q && (q.multiple === true || (Array.isArray(q.correct) && q.correct.length > 1)));
+}
+
+function isAnswerCorrect(q, userAnswer) {
+  if (!q || userAnswer === undefined || userAnswer === null) return false;
+  if (isMultiQuestion(q)) {
+    if (!Array.isArray(userAnswer) || userAnswer.length !== q.correct.length) return false;
+    const sortedUser = [...userAnswer].sort((a, b) => a - b);
+    const sortedCorrect = [...q.correct].sort((a, b) => a - b);
+    return sortedUser.every((val, idx) => val === sortedCorrect[idx]);
+  }
+  return userAnswer === q.correct;
+}
 
 window.getActiveExamQuestions = function() {
   return mockExamQuestions;
@@ -24,7 +39,7 @@ window.saveActiveExamSession = function() {
     const sessionData = {
       questions: mockExamQuestions,
       answers: mockExamAnswers,
-      flags: Array.from(mockExamFlags),
+      flags: mockExamFlags,
       currentIndex: currentExamIndex,
       label: currentMockExamLabel,
       isInstant: isInstantFeedbackMode,
@@ -61,7 +76,18 @@ window.restoreActiveExamSession = function() {
 
     mockExamQuestions = session.questions;
     mockExamAnswers = session.answers || {};
-    mockExamFlags = new Set(session.flags || []);
+    if (session.flags) {
+      if (Array.isArray(session.flags)) {
+        mockExamFlags = {};
+        session.flags.forEach(f => { mockExamFlags[f] = 'UNSURE'; });
+      } else if (typeof session.flags === 'object') {
+        mockExamFlags = session.flags;
+      } else {
+        mockExamFlags = {};
+      }
+    } else {
+      mockExamFlags = {};
+    }
     currentExamIndex = (typeof session.currentIndex === 'number' && session.currentIndex >= 0 && session.currentIndex < mockExamQuestions.length)
       ? session.currentIndex
       : 0;
@@ -243,6 +269,46 @@ window.switchPracticeDataset = function(datasetCode) {
       'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)'
     };
     AppStore.showToast(`📚 Đã chuyển nguồn sang: ${names[datasetCode]}`);
+  }
+};
+
+let currentOfficialDataset = 'V2'; // 'V1', 'V2', 'BOTH'
+
+window.switchOfficialDataset = function(datasetCode) {
+  if (!['V1', 'V2', 'BOTH'].includes(datasetCode)) datasetCode = 'V2';
+  currentOfficialDataset = datasetCode;
+
+  // Update button active styles
+  const btnV1 = document.getElementById('btn-official-dataset-v1');
+  const btnV2 = document.getElementById('btn-official-dataset-v2');
+  const btnBoth = document.getElementById('btn-official-dataset-both');
+
+  if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+
+  const pool = window.getPracticeQuestionPool(currentOfficialDataset);
+  const badgeEl = document.getElementById('official-pool-badge');
+  if (badgeEl) {
+    badgeEl.textContent = `${pool.length.toLocaleString()} câu`;
+  }
+
+  const startBtn = document.getElementById('btn-start-official-mock');
+  if (startBtn) {
+    const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+    const tag = datasetCode === 'V1' ? 'Bộ 1' : (datasetCode === 'V2' ? 'Bộ 2' : 'Kết Hợp');
+    startBtn.innerHTML = curLang === 'EN'
+      ? `🏆 START 60Q MOCK EXAM (${tag} - 120 MINS) →`
+      : `🏆 BẮT ĐẦU THI THẬT 60 CÂU (${tag} - 120 PHÚT) →`;
+  }
+
+  if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+    const names = {
+      'V1': 'Bộ 1: Nền Tảng (644 câu)',
+      'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
+      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)'
+    };
+    AppStore.showToast(`🏆 Nguồn thi thật: ${names[datasetCode]}`);
   }
 };
 
@@ -465,7 +531,7 @@ window.startCustomPracticeExam = function(isInstant = false) {
   isMockSubmitted = false;
   revealedQuestions.clear();
   mockExamAnswers = {};
-  mockExamFlags.clear();
+  mockExamFlags = {};
   currentExamIndex = 0;
   updateHeaderBarState();
 
@@ -481,9 +547,11 @@ window.startCustomPracticeExam = function(isInstant = false) {
 };
 
 window.startOfficialMockExam = function() {
-  const officialPool = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_MERGED) || (typeof MOCK_EXAM_POOL_MERGED !== 'undefined' ? MOCK_EXAM_POOL_MERGED : null) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []);
+  const officialPool = window.getPracticeQuestionPool(currentOfficialDataset);
   if (!officialPool || officialPool.length === 0) {
-    AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
+    if (typeof AppStore !== 'undefined' && AppStore.showToast) {
+      AppStore.showToast("⚠️ Chưa tải được bộ đề thi mô phỏng!");
+    }
     return;
   }
 
@@ -491,10 +559,10 @@ window.startOfficialMockExam = function() {
   isInstantFeedbackMode = false;
   revealedQuestions.clear();
   mockExamAnswers = {};
-  mockExamFlags.clear();
+  mockExamFlags = {};
   mockSecondsRemaining = 120 * 60;
   currentExamIndex = 0;
-  currentMockExamLabel = 'OFFICIAL_MOCK_60Q';
+  currentMockExamLabel = `OFFICIAL_MOCK_60Q_${currentOfficialDataset}`;
   updateHeaderBarState();
 
   // Draw 60 UNIQUE questions matching official domain weight distribution (D1: 16Q, D2: 11Q, D3: 12Q, D4: 12Q, D5: 9Q)
@@ -594,12 +662,12 @@ function renderQuestionGrid() {
   if (legendEl) {
     if (isMockSubmitted) {
       legendEl.innerHTML = curLang === 'EN' 
-        ? '🔵 Active | 🟢 Correct | 🔴 Incorrect | ⚪ Unanswered | 🚩 Flagged'
-        : '🔵 Đang xem | 🟢 Câu Đúng | 🔴 Câu Sai | ⚪ Chưa Làm | 🚩 Cắm Cờ';
+        ? '🔵 Active | 🟢 Correct | 🔴 Incorrect | ⚪ Skipped | 🟢 Sure | 🟡 Unsure | 🟣 Guess'
+        : '🔵 Đang xem | 🟢 Câu đúng | 🔴 Câu sai | ⚪ Chưa làm | 🟢 Chắc đúng | 🟡 Phân vân | 🟣 Chọn đại';
     } else {
       legendEl.innerHTML = curLang === 'EN'
-        ? '🔵 Active | 🟢 Answered | 🟡 Flagged | ⚪ Unanswered'
-        : '🔵 Đang xem | 🟢 Đã làm | 🟡 Cắm cờ | ⚪ Chưa làm';
+        ? '🔵 Active | 🟢 Answered | ⚪ Unanswered | 🟢 Sure | 🟡 Unsure | 🟣 Guess'
+        : '🔵 Đang xem | 🟢 Đã làm | ⚪ Chưa làm | 🟢 Chắc đúng | 🟡 Phân vân | 🟣 Chọn đại';
     }
   }
 
@@ -609,8 +677,11 @@ function renderQuestionGrid() {
 
   gridEl.innerHTML = mockExamQuestions.map((q, idx) => {
     const qKey = q.uniqueId || q.id;
-    const isAnswered = mockExamAnswers[qKey] !== undefined;
-    const isFlagged = mockExamFlags.has(qKey);
+    const userAnswer = mockExamAnswers[qKey];
+    const isAnswered = isMultiQuestion(q)
+      ? (Array.isArray(userAnswer) && userAnswer.length > 0)
+      : (userAnswer !== undefined && userAnswer !== null);
+    const flagType = mockExamFlags[qKey] || null;
     const isActive = idx === currentExamIndex;
     const isQuestionRevealed = isMockSubmitted || (isInstantFeedbackMode && revealedQuestions.has(qKey));
 
@@ -618,45 +689,57 @@ function renderQuestionGrid() {
     if (isActive) btnClass += ' active-nav';
 
     if (isQuestionRevealed) {
-      const userAnswer = mockExamAnswers[qKey];
-      if (userAnswer === q.correct) {
+      if (isAnswerCorrect(q, userAnswer)) {
         btnClass += ' correct-nav';
         correctCount++;
-      } else if (userAnswer !== undefined) {
+      } else if (isAnswered) {
         btnClass += ' wrong-nav';
         wrongCount++;
       } else {
         btnClass += ' unanswered-submitted-nav';
         unansweredCount++;
       }
-      if (isFlagged) btnClass += ' flagged-nav-review';
     } else {
-      if (isFlagged) btnClass += ' flagged-nav';
       if (isAnswered) btnClass += ' answered-nav';
     }
 
-    const flagBadgeHtml = isFlagged ? '<span class="grid-nav-flag-badge">🚩</span>' : '';
+    let flagBadgeHtml = '';
+    let flagTitle = '';
+    if (flagType === 'SURE') {
+      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-sure">🟢</span>';
+      flagTitle = ' [🟢 Chắc chắn đúng]';
+    } else if (flagType === 'UNSURE') {
+      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-unsure">🟡</span>';
+      flagTitle = ' [🟡 Còn phân vân]';
+    } else if (flagType === 'GUESS') {
+      flagBadgeHtml = '<span class="grid-nav-flag-badge flag-guess">🟣</span>';
+      flagTitle = ' [🟣 Chọn đại]';
+    }
 
     return `
-      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})${isFlagged ? ' [🚩 Flagged]' : ''}">
+      <button type="button" class="${btnClass}" onclick="window.jumpToQuestion(${idx})" title="Câu ${idx + 1} (${q.domain})${flagTitle}">
         ${flagBadgeHtml}
         ${idx + 1}
       </button>
     `;
   }).join('');
 
-  const answeredCount = Object.keys(mockExamAnswers).length;
-  const flaggedCount = mockExamFlags.size;
+  const answeredCount = mockExamQuestions.filter(q => {
+    const k = q.uniqueId || q.id;
+    const ans = mockExamAnswers[k];
+    return isMultiQuestion(q) ? (Array.isArray(ans) && ans.length > 0) : (ans !== undefined && ans !== null);
+  }).length;
+  const flaggedCount = Object.keys(mockExamFlags).length;
   const statsEl = document.getElementById('grid-stats-text');
   if (statsEl) {
     if (isMockSubmitted || isInstantFeedbackMode) {
       statsEl.textContent = curLang === 'EN' 
         ? `Correct: ${correctCount}/${mockExamQuestions.length} | Incorrect: ${wrongCount} | Skipped: ${unansweredCount} | Flagged: ${flaggedCount}`
-        : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | Cắm cờ: ${flaggedCount}`;
+        : `Đúng: ${correctCount}/${mockExamQuestions.length} | Sai: ${wrongCount} | Chưa làm: ${unansweredCount} | Gắn cờ: ${flaggedCount}`;
     } else {
       statsEl.textContent = curLang === 'EN' 
         ? `Answered: ${answeredCount}/${mockExamQuestions.length} | Flagged: ${flaggedCount}`
-        : `Đã làm: ${answeredCount}/${mockExamQuestions.length} | Cắm cờ: ${flaggedCount}`;
+        : `Đã làm: ${answeredCount}/${mockExamQuestions.length} | Gắn cờ: ${flaggedCount}`;
     }
   }
 }
@@ -685,38 +768,81 @@ function renderCurrentQuestion() {
   const optsText = (currentLang === 'EN' && q.optionsEN) ? q.optionsEN : q.options;
 
   const isSelected = mockExamAnswers[qKey];
-  const isFlagged = mockExamFlags.has(qKey);
+  const currentFlag = mockExamFlags[qKey] || null;
+  const isMulti = isMultiQuestion(q);
 
-  const taskTag = q.taskStatement ? `<span class="badge badge-d3" style="font-family: monospace; font-size: 0.78rem;">📌 ${q.taskStatement}</span>` : '';
-  const diffTag = q.difficulty ? `<span class="badge badge-d2" style="font-size: 0.75rem; text-transform: uppercase;">⚡ ${q.difficulty}</span>` : '';
+  const multiBadge = isMulti
+    ? `<span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); font-weight: 700; font-size: 0.78rem;">🎯 ${currentLang === 'EN' ? `Select ${q.correct.length} options` : `Chọn ${q.correct.length} đáp án`}</span>`
+    : '';
 
   const isQuestionRevealed = isMockSubmitted || (isInstantFeedbackMode && revealedQuestions.has(qKey));
 
+  const multiNotice = isMulti
+    ? `<div style="font-size: 0.88rem; color: var(--accent-purple); margin-bottom: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.75rem; background: rgba(139, 92, 246, 0.08); border-radius: 8px; border-left: 3px solid var(--accent-purple);">
+        <span>ℹ️</span>
+        <span>${currentLang === 'EN' ? `This question requires selecting exactly ${q.correct.length} options.` : `Câu hỏi này yêu cầu chọn đúng ${q.correct.length} đáp án.`}</span>
+      </div>`
+    : '';
+
+  const selectedList = isMulti ? (Array.isArray(isSelected) ? isSelected : []) : [];
+  const selectedCount = selectedList.length;
+  const targetCount = isMulti ? q.correct.length : 1;
+  const isReadyToConfirm = selectedCount > 0;
+
+  const confirmBtnHtml = (isMulti && isInstantFeedbackMode && !isQuestionRevealed) ? `
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+      <button type="button" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 0.5rem; ${isReadyToConfirm ? '' : 'opacity: 0.6;'}" onclick="window.confirmMultiInstant('${qKey}')" ${isReadyToConfirm ? '' : 'disabled'}>
+        <span>✓</span>
+        <span>${currentLang === 'EN' ? `Confirm Answer (${selectedCount}/${targetCount})` : `Xác Nhận Đáp Án (${selectedCount}/${targetCount})`}</span>
+      </button>
+    </div>
+  ` : '';
+
+  const allCorrect = isAnswerCorrect(q, isSelected);
+
   qContainer.innerHTML = `
     <div class="card" style="padding: 2rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="badge badge-${q.domain.toLowerCase()}">${currentLang === 'EN' ? `Question ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}` : `Câu ${currentExamIndex + 1} / ${mockExamQuestions.length} • ${q.domain}`}</span>
+          <span class="badge badge-purple" style="font-size: 0.85rem; font-weight: 700; padding: 0.35rem 0.75rem;">${currentLang === 'EN' ? `Question ${currentExamIndex + 1} / ${mockExamQuestions.length}` : `Câu ${currentExamIndex + 1} / ${mockExamQuestions.length}`}</span>
           ${isInstantFeedbackMode ? '<span class="badge badge-d2" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); font-size: 0.75rem;">⚡ Instant Feedback</span>' : ''}
-          ${taskTag}
-          ${diffTag}
+          ${multiBadge}
         </div>
         
-        <button type="button" class="btn btn-secondary" style="font-size: 0.82rem; ${isFlagged ? 'background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber); color: var(--accent-amber);' : ''}" onclick="window.toggleFlagCurrentQuestion()">
-          ${isFlagged ? (currentLang === 'EN' ? '🚩 Flagged / Skip' : '🚩 Đã Cắm Cờ Bỏ Qua') : (currentLang === 'EN' ? '🏁 Flag for Review' : '🏁 Cắm Cờ Xem Lại (Flag)')}
-        </button>
+        <div class="flag-btn-group">
+          <button type="button" class="flag-choice-btn ${currentFlag === 'SURE' ? 'active-sure' : ''}" onclick="window.setQuestionConfidenceFlag('SURE')" title="${currentLang === 'EN' ? 'Sure / High Confidence' : 'Chắc chắn đúng'}">
+            <span>🟢</span>
+            <span>${currentLang === 'EN' ? 'Sure' : 'Chắc đúng'}</span>
+          </button>
+          <button type="button" class="flag-choice-btn ${currentFlag === 'UNSURE' ? 'active-unsure' : ''}" onclick="window.setQuestionConfidenceFlag('UNSURE')" title="${currentLang === 'EN' ? 'Unsure / Doubt' : 'Còn phân vân'}">
+            <span>🟡</span>
+            <span>${currentLang === 'EN' ? 'Unsure' : 'Phân vân'}</span>
+          </button>
+          <button type="button" class="flag-choice-btn ${currentFlag === 'GUESS' ? 'active-guess' : ''}" onclick="window.setQuestionConfidenceFlag('GUESS')" title="${currentLang === 'EN' ? 'Wild Guess' : 'Chọn đại'}">
+            <span>🟣</span>
+            <span>${currentLang === 'EN' ? 'Guess' : 'Chọn đại'}</span>
+          </button>
+        </div>
       </div>
 
       <h2 style="font-size: 1.15rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-primary);">${qText}</h2>
 
-      <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2rem;">
+      ${multiNotice}
+
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: ${isMulti && isInstantFeedbackMode && !isQuestionRevealed ? '1rem' : '2rem'};">
         ${optsText.map((opt, oIdx) => {
           let optClass = 'quiz-option';
-          if (isSelected === oIdx) optClass += ' selected';
+          const isOptSelected = isMulti 
+            ? (Array.isArray(isSelected) && isSelected.includes(oIdx))
+            : (isSelected === oIdx);
+
+          if (isOptSelected) optClass += ' selected';
+
+          const isOptCorrect = Array.isArray(q.correct) ? q.correct.includes(oIdx) : (oIdx === q.correct);
 
           if (isQuestionRevealed) {
-            if (oIdx === q.correct) optClass += ' correct-option';
-            else if (isSelected === oIdx && isSelected !== q.correct) optClass += ' wrong-option';
+            if (isOptCorrect) optClass += ' correct-option';
+            else if (isOptSelected) optClass += ' wrong-option';
           }
 
           let cardBg = 'var(--bg-tertiary)';
@@ -724,39 +850,44 @@ function renderCurrentQuestion() {
           let cardShadow = '0 2px 4px rgba(0,0,0,0.1)';
           let cardColor = 'var(--text-primary)';
 
-          if (isSelected === oIdx) {
+          if (isOptSelected) {
             cardBg = 'rgba(139, 92, 246, 0.18)';
             cardBorder = '2px solid var(--accent-purple)';
             cardShadow = '0 0 14px rgba(139, 92, 246, 0.35)';
           }
 
           if (isQuestionRevealed) {
-            if (oIdx === q.correct) {
+            if (isOptCorrect) {
               cardBg = 'rgba(16, 185, 129, 0.18)';
               cardBorder = '2px solid var(--accent-emerald)';
               cardColor = 'var(--accent-emerald)';
-            } else if (isSelected === oIdx && isSelected !== q.correct) {
+            } else if (isOptSelected) {
               cardBg = 'rgba(244, 63, 94, 0.18)';
               cardBorder = '2px solid var(--accent-rose)';
               cardColor = 'var(--accent-rose)';
             }
           }
 
+          const inputType = isMulti ? 'checkbox' : 'radio';
           const cardStyle = `display: flex !important; align-items: center !important; gap: 0.85rem !important; background: ${cardBg} !important; border: ${cardBorder} !important; padding: 1rem 1.25rem !important; border-radius: 12px !important; cursor: pointer !important; font-size: 0.95rem !important; color: ${cardColor} !important; margin-bottom: 0.75rem !important; box-shadow: ${cardShadow} !important; transition: all 0.2s ease !important;`;
 
           return `
             <label class="${optClass}" style="${cardStyle}" onclick="window.selectOption('${qKey}', ${oIdx})">
-              <input type="radio" name="mock_q_${qKey}" ${isSelected === oIdx ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
+              <input type="${inputType}" name="mock_q_${qKey}" ${isOptSelected ? 'checked' : ''} style="transform: scale(1.25); cursor: pointer; accent-color: var(--accent-purple); margin-right: 0.5rem; pointer-events: none;">
               <span>${opt}</span>
             </label>
           `;
         }).join('')}
       </div>
 
+      ${confirmBtnHtml}
+
       ${isQuestionRevealed ? `
-        <div class="callout ${isSelected === q.correct ? '' : 'callout-warning'}" style="margin-top: 1.5rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem;">
-          <div class="callout-title" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; color: ${isSelected === q.correct ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
-            ${isSelected === q.correct ? (currentLang === 'EN' ? '✅ CORRECT ANSWER (+10 XP)' : '✅ ĐÁP ÁN CHÍNH XÁC (+10 XP)') : (currentLang === 'EN' ? '❌ INCORRECT (+2 XP)' : '❌ CHƯA CHÍNH XÁC (+2 XP)')}
+        <div class="callout ${allCorrect ? '' : 'callout-warning'}" style="margin-top: 1.5rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem;">
+          <div class="callout-title" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; color: ${allCorrect ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
+            ${allCorrect
+              ? (currentLang === 'EN' ? '✅ CORRECT ANSWER (+10 XP)' : '✅ ĐÁP ÁN CHÍNH XÁC (+10 XP)')
+              : (currentLang === 'EN' ? '❌ INCORRECT (+2 XP)' : '❌ CHƯA CHÍNH XÁC (+2 XP)')}
           </div>
 
           ${q.rationale ? `
@@ -766,6 +897,15 @@ function renderCurrentQuestion() {
           ` : ''}
 
           <div style="font-size: 0.92rem; line-height: 1.6; white-space: pre-line; margin-bottom: 1rem;">${q.explanation}</div>
+
+          ${(q.optionExplanations && q.optionExplanations.length > 0) ? `
+            <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(0, 0, 0, 0.15); border-radius: 8px; font-size: 0.88rem;">
+              <strong style="display: block; margin-bottom: 0.5rem; color: var(--text-primary);">📋 ${currentLang === 'EN' ? 'Option-by-Option Breakdown:' : 'Phân tích chi tiết từng phương án:'}</strong>
+              <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                ${q.optionExplanations.map(exp => `<div>${exp}</div>`).join('')}
+              </div>
+            </div>
+          ` : ''}
 
           ${(q.sources && q.sources.length > 0) ? `
             <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
@@ -797,24 +937,43 @@ function renderCurrentQuestion() {
 
 window.selectOption = function(qId, oIdx) {
   if (isMockSubmitted) return;
-  
-  const isFirstTimeReveal = isInstantFeedbackMode && !revealedQuestions.has(qId);
-  mockExamAnswers[qId] = oIdx;
+  const q = mockExamQuestions.find(item => (item.uniqueId || item.id) === qId);
+  if (!q) return;
 
-  if (isInstantFeedbackMode) {
-    revealedQuestions.add(qId);
-    const q = mockExamQuestions.find(item => (item.uniqueId || item.id) === qId);
+  const isMulti = isMultiQuestion(q);
 
-    if (q && isFirstTimeReveal) {
-      if (oIdx === q.correct) {
-        if (typeof AppStore !== 'undefined') {
-          AppStore.addXP(10);
-          AppStore.showToast("✅ Chính xác! +10 XP");
-        }
-      } else {
-        if (typeof AppStore !== 'undefined') {
-          AppStore.addXP(2);
-          AppStore.showToast("❌ Chưa chính xác! +2 XP thử sức");
+  if (isMulti) {
+    if (isInstantFeedbackMode && revealedQuestions.has(qId)) return;
+    let cur = mockExamAnswers[qId];
+    if (!Array.isArray(cur)) cur = [];
+    if (cur.includes(oIdx)) {
+      cur = cur.filter(x => x !== oIdx);
+    } else {
+      cur = [...cur, oIdx].sort((a, b) => a - b);
+    }
+    if (cur.length === 0) {
+      delete mockExamAnswers[qId];
+    } else {
+      mockExamAnswers[qId] = cur;
+    }
+  } else {
+    const isFirstTimeReveal = isInstantFeedbackMode && !revealedQuestions.has(qId);
+    mockExamAnswers[qId] = oIdx;
+
+    if (isInstantFeedbackMode) {
+      revealedQuestions.add(qId);
+
+      if (q && isFirstTimeReveal) {
+        if (isAnswerCorrect(q, oIdx)) {
+          if (typeof AppStore !== 'undefined') {
+            AppStore.addXP(10);
+            AppStore.showToast("✅ Chính xác! +10 XP");
+          }
+        } else {
+          if (typeof AppStore !== 'undefined') {
+            AppStore.addXP(2);
+            AppStore.showToast("❌ Chưa chính xác! +2 XP thử sức");
+          }
         }
       }
     }
@@ -825,19 +984,54 @@ window.selectOption = function(qId, oIdx) {
   window.saveActiveExamSession();
 };
 
-window.toggleFlagCurrentQuestion = function() {
+window.confirmMultiInstant = function(qId) {
+  if (isMockSubmitted || !isInstantFeedbackMode || revealedQuestions.has(qId)) return;
+  const q = mockExamQuestions.find(item => (item.uniqueId || item.id) === qId);
+  if (!q) return;
+
+  const curAns = mockExamAnswers[qId] || [];
+  if (curAns.length === 0) {
+    if (typeof AppStore !== 'undefined') {
+      const curLang = AppStore.getLang();
+      AppStore.showToast(curLang === 'EN' ? "⚠️ Please select at least one option!" : "⚠️ Vui lòng chọn ít nhất một đáp án!");
+    }
+    return;
+  }
+
+  revealedQuestions.add(qId);
+  const isCorrect = isAnswerCorrect(q, curAns);
+  if (typeof AppStore !== 'undefined') {
+    if (isCorrect) {
+      AppStore.addXP(10);
+      AppStore.showToast("✅ Chính xác toàn bộ! +10 XP");
+    } else {
+      AppStore.addXP(2);
+      AppStore.showToast("❌ Chưa chính xác! +2 XP thử sức");
+    }
+  }
+
+  renderQuestionGrid();
+  renderCurrentQuestion();
+  window.saveActiveExamSession();
+};
+
+window.setQuestionConfidenceFlag = function(flagType) {
   const q = mockExamQuestions[currentExamIndex];
   if (!q) return;
 
   const qKey = q.uniqueId || q.id;
-  if (mockExamFlags.has(qKey)) {
-    mockExamFlags.delete(qKey);
+  if (mockExamFlags[qKey] === flagType) {
+    delete mockExamFlags[qKey]; // Toggle off if already selected
   } else {
-    mockExamFlags.add(qKey);
+    mockExamFlags[qKey] = flagType;
   }
   renderQuestionGrid();
   renderCurrentQuestion();
   window.saveActiveExamSession();
+};
+
+window.toggleFlagCurrentQuestion = function() {
+  window.setQuestionConfidenceFlag('UNSURE');
 };
 
 function updateHeaderBarState() {
@@ -914,7 +1108,7 @@ window.cancelMockExam = function() {
   const wasSubmitted = isMockSubmitted;
   isMockSubmitted = false;
   mockExamAnswers = {};
-  mockExamFlags.clear();
+  mockExamFlags = {};
   mockExamQuestions = [];
   currentExamIndex = 0;
   updateHeaderBarState();
@@ -947,19 +1141,12 @@ window.submitMockExam = function() {
   const domainScores = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
   const domainTotals = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0 };
 
-  const subtopicStats = {}; // ts -> { total: 0, correct: 0 }
-
   mockExamQuestions.forEach(q => {
     domainTotals[q.domain] = (domainTotals[q.domain] || 0) + 1;
-    const ts = q.taskStatement || 'General';
-    if (!subtopicStats[ts]) subtopicStats[ts] = { total: 0, correct: 0 };
-    subtopicStats[ts].total++;
-
     const qKey = q.uniqueId || q.id;
-    if (mockExamAnswers[qKey] === q.correct) {
+    if (isAnswerCorrect(q, mockExamAnswers[qKey])) {
       totalScore++;
       domainScores[q.domain] = (domainScores[q.domain] || 0) + 1;
-      subtopicStats[ts].correct++;
     }
   });
 
@@ -998,7 +1185,7 @@ window.submitMockExam = function() {
 
     refreshReportModalState(totalScore, isPassed);
 
-    // Render Domain Scores Breakdown
+    // Render Domain Scores Breakdown (only keep domain scores: D: X/Y câu)
     const breakContainer = document.getElementById('mock-domain-breakdown');
     if (breakContainer) {
       breakContainer.innerHTML = Object.keys(domainTotals).map(dom => {
@@ -1006,30 +1193,52 @@ window.submitMockExam = function() {
         const dTot = domainTotals[dom] || 0;
         const dPct = dTot > 0 ? Math.round((dScore / dTot) * 100) : 0;
         return `
-          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.4rem;">
-            <span>${dom}: ${dScore}/${dTot}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <span><strong style="color: var(--text-primary);">${dom}:</strong> ${dScore}/${dTot} câu</span>
             <strong style="color: ${dPct >= 72 ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">${dPct}%</strong>
           </div>
         `;
       }).join('');
     }
 
-    // Render Subtopic Weakness Breakdown Report
-    const subtopicContainer = document.getElementById('mock-subtopic-breakdown');
-    if (subtopicContainer) {
-      const sortedSubtopics = Object.keys(subtopicStats).map(ts => {
-        const item = subtopicStats[ts];
-        const pct = Math.round((item.correct / item.total) * 100);
-        return { ts, correct: item.correct, total: item.total, pct };
-      }).sort((a, b) => a.pct - b.pct);
+    // Render Confidence Flag Breakdown Report
+    const flagContainer = document.getElementById('mock-flag-breakdown');
+    if (flagContainer) {
+      const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
+      const flagStats = {
+        SURE: { total: 0, correct: 0, label: curLang === 'EN' ? 'Sure / High Confidence' : 'Chắc chắn đúng', icon: '🟢', color: '#10b981' },
+        UNSURE: { total: 0, correct: 0, label: curLang === 'EN' ? 'Unsure / Doubt' : 'Còn phân vân', icon: '🟡', color: '#f59e0b' },
+        GUESS: { total: 0, correct: 0, label: curLang === 'EN' ? 'Wild Guess' : 'Chọn đại', icon: '🟣', color: '#a855f7' },
+        NONE: { total: 0, correct: 0, label: curLang === 'EN' ? 'No Flag' : 'Không cắm cờ', icon: '⚪', color: 'var(--text-muted)' }
+      };
 
-      subtopicContainer.innerHTML = sortedSubtopics.map(item => {
-        const color = item.pct >= 75 ? 'var(--accent-emerald)' : item.pct >= 50 ? 'var(--accent-amber)' : 'var(--accent-rose)';
-        const icon = item.pct >= 75 ? '✅' : item.pct >= 50 ? '⚠️' : '❌';
+      mockExamQuestions.forEach(q => {
+        const qKey = q.uniqueId || q.id;
+        const f = mockExamFlags[qKey] || 'NONE';
+        if (flagStats[f]) {
+          flagStats[f].total++;
+          if (isAnswerCorrect(q, mockExamAnswers[qKey])) {
+            flagStats[f].correct++;
+          }
+        }
+      });
+
+      const displayKeys = ['SURE', 'UNSURE', 'GUESS'];
+      if (flagStats.NONE.total > 0) displayKeys.push('NONE');
+
+      flagContainer.innerHTML = displayKeys.map(k => {
+        const item = flagStats[k];
+        const pct = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
         return `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <span>${icon} <code style="color: var(--text-primary); font-size: 0.78rem;">${item.ts}</code></span>
-            <strong style="color: ${color};">${item.correct}/${item.total} (${item.pct}%)</strong>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid rgba(139, 92, 246, 0.15);">
+            <span style="display: flex; align-items: center; gap: 0.45rem;">
+              <span>${item.icon}</span>
+              <span style="color: var(--text-primary); font-weight: 600;">${item.label}:</span>
+            </span>
+            <span>
+              <strong style="color: ${item.color}; font-size: 0.95rem;">${item.correct}/${item.total} câu</strong>
+              ${item.total > 0 ? `<span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 0.4rem;">(${pct}%)</span>` : ''}
+            </span>
           </div>
         `;
       }).join('');
@@ -1105,7 +1314,7 @@ window.viewMockHistoryDetail = function(historyId) {
 
   mockExamQuestions = item.questions;
   mockExamAnswers = item.userAnswers || {};
-  mockExamFlags.clear();
+  mockExamFlags = {};
   currentExamIndex = 0;
   isMockSubmitted = true;
   currentMockExamLabel = item.domains;
@@ -1146,7 +1355,7 @@ window.addEventListener('ccaf_lang_changed', () => {
       let totalScore = 0;
       mockExamQuestions.forEach(q => {
         const qKey = q.uniqueId || q.id;
-        if (mockExamAnswers[qKey] === q.correct) totalScore++;
+        if (isAnswerCorrect(q, mockExamAnswers[qKey])) totalScore++;
       });
       const pct = mockExamQuestions.length > 0 ? Math.round((totalScore / mockExamQuestions.length) * 100) : 0;
       refreshReportModalState(totalScore, pct >= 72);
@@ -1209,7 +1418,7 @@ window.startTopicSpecificPracticeExam = function(topics = ['3.2', '3.3', '3.5', 
   isMockSubmitted = false;
   revealedQuestions.clear();
   mockExamAnswers = {};
-  mockExamFlags.clear();
+  mockExamFlags = {};
   currentExamIndex = 0;
   updateHeaderBarState();
 
@@ -1263,6 +1472,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.updateDomainCheckboxLabels();
   window.renderPracticeTermsGrid();
+  window.switchOfficialDataset(currentOfficialDataset);
   window.renderMockHistoryTable();
 });
 

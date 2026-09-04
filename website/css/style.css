@@ -1087,7 +1087,8 @@ html, body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.quiz-option input[type="radio"] {
+.quiz-option input[type="radio"],
+.quiz-option input[type="checkbox"] {
   appearance: auto !important;
   -webkit-appearance: auto !important;
   width: 20px !important;
@@ -1098,6 +1099,7 @@ html, body {
   cursor: pointer !important;
   accent-color: var(--accent-purple) !important;
   pointer-events: none !important;
+  border-radius: 4px;
 }
 
 .quiz-option:hover {
@@ -1217,6 +1219,7 @@ html, body {
    12. Mock Exam Question Navigation Grid Buttons
    ========================================================================== */
 .grid-nav-btn {
+  position: relative !important;
   width: 100%;
   aspect-ratio: 1 / 1;
   min-height: 26px;
@@ -1253,13 +1256,6 @@ html, body {
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.3) !important;
 }
 
-.grid-nav-btn.flagged-nav {
-  background: rgba(245, 158, 11, 0.25) !important;
-  border: 1px solid #f59e0b !important;
-  color: #fbbf24 !important;
-  font-weight: 700 !important;
-}
-
 .grid-nav-btn.active-nav {
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
   border: 2px solid #38bdf8 !important;
@@ -1279,19 +1275,6 @@ html, body {
   color: #ffffff !important;
   font-weight: 800 !important;
   box-shadow: 0 0 18px rgba(16, 185, 129, 0.95) !important;
-  transform: scale(1.15) !important;
-  z-index: 3 !important;
-}
-
-/* Active AND Flagged: Amber background + bright Cyan outline ring indicator */
-.grid-nav-btn.active-nav.flagged-nav {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  border: 2px solid #fde047 !important;
-  outline: 3px solid #38bdf8 !important;
-  outline-offset: 1px !important;
-  color: #ffffff !important;
-  font-weight: 800 !important;
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.95) !important;
   transform: scale(1.15) !important;
   z-index: 3 !important;
 }
@@ -1360,19 +1343,67 @@ html, body {
   z-index: 3 !important;
 }
 
-/* Flagged Badge Indicator Overlay in Review Mode */
-.grid-nav-flag-badge {
-  position: absolute !important;
-  top: -4px !important;
-  right: -4px !important;
-  font-size: 0.65rem !important;
-  line-height: 1 !important;
-  z-index: 4 !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+/* 3-Flag Confidence Button Group in Question Header */
+.flag-btn-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  flex-wrap: wrap !important;
 }
 
-.grid-nav-btn.flagged-nav-review {
-  box-shadow: 0 0 0 1.5px #f59e0b !important;
+.flag-choice-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.35rem 0.65rem !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+}
+
+.flag-choice-btn:hover {
+  background: var(--bg-card-hover) !important;
+  color: var(--text-primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+.flag-choice-btn.active-sure {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35) !important;
+}
+
+.flag-choice-btn.active-unsure {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35) !important;
+}
+
+.flag-choice-btn.active-guess {
+  background: rgba(168, 85, 247, 0.2) !important;
+  border-color: #a855f7 !important;
+  color: #c084fc !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.35) !important;
+}
+
+/* Flagged Badge Indicator Overlay on Grid Buttons */
+.grid-nav-flag-badge {
+  position: absolute !important;
+  top: -5px !important;
+  right: -5px !important;
+  font-size: 0.68rem !important;
+  line-height: 1 !important;
+  z-index: 5 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  pointer-events: none !important;
 }
 
 /* ==========================================================================

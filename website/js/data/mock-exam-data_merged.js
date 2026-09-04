@@ -3,6 +3,7 @@
  * Combined from LNQuyen + VieHub + Anthropic Official 254 Bank
  * Full 100% Bilingual (English & Senior-Engineer Vietnamese)
  * 100% Aligned Content, Zero Misalignment, Zero Stray Brackets
+ * Multi-Select Support for 10 Official Multi-Answer Questions
  * Domains: D1 (139), D2 (114), D3 (107), D4 (94), D5 (79)
  */
 
@@ -3705,23 +3706,30 @@ function generateMockQuestionsPoolMerged() {
       "A. Sharing its full conversation history with each subagent automatically at spawn time.",
       "B. Deciding which subagents to invoke based on the complexity of each incoming query.",
       "C. Routing all inter-agent communication so subagents never exchange messages directly.",
-      "D. Running every search itself first so subagents only verify its findings.\n- **E.** Aggregating subagent results and re-delegating targeted follow-up queries when synthesis shows gaps."
+      "D. Running every search itself first so subagents only verify its findings.",
+      "E. Aggregating subagent results and re-delegating targeted follow-up queries when synthesis shows gaps."
     ],
     "options": [
-      "A. Quyết định những subagent nào cần kích hoạt dựa trên độ phức tạp của mỗi truy vấn đầu vào.",
-      "B. Định tuyến toàn bộ giao tiếp liên agent để các subagent không bao giờ trao đổi tin nhắn trực tiếp với nhau.",
-      "C. Tự mình thực hiện toàn bộ việc tìm kiếm trước để các subagent chỉ cần xác minh lại phát hiện của nó.",
-      "D. Tổng hợp kết quả từ các subagent và tái ủy quyền các truy vấn theo dõi có mục tiêu khi bản tổng hợp bộc lộ lỗ hổng thông tin."
+      "A. Tự động chia sẻ toàn bộ lịch sử hội thoại của nó với từng subagent khi khởi tạo.",
+      "B. Quyết định những subagent nào cần kích hoạt dựa trên độ phức tạp của mỗi truy vấn đầu vào.",
+      "C. Định tuyến toàn bộ giao tiếp liên agent để các subagent không bao giờ trao đổi tin nhắn trực tiếp với nhau.",
+      "D. Tự mình thực hiện toàn bộ việc tìm kiếm trước để các subagent chỉ cần xác minh lại phát hiện của nó.",
+      "E. Tổng hợp kết quả từ các subagent và tái ủy quyền các truy vấn theo dõi có mục tiêu khi bản tổng hợp bộc lộ lỗ hổng thông tin."
     ],
-    "correct": 0,
+    "correct": [
+      1,
+      2,
+      4
+    ],
     "optionExplanations": [
-      "Option A ✅ (ĐÚNG): Subagents run with isolated context; nothing is inherited automatically, and the coordinator passes only the context each task needs.",
-      "Option B ❌ (SAI): The guide places dynamic subagent selection with the coordinator, which analyses query requirements instead of always running the full pipeline.",
-      "Option C ❌ (SAI): Hub-and-spoke routes every message through the coordinator for observability and consistent error handling.",
-      "Option D ❌ (SAI): The coordinator delegates work rather than duplicating it; doing every search itself defeats the point of decomposition."
+      "Option A ❌ (SAI): Subagents run with isolated context; nothing is inherited automatically, and the coordinator passes only the context each task needs.",
+      "Option B ✅ (ĐÚNG): The guide places dynamic subagent selection with the coordinator, which analyses query requirements instead of always running the full pipeline.",
+      "Option C ✅ (ĐÚNG): Hub-and-spoke routes every message through the coordinator for observability and consistent error handling.",
+      "Option D ❌ (SAI): The coordinator delegates work rather than duplicating it; doing every search itself defeats the point of decomposition.",
+      "Option E ✅ (ĐÚNG): Synthesis and follow-up delegation are the coordinator's core loop; subagents produce findings, but the coordinator decides when the investigation is complete."
     ],
-    "rationale": "Hub-and-spoke architecture concentrates subagent selection, message routing, result aggregation, and error handling in the coordinator, while subagents work in isolated contexts on delegated tasks.",
-    "explanation": "Trong kiến trúc hub-and-spoke, coordinator tập trung việc lựa chọn subagent (A), điều phối tin nhắn trung gian (B), và tổng hợp kết quả kèm tinh chỉnh lỗ hổng thông tin (D).",
+    "rationale": "The coordinator handles routing, dynamic subagent selection, and iterative synthesis; subagents execute focused tasks within isolated contexts without directly communicating.",
+    "explanation": "Trong kiến trúc Hub-and-spoke, Coordinator chịu trách nhiệm quyết định subagent cần gọi (B), định tuyến mọi giao tiếp để kiểm soát luồng (C), và tổng hợp kết quả cũng như giao việc bổ sung khi thiếu thông tin (E). Subagent chạy độc lập trong context cô lập, không tự động kế thừa lịch sử hay giao tiếp ngang hàng.",
     "sources": [
       {
         "label": "Lesson 1.2: Multi-Agent Orchestration (Coordinator responsibilities)",
@@ -3732,7 +3740,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-2-orchestration-patterns#hub-and-spoke-architecture"
       }
     ],
-    "id": "ccaf-094"
+    "id": "ccaf-094",
+    "multiple": true
   },
   {
     "originalId": "q-1-3-001",
@@ -5276,23 +5285,26 @@ function generateMockQuestionsPoolMerged() {
       "A. The review covers the same predictable set of aspects on every run.",
       "B. The useful subtasks only become clear as intermediate findings come in.",
       "C. Each step's output feeds the next in a stable, known order.",
-      "D. The task is open-ended, like adding comprehensive tests to a legacy codebase you have not mapped yet."
+      "D. The task is open-ended, like adding comprehensive tests to a legacy codebase you have not yet explored."
     ],
     "options": [
-      "A. Quy trình rà soát bao quát cùng một tập hợp khía cạnh có thể đoán trước ở mọi lần chạy.",
-      "B. Các tác vụ con hữu ích chỉ trở nên rõ ràng khi nhận được các phát hiện trung gian.",
-      "C. Đầu ra của mỗi bước nuôi dưỡng bước tiếp theo theo một thứ tự cố định, đã biết trước.",
-      "D. Nhiệm vụ mang tính chất mở, như việc thêm bộ test toàn diện vào một codebase legacy mà bạn chưa từng lập bản đồ."
+      "A. Đợt rà soát bao quát cùng một tập hợp khía cạnh có thể dự đoán được trong mỗi lần chạy.",
+      "B. Các nhiệm vụ phụ hữu ích chỉ trở nên rõ ràng khi nhận được các phát hiện trung gian.",
+      "C. Đầu ra của mỗi bước cung cấp cho bước tiếp theo theo một thứ tự ổn định, đã biết trước.",
+      "D. Nhiệm vụ mang tính mở, chẳng hạn như thêm kiểm thử toàn diện vào một codebase cũ mà bạn chưa khám phá."
     ],
-    "correct": 3,
+    "correct": [
+      1,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): A predictable multi-aspect review is exactly where a fixed prompt-chaining pipeline fits best.",
-      "Option B ❌ (SAI): Adaptive plans generate subtasks from what each step discovers, which a fixed pipeline cannot do.",
-      "Option C ❌ (SAI): A stable, known step order is the defining property of a sequential pipeline, not of adaptive decomposition.",
-      "Option D ✅ (ĐÚNG): This is the guide's example of open-ended work: map the structure first, then build a prioritised plan that adapts as dependencies surface."
+      "Option A ❌ (SAI): Predictable, identical aspects call for a fixed parallel workflow, not dynamic decomposition.",
+      "Option B ✅ (ĐÚNG): When subsequent steps depend on what previous steps uncover, the decomposition must be dynamic and adaptive.",
+      "Option C ❌ (SAI): Stable sequential pipelines suit predictable workflows where each stage's inputs and outputs are defined in advance.",
+      "Option D ✅ (ĐÚNG): Open-ended exploration with uncertain scope requires dynamic task generation as the codebase structure is discovered."
     ],
-    "rationale": "Fixed pipelines suit predictable, repeatable workflows; dynamic decomposition suits open-ended investigation where the plan must adapt to discoveries.",
-    "explanation": "Pipeline cố định phù hợp với quy trình lặp lại ổn định; phân rã thích ứng động phù hợp với bài toán mở (D) và khi các bước đi tiếp theo phụ thuộc vào phát hiện trung gian (B).",
+    "rationale": "Dynamic decomposition is chosen when tasks cannot be planned upfront because discovery drives subsequent work (open-ended tasks and emergent subtasks).",
+    "explanation": "Phân rã động thích ứng (Dynamic adaptive decomposition) là bắt buộc khi các bước tiếp theo phụ thuộc vào phát hiện từ bước trước (B) và phạm vi công việc mang tính mở, chưa biết trước toàn bộ codebase (D). Ngược lại, quy trình có các bước cố định hoặc thứ tự ổn định thì phù hợp với pipeline tuần tự/song song tĩnh.",
     "sources": [
       {
         "label": "Lesson 1.6: Task Decomposition Strategies (Dynamic adaptive decomposition)",
@@ -5303,7 +5315,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/1-agentic-architecture/1-6-task-decomposition#pattern-1-fixed-sequential-pipelines-prompt-chaining"
       }
     ],
-    "id": "ccaf-131"
+    "id": "ccaf-131",
+    "multiple": true
   },
   {
     "originalId": "q-1-7-001",
@@ -8693,26 +8706,31 @@ function generateMockQuestionsPoolMerged() {
     "optionsEN": [
       "A. Rename tools whose names overlap so each name reflects a distinct function.",
       "B. Trim every description to one short sentence so the model relies on tool names alone.",
-      "C. Check the system prompt for keyword-sensitive instructions that create unintended associations with particular tools.",
-      "D. Rewrite each description to state the tool's purpose, inputs and outputs, and when to prefer it.",
+      "C. Check the system prompt for keyword-sensitive instructions that create unintended bias.",
+      "D. Rewrite each description to state the tool's purpose, inputs and outputs, and when not to use it.",
       "E. Merge the similar tools into one generic tool with a mode parameter."
     ],
     "options": [
-      "A. Đổi tên các công cụ có tên trùng lặp để mỗi tên phản ánh một chức năng riêng biệt rõ ràng.",
-      "B. Rút gọn mỗi mô tả thành một câu ngắn để model chỉ dựa vào tên tool.",
-      "C. Kiểm tra system prompt để loại bỏ các chỉ thị nhạy cảm với từ khóa vô tình tạo ra liên kết thiên vị với công cụ cụ thể.",
-      "D. Viết lại mô tả của từng công cụ nêu rõ mục đích, đầu vào, đầu ra và chỉ dẫn cụ thể khi nào nên ưu tiên dùng công cụ đó.",
-      "E. Gộp các công cụ tương tự thành một công cụ tổng quát có tham số mode."
+      "A. Đổi tên các công cụ có tên trùng lặp để mỗi tên phản ánh một chức năng riêng biệt.",
+      "B. Cắt giảm mọi mô tả xuống một câu ngắn để mô hình chỉ dựa vào tên công cụ.",
+      "C. Kiểm tra system prompt để tìm các chỉ dẫn nhạy cảm với từ khóa tạo ra thiên kiến không mong muốn.",
+      "D. Viết lại từng mô tả để nêu rõ mục đích của công cụ, đầu vào và đầu ra, và khi nào không nên dùng nó.",
+      "E. Hợp nhất các công cụ tương tự thành một công cụ chung với tham số chế độ (mode)."
     ],
-    "correct": 3,
+    "correct": [
+      0,
+      2,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): The guide's example renames analyze_content to extract_web_results, removing the functional overlap that caused misrouting.",
-      "Option B ❌ (SAI): Minimal descriptions cause unreliable selection among similar tools; names alone cannot carry boundary information.",
-      "Option C ❌ (SAI): System prompt wording can override well-written descriptions, so it belongs in the same review.",
-      "Option D ✅ (ĐÚNG): Descriptions are the primary signal Claude uses to choose tools; differentiating them is the first fix for misrouting."
+      "Option A ✅ (ĐÚNG): Distinct names reduce semantic confusion when tools have overlapping or similar domains.",
+      "Option B ❌ (SAI): Shortening descriptions removes vital context for tool discrimination and hurts accuracy.",
+      "Option C ✅ (ĐÚNG): System prompt phrasing can inadvertently bias Claude toward specific tool names; auditing removes unintended bias.",
+      "Option D ✅ (ĐÚNG): Explaining purpose, schema, and negative guidance ('when NOT to use') is the most effective way to eliminate tool confusion.",
+      "Option E ❌ (SAI): Mega-tools with mode parameters degrade reliability and complicate argument schemas."
     ],
-    "rationale": "Misrouting between similar tools is fixed by differentiated descriptions, distinct names, and a system prompt that does not fight the tool definitions.",
-    "explanation": "Việc phân biệt rõ ràng tên gọi (A), loại bỏ thiên kiến từ khóa trong system prompt (C) và viết mô tả sắc nét nêu rõ ranh giới sử dụng (D) là các giải pháp cốt lõi để nâng cao độ tin cậy khi chọn tool.",
+    "rationale": "Reliable tool selection requires distinct tool names, comprehensive descriptions with negative guidance (when not to use), and eliminating prompt biases.",
+    "explanation": "3 biện pháp cải thiện việc chọn tool của Claude: đổi tên công cụ rõ ràng (A), loại bỏ thiên kiến từ khóa trong prompt (C), và viết lại mô tả nêu rõ mục đích kèm hướng dẫn khi nào KHÔNG nên dùng (D). Hợp nhất thành multi-mode tool (E) là anti-pattern.",
     "sources": [
       {
         "label": "Lesson 2.1: Tool Interface Design (Misrouting)",
@@ -8727,7 +8745,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://platform.claude.com/docs/en/build-with-claude/tool-use"
       }
     ],
-    "id": "ccaf-217"
+    "id": "ccaf-217",
+    "multiple": true
   },
   {
     "originalId": "q-2-2-001",
@@ -9110,21 +9129,26 @@ function generateMockQuestionsPoolMerged() {
       "E. A plain 'no results found' message in place of the error."
     ],
     "options": [
-      "A. Không báo cáo gì: subagent nên tự động thử lại âm thầm cho đến khi thành công.",
-      "B. Kết quả một phần đã thu thập được trước khi xảy ra sự cố.",
-      "C. Loại lỗi cụ thể, chẳng hạn như tạm thời (transient), xác thực (validation), hoặc quyền truy cập (permission).",
-      "D. Thao tác đã được thực hiện, bao gồm cả câu truy vấn cụ thể đã bị lỗi.",
-      "E. Một thông điệp đơn giản 'không tìm thấy kết quả' thay cho thông báo lỗi."
+      "A. Hoàn toàn không báo cáo gì: subagent nên tự động thử lại trong im lặng cho đến khi truy vấn thành công.",
+      "B. Kết quả một phần đã thu thập được trước khi xảy ra lỗi.",
+      "C. Phân loại lỗi, chẳng hạn như tạm thời (transient), xác thực (validation), hoặc quyền truy cập (permission).",
+      "D. Những gì đã được cố gắng thực hiện, bao gồm cả câu truy vấn bị lỗi.",
+      "E. Một thông báo chung 'không tìm thấy kết quả' thay cho thông tin lỗi."
     ],
-    "correct": 3,
+    "correct": [
+      1,
+      2,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): Silent retries hide failures from the coordinator, which owns error handling and needs observability into what went wrong.",
-      "Option B ❌ (SAI): Partial results preserve completed work so the coordinator does not re-run what already succeeded.",
-      "Option C ❌ (SAI): Categorising the failure lets the coordinator make the right retry-or-reroute decision.",
-      "Option D ✅ (ĐÚNG): The attempted query gives the coordinator enough detail to retry intelligently or reformulate the request."
+      "Option A ❌ (SAI): Silent retries lead to infinite loops and hide failures from the coordinator.",
+      "Option B ✅ (ĐÚNG): Partial results preserve valuable work done before the failure, avoiding redundant calls.",
+      "Option C ✅ (ĐÚNG): Explicit failure types (transient vs permanent vs permission) allow the coordinator to decide whether to retry or escalate.",
+      "Option D ✅ (ĐÚNG): Logging what was attempted and the exact query provides actionable context for error remediation.",
+      "Option E ❌ (SAI): Masking errors as 'no results' misleads the coordinator into false negative conclusions."
     ],
-    "rationale": "Structured error context (failure type, what was attempted, partial results) lets the coordinator handle errors consistently instead of guessing, and keeps access failures distinguishable from valid empty results.",
-    "explanation": "Ngữ cảnh lỗi có cấu trúc hoàn chỉnh bao gồm loại lỗi (C), thao tác đã cố gắng thực hiện (D) và các kết quả từng phần đã thu thập được (B) để coordinator có đủ dữ kiện đưa ra quyết định xử lý tiếp theo.",
+    "rationale": "Structured error handling in multi-agent systems requires preserving partial results, classifying the failure type, and reporting what was attempted.",
+    "explanation": "Ngữ cảnh lỗi có cấu trúc phải gồm: kết quả một phần đã có (B) để không lãng phí, loại lỗi (C) để biết có nên thử lại hay không, và câu lệnh đã cố gắng thực thi (D) để coordinator điều chỉnh chiến lược.",
     "sources": [
       {
         "label": "Lesson 2.2: Structured Error Responses (Four error categories)",
@@ -9139,7 +9163,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://modelcontextprotocol.io/docs/concepts/tools"
       }
     ],
-    "id": "ccaf-227"
+    "id": "ccaf-227",
+    "multiple": true
   },
   {
     "originalId": "q-2-3-001",
@@ -13677,26 +13702,29 @@ function generateMockQuestionsPoolMerged() {
     "questionEN": "Test-file conventions must apply to *.test.tsx files spread across many directories of a codebase. Why is a .claude/rules/ file with a paths glob the right mechanism? (Select 2)",
     "question": "Quy ước viết file test cần áp dụng cho các file `*.test.tsx` nằm rải rác trên nhiều thư mục của codebase. Tại sao file rule trong `.claude/rules/` với mẫu glob lại là cơ chế tối ưu? (Chọn 2 đáp án đúng)",
     "optionsEN": [
-      "A. One glob such as **/*.test.tsx captures the files by type wherever they live in the tree.",
+      "A. One glob such as **/*.test.tsx captures the files by type wherever they live in the directory tree.",
       "B. The rule is appended to every session's context, so the conventions are never missed.",
-      "C. The rule loads only when Claude edits a matching file, keeping irrelevant context and token usage out of other sessions.",
+      "C. The rule loads only when Claude edits a matching file, keeping irrelevant context out of other sessions.",
       "D. A CLAUDE.md file in each directory would achieve the same effect with less duplication."
     ],
     "options": [
-      "A. Một mẫu glob như `**/*.test.tsx` bắt trọn các file theo loại bất kể chúng nằm ở nhánh nào trong cây thư mục.",
-      "B. Quy tắc này được nối vào mọi phiên làm việc nên không bao giờ bị bỏ sót.",
-      "C. Quy tắc chỉ được nạp khi Claude chỉnh sửa file khớp mẫu, giúp loại bỏ ngữ cảnh thừa và tiết kiệm token cho các phiên khác.",
-      "D. Đặt file CLAUDE.md ở từng thư mục sẽ ít trùng lặp hơn."
+      "A. Một mẫu glob như **/*.test.tsx bắt trọn các file theo loại dù chúng nằm ở bất kỳ đâu trong cây thư mục.",
+      "B. Quy tắc được nối vào ngữ cảnh của mọi phiên làm việc, nên không bao giờ bị bỏ sót quy chuẩn.",
+      "C. Quy tắc chỉ được nạp khi Claude chỉnh sửa một file khớp mẫu, giữ cho ngữ cảnh không liên quan nằm ngoài các phiên khác.",
+      "D. Một file CLAUDE.md trong mỗi thư mục sẽ đạt được hiệu quả tương tự với ít sự trùng lặp hơn."
     ],
-    "correct": 2,
+    "correct": [
+      0,
+      2
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): Glob patterns apply conventions by file type regardless of directory, which per-directory files cannot do cleanly.",
-      "Option B ❌ (SAI): Always-on loading is what path-specific rules avoid; a rule that loads everywhere is just CLAUDE.md content.",
-      "Option C ✅ (ĐÚNG): Conditional activation on path match is the core benefit of path-scoped rules.",
-      "Option D ❌ (SAI): Scattered test files would need a copy of the convention in every directory, which is exactly the duplication glob-scoped rules remove."
+      "Option A ✅ (ĐÚNG): A single glob pattern covers all matching files regardless of directory depth, avoiding repetitive rule files.",
+      "Option B ❌ (SAI): Path-specific rules are NOT always-on; always loading them causes unnecessary context bloat.",
+      "Option C ✅ (ĐÚNG): Conditional activation ensures context is only consumed when relevant files are being touched.",
+      "Option D ❌ (SAI): Placing CLAUDE.md in every folder creates severe duplication and maintenance overhead."
     ],
-    "rationale": "Path-scoped rules activate on glob match, so file-type conventions follow the files wherever they sit, without loading into unrelated sessions.",
-    "explanation": "File rule có phạm vi đường dẫn (path-scoped rules) vừa bắt trọn các file theo mẫu glob trên toàn dự án (A), vừa chỉ nạp vào context khi cần thiết giúp tiết kiệm token tối đa (C).",
+    "rationale": "Path-scoped rules with glob patterns provide wide matching across arbitrary directories while keeping context lean through conditional activation.",
+    "explanation": "File quy tắc có paths glob vừa bao quát toàn bộ file kiểm thử phân tán qua mẫu **/*.test.tsx (A), vừa chỉ nạp vào context khi chỉnh sửa đúng file đó (C), giúp tiết kiệm context window tối đa.",
     "sources": [
       {
         "label": "Lesson 3.3: Path-Specific Rules (Path-specific rules)",
@@ -13707,7 +13735,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/3-claude-code-config/3-1-claude-md-hierarchy#the-clauderules-directory"
       }
     ],
-    "id": "ccaf-339"
+    "id": "ccaf-339",
+    "multiple": true
   },
   {
     "originalId": "q-3-4-001",
@@ -14185,24 +14214,29 @@ function generateMockQuestionsPoolMerged() {
       "B. Write a test suite first, then iterate by sharing the failing tests.",
       "C. Provide two or three concrete input/output examples of the expected transformation.",
       "D. Collect every independent issue into one combined message to save round trips.",
-      "E. Use the interview pattern so Claude surfaces design considerations before implementing."
+      "E. Use the interview pattern so Claude surfaces design considerations before implementation."
     ],
     "options": [
-      "A. Viết lại hướng dẫn bằng văn xuôi dài hơn và nhiều đoạn văn chi tiết hơn.",
-      "B. Viết một bộ test suite trước, sau đó lặp lại cải tiến bằng cách chia sẻ các bài test bị fail.",
-      "C. Cung cấp 2 hoặc 3 ví dụ đầu vào/đầu ra cụ thể minh họa chính xác kết quả chuyển đổi mong muốn.",
-      "D. Gom tất cả các lỗi độc lập vào một tin nhắn duy nhất.",
-      "E. Sử dụng mẫu phỏng vấn (interview pattern) để Claude làm rõ các yếu tố thiết kế trước khi triển khai."
+      "A. Viết lại các chỉ dẫn bằng văn xuôi thành các đoạn văn dài hơn, chi tiết hơn.",
+      "B. Viết một bộ kiểm thử trước, sau đó lặp lại bằng cách chia sẻ các kiểm thử thất bại.",
+      "C. Cung cấp 2 hoặc 3 ví dụ đầu vào/đầu ra cụ thể về quá trình chuyển đổi kỳ vọng.",
+      "D. Thu thập mọi vấn đề độc lập vào một thông báo kết hợp để tiết kiệm lượt trao đổi.",
+      "E. Sử dụng mẫu phỏng vấn (interview pattern) để Claude nêu ra các cân nhắc thiết kế trước khi thực hiện."
     ],
-    "correct": 0,
+    "correct": [
+      1,
+      2,
+      4
+    ],
     "optionExplanations": [
-      "Option A ✅ (ĐÚNG): The problem is prose interpretation itself; the guide's answer is examples, not more prose.",
-      "Option B ❌ (SAI): Test-driven iteration turns each failure into precise, actionable feedback for the next pass.",
-      "Option C ❌ (SAI): Concrete examples are the guide's most effective way to communicate transformations that prose describes inconsistently.",
-      "Option D ❌ (SAI): The guide batches issues into one message only when the fixes interact; independent problems are fixed sequentially."
+      "Option A ❌ (SAI): Adding longer prose increases ambiguity and lost-in-the-middle issues instead of clarifying logic.",
+      "Option B ✅ (ĐÚNG): Test-driven iteration provides objective, machine-verifiable feedback that Claude can systematically fix.",
+      "Option C ✅ (ĐÚNG): Concrete few-shot input/output pairs eliminate ambiguity far more effectively than descriptive text.",
+      "Option D ❌ (SAI): Batching multiple unrelated issues confuses Claude's attention; issues should be tackled incrementally.",
+      "Option E ✅ (ĐÚNG): The interview pattern allows Claude to ask clarifying questions about edge cases before writing code."
     ],
-    "rationale": "When prose is interpreted inconsistently the guide reaches for concrete examples, test-driven iteration, and the interview pattern rather than longer descriptions.",
-    "explanation": "Khi hướng dẫn văn xuôi bị diễn giải mơ hồ, bộ ba giải pháp hữu hiệu nhất của Anthropic là: cung cấp ví dụ mẫu cụ thể (C), lặp lại dựa trên test suite (B), và áp dụng interview pattern để làm rõ ràng yêu cầu (E).",
+    "rationale": "When prose fails, use concrete examples, test-driven validation loops, and upfront interview patterns to clarify ambiguous edge cases.",
+    "explanation": "Bộ ba kỹ thuật tinh chỉnh hiệu quả nhất theo Anthropic: viết test suite trước để có phản hồi khách quan (B), cung cấp 2-3 ví dụ input/output mẫu (C), và dùng interview pattern để Claude hỏi làm rõ trước khi sinh mã (E).",
     "sources": [
       {
         "label": "Lesson 3.5: Iterative Refinement Techniques (Example-based communication)",
@@ -14217,7 +14251,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/3-claude-code-config/3-5-iterative-refinement#batch-vs-sequential-feedback"
       }
     ],
-    "id": "ccaf-351"
+    "id": "ccaf-351",
+    "multiple": true
   },
   {
     "originalId": "q-3-6-002",
@@ -17108,20 +17143,23 @@ function generateMockQuestionsPoolMerged() {
       "D. Create two to four targeted examples for the ambiguous cases, showing why one interpretation is chosen."
     ],
     "options": [
-      "A. Thêm ví dụ cho mọi biến thể tài liệu từng thấy trên production.",
-      "B. Dùng các ví dụ minh họa cách trích xuất chuẩn xác từ các cấu trúc tài liệu đa dạng để khắc phục tình trạng trích xuất rỗng các trường bắt buộc.",
-      "C. Thay thế các ví dụ bằng đoạn mô tả văn bản dài hơn.",
-      "D. Tạo từ 2 đến 4 ví dụ có mục tiêu cho các trường hợp mơ hồ, giải thích rõ lý do tại sao diễn giải này được chọn thay vì phương án khác."
+      "A. Thêm ví dụ cho mọi biến thể tài liệu đã thấy trong môi trường production cho đến nay.",
+      "B. Sử dụng các ví dụ thể hiện việc trích xuất chính xác từ các cấu trúc tài liệu đa dạng để sửa lỗi trích xuất rỗng hoặc null cho các trường bắt buộc.",
+      "C. Thay thế các ví dụ bằng một mô tả ngôn ngữ tự nhiên dài hơn về từng trường.",
+      "D. Tạo từ 2 đến 4 ví dụ có mục tiêu cho các trường hợp mơ hồ, giải thích lý do tại sao một cách hiểu được chọn."
     ],
-    "correct": 3,
+    "correct": [
+      1,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): Volume is not the fix; a handful of targeted examples for the ambiguity beats exhaustive coverage and its context cost.",
-      "Option B ❌ (SAI): Varied-structure examples fix empty or null extraction of fields that are present, which is the few-shot remedy for unreliable extraction; fabrication of absent data is handled by nullable schema fields instead.",
-      "Option C ❌ (SAI): Descriptions alone are what produced the inconsistency; examples communicate the expected mapping more reliably than more prose.",
-      "Option D ✅ (ĐÚNG): Targeted examples that demonstrate the reasoning are the guide's specific remedy for ambiguous cases."
+      "Option A ❌ (SAI): Adding examples for every variant causes token bloat and distribution bias; targeted examples work better.",
+      "Option B ✅ (ĐÚNG): Showing diverse document layouts teaches the model structural invariance and prevents null extractions.",
+      "Option C ❌ (SAI): Natural language descriptions cannot replace concrete structural examples when layout ambiguity exists.",
+      "Option D ✅ (ĐÚNG): A small set (2-4) of targeted edge-case examples demonstrating the reasoning clarifies ambiguous boundaries."
     ],
-    "rationale": "For ambiguous extraction cases, a small set of targeted few-shot examples that demonstrate the reasoning, plus examples across varied document structures, beats more prose or exhaustive variant coverage.",
-    "explanation": "Áp dụng ví dụ đa dạng cấu trúc (B) và tập trung từ 2-4 ví dụ vào các ca mơ hồ kèm lời giải thích (D) là các best practice hàng đầu của Few-shot Prompting.",
+    "rationale": "Effective few-shot prompting uses structurally diverse examples alongside targeted edge cases with explicit reasoning, rather than exhaustive memorization.",
+    "explanation": "Thay vì nhồi nhét mọi biến thể, hãy dùng ví dụ đa dạng cấu trúc tài liệu (B) và tập trung 2-4 ví dụ vào các ca mơ hồ có kèm lập luận tại sao lại trích xuất như vậy (D).",
     "sources": [
       {
         "label": "Lesson 4.2: Few-Shot Prompting (Few-shot construction)",
@@ -17132,7 +17170,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
       }
     ],
-    "id": "ccaf-424"
+    "id": "ccaf-424",
+    "multiple": true
   },
   {
     "originalId": "q-4-3-001",
@@ -17733,20 +17772,23 @@ function generateMockQuestionsPoolMerged() {
       "D. The information exists only in an external document that is not provided in context."
     ],
     "options": [
-      "A. Model đặt đúng giá trị nhưng nhầm trường ở lần thử gần nhất.",
-      "B. Thông tin bắt buộc cần tìm hoàn toàn không tồn tại trong tài liệu nguồn.",
-      "C. Dịch vụ xác thực bị timeout ở lần thử trước.",
-      "D. Thông tin cần thiết chỉ tồn tại trong một tài liệu bên ngoài không được cung cấp trong ngữ cảnh."
+      "A. Mô hình đã đặt một giá trị đúng vào sai trường ở lần thử cuối cùng.",
+      "B. Thông tin được yêu cầu đơn giản là không tồn tại trong tài liệu nguồn.",
+      "C. Dịch vụ xác thực đã hết thời gian chờ (timeout) ở lần thử cuối cùng.",
+      "D. Thông tin chỉ tồn tại trong một tài liệu bên ngoài không được cung cấp trong ngữ cảnh."
     ],
-    "correct": 3,
+    "correct": [
+      1,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): A value in the wrong field is a semantic validation error; retry-with-error-feedback naming the misplaced field guides the next attempt to correct it.",
-      "Option B ❌ (SAI): No amount of retrying makes missing information appear; the guide marks absent data as the boundary of retry effectiveness.",
-      "Option C ❌ (SAI): A timeout is a transient failure, which is precisely the class of error a retry is likely to resolve.",
-      "Option D ✅ (ĐÚNG): Retries cannot reach data outside the model's context; the fix is supplying the external document, not another attempt."
+      "Option A ❌ (SAI): Misplaced fields are fixable formatting errors that retry feedback with schema guidance can correct.",
+      "Option B ✅ (ĐÚNG): When data is absent from the input, retries cannot conjure it up and only cause hallucinations.",
+      "Option C ❌ (SAI): Timeouts are transient errors where another retry often succeeds.",
+      "Option D ✅ (ĐÚNG): The model cannot access data outside its context window; retrying without providing the document is futile."
     ],
-    "rationale": "Retries help when the failure is transient or correctable from feedback; they are ineffective when the required information is absent or outside the provided context.",
-    "explanation": "Thử lại chỉ có tác dụng khi lỗi mang tính tạm thời hoặc có thể sửa được từ phản hồi; thử lại hoàn toàn vô ích khi thông tin vắng mặt trong tài liệu (B) hoặc nằm ngoài ngữ cảnh được cung cấp (D).",
+    "rationale": "Retries succeed on transient failures and correctable reasoning/formatting mistakes, but fail when information is fundamentally absent from the input context.",
+    "explanation": "Thử lại vô ích khi thông tin hoàn toàn không có trong tài liệu nguồn (B) hoặc thông tin nằm ở tài liệu bên ngoài chưa được cung cấp trong ngữ cảnh (D). Trong các trường hợp này phải trả về null hoặc bổ sung ngữ cảnh.",
     "sources": [
       {
         "label": "Lesson 4.4: Validation, Retry, and Feedback Loops (Retry boundary)",
@@ -17757,7 +17799,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/4-prompt-engineering/4-4-validation-retry-loops#retry-with-error-feedback"
       }
     ],
-    "id": "ccaf-439"
+    "id": "ccaf-439",
+    "multiple": true
   },
   {
     "originalId": "q-4-4-009",
@@ -20316,15 +20359,20 @@ function generateMockQuestionsPoolMerged() {
       "D. Điểm tin cậy tự báo cáo của agent tụt xuống dưới ngưỡng.",
       "E. Agent không thể tạo ra tiến triển có ý nghĩa sau nhiều lượt trao đổi."
     ],
-    "correct": 0,
-    "optionExplanations": [
-      "Option A ✅ (ĐÚNG): Sentiment is an unreliable proxy for case complexity; the agent acknowledges frustration while offering resolution when the issue is within its capability.",
-      "Option B ❌ (SAI): Explicit requests are honoured immediately, without first attempting the investigation.",
-      "Option C ❌ (SAI): A policy gap means the agent would be improvising a rule, which is a defined escalation trigger.",
-      "Option D ❌ (SAI): Self-reported confidence scores are an unreliable proxy for actual complexity, so they make a poor escalation trigger."
+    "correct": [
+      1,
+      2,
+      4
     ],
-    "rationale": "The guide's valid triggers are explicit customer requests, policy gaps or exceptions, and inability to make meaningful progress; sentiment and self-reported confidence are named as unreliable proxies.",
-    "explanation": "Ba kích hoạt chuyển tiếp hợp lệ tiêu chuẩn theo Anthropic: khách hàng yêu cầu rõ ràng (B), chính sách im lặng/mơ hồ (C), và agent bế tắc không tạo được tiến triển (E).",
+    "optionExplanations": [
+      "Option A ❌ (SAI): Sentiment is an unreliable proxy for complexity; frustrated users can often be resolved with straightforward policy answers.",
+      "Option B ✅ (ĐÚNG): Explicit customer requests for a human must always be honored immediately without obstruction.",
+      "Option C ✅ (ĐÚNG): Policy gaps or ambiguities require human judgment so the agent does not improvise rules.",
+      "Option D ❌ (SAI): LLM self-reported confidence scores are poorly calibrated and make unreliable escalation triggers.",
+      "Option E ✅ (ĐÚNG): Inability to make meaningful progress (looping or stagnation) is an authoritative escalation trigger."
+    ],
+    "rationale": "Anthropic defines three valid escalation triggers: explicit human requests, policy ambiguity/gaps, and inability to make meaningful progress. Sentiment and self-reported confidence are unreliable proxies.",
+    "explanation": "3 điều kiện kích hoạt chuyển tiếp hợp lệ theo tài liệu Anthropic: khách hàng yêu cầu gặp người (B), chính sách công ty im lặng hoặc mơ hồ (C), và agent bế tắc không tạo được tiến triển (E). Cảm xúc tiêu cực và điểm tin cậy tự báo cáo là các chỉ số không đáng tin cậy.",
     "sources": [
       {
         "label": "Lesson 5.2: Escalation and Ambiguity (The three valid escalation triggers)",
@@ -20335,7 +20383,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/5-context-management/5-2-escalation-ambiguity#explicit-escalation-criteria-in-system-prompts"
       }
     ],
-    "id": "ccaf-503"
+    "id": "ccaf-503",
+    "multiple": true
   },
   {
     "originalId": "q-5-3-002",
@@ -21187,21 +21236,26 @@ function generateMockQuestionsPoolMerged() {
       "E. Expand the review team until every extraction can be checked by hand."
     ],
     "options": [
-      "A. Hiệu chuẩn ngưỡng tin cậy ở cấp trường (field-level confidence) đối chiếu với tập dữ liệu kiểm chứng được gắn nhãn.",
-      "B. Tin tưởng hoàn toàn vào chỉ số chính xác gộp một khi nó ổn định qua một quý.",
-      "C. Xác minh độ chính xác độc lập theo từng loại tài liệu và từng phân khúc dữ liệu, không chỉ dựa vào con số gộp trung bình.",
-      "D. Duy trì việc lấy mẫu ngẫu nhiên phân tầng đối với các trích xuất độ tin cậy cao để liên tục đo lường tỷ lệ lỗi thực tế và phát hiện các mẫu lỗi mới.",
-      "E. Tuyển thêm nhân viên duyệt để kiểm tra thủ công 100% tài liệu."
+      "A. Hiệu chuẩn các ngưỡng độ tin cậy ở cấp trường trên một tập dữ liệu kiểm chứng đã được gán nhãn.",
+      "B. Tin tưởng vào con số độ chính xác gộp một khi nó đã giữ ổn định trong một quý đầy đủ.",
+      "C. Xác minh độ chính xác riêng biệt theo từng loại tài liệu và từng phân khúc trường dữ liệu, thay vì chỉ xem xét tổng thể.",
+      "D. Duy trì việc lấy mẫu ngẫu nhiên phân tầng đối với các trích xuất có độ tin cậy cao để đánh giá tỷ lệ lỗi và phát hiện các mẫu dị thường mới.",
+      "E. Mở rộng đội ngũ đánh giá cho đến khi mọi trích xuất đều có thể được kiểm tra thủ công."
     ],
-    "correct": 3,
+    "correct": [
+      0,
+      2,
+      3
+    ],
     "optionExplanations": [
-      "Option A ❌ (SAI): Confidence scores only route review attention correctly once they are calibrated on labelled data.",
-      "Option B ❌ (SAI): Stability of the aggregate number does not reveal per-segment weaknesses, which is the risk the guide highlights.",
-      "Option C ❌ (SAI): A strong aggregate figure can mask poor performance on specific document types or fields.",
-      "Option D ✅ (ĐÚNG): Stratified sampling is the guide's mechanism for ongoing measurement after automation."
+      "Option A ✅ (ĐÚNG): Field-level calibration against ground-truth validation data ensures confidence thresholds accurately separate high-accuracy from error-prone outputs.",
+      "Option B ❌ (SAI): Aggregate metrics conceal catastrophic errors in rare document types or mission-critical fields.",
+      "Option C ✅ (ĐÚNG): Disaggregated evaluation by document category and field segment exposes blind spots before automation is enabled.",
+      "Option D ✅ (ĐÚNG): Stratified ongoing spot-checking ensures drift and novel edge cases are caught even in automated batches.",
+      "Option E ❌ (SAI): 100% manual review completely contradicts automation goals and does not scale."
     ],
-    "rationale": "Before automating high-confidence extractions the guide requires per-segment validation, calibrated field-level confidence, and stratified sampling as an ongoing error-rate check.",
-    "explanation": "Ba trụ cột bảo vệ thiết yếu trước khi tự động hóa: hiệu chuẩn điểm tin cậy trên tập kiểm chứng (A), kiểm tra phân tầng theo từng loại tài liệu (C), và duy trì lấy mẫu ngẫu nhiên kiểm toán định kỳ (D).",
+    "rationale": "Automating high-confidence extraction safely requires calibrated field-level thresholds, disaggregated segmentation checks, and ongoing stratified spot-auditing.",
+    "explanation": "3 biện pháp bảo vệ cốt lõi trước khi tự động hóa: hiệu chuẩn ngưỡng tin cậy theo từng trường trên tập kiểm chứng (A), phân tích độ chính xác theo từng loại tài liệu/phân khúc (C), và duy trì lấy mẫu phân tầng kiểm tra định kỳ (D).",
     "sources": [
       {
         "label": "Lesson 5.5: Human Review and Confidence Calibration (Aggregate metrics trap)",
@@ -21216,7 +21270,8 @@ function generateMockQuestionsPoolMerged() {
         "url": "https://claudecertificationguide.com/learn/5-context-management/5-5-human-review-calibration#field-level-confidence-calibration"
       }
     ],
-    "id": "ccaf-524"
+    "id": "ccaf-524",
+    "multiple": true
   },
   {
     "originalId": "q-5-6-001",

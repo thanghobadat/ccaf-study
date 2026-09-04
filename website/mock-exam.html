@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🏆 Đấu Trường Thi Thật & Ôn Tập Mô Phỏng CCAF — CCAF Learning Hub</title>
-  <link rel="stylesheet" href="css/style.css?v=9.0">
+  <link rel="stylesheet" href="css/style.css?v=10.0">
   <style>
     .mock-header-bar {
       position: sticky;
@@ -352,6 +352,25 @@
             Mô phỏng 100% quy trình và tâm lý phòng thi thật của Anthropic. Rút 60 câu ngẫu nhiên theo chuẩn tỷ lệ 5 Domain.
           </p>
 
+          <!-- Dataset Switcher for Official Exam (Bộ 1, Bộ 2, Kết Hợp) -->
+          <div style="margin-bottom: 1.15rem; background: var(--bg-tertiary); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.55rem; display: flex; align-items: center; justify-content: space-between;">
+              <span>📚 Chọn Nguồn Bộ Đề Thi Thật:</span>
+              <span id="official-pool-badge" class="badge badge-d4" style="font-size: 0.75rem;">533 câu</span>
+            </div>
+            <div class="dataset-switcher-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.45rem;">
+              <button type="button" id="btn-official-dataset-v1" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('V1')">
+                📘 Bộ 1: Nền Tảng (644 câu)
+              </button>
+              <button type="button" id="btn-official-dataset-v2" class="btn btn-primary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('V2')">
+                🎯 Bộ 2: Thực Chiến (533 câu)
+              </button>
+              <button type="button" id="btn-official-dataset-both" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('BOTH')">
+                ⚡ Kết Hợp (1,177 câu)
+              </button>
+            </div>
+          </div>
+
           <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem; margin-bottom: 1.5rem;">
             <div>📋 <strong>Số lượng:</strong> 60 câu hỏi tình huống</div>
             <div>⏱️ <strong>Thời gian:</strong> 120 phút đếm ngược</div>
@@ -359,7 +378,7 @@
             <div>🚩 <strong>Tính năng:</strong> Cắm cờ Flag câu khó + Bảng 60 câu</div>
           </div>
 
-          <button class="btn btn-secondary" style="width: 100%; border-color: var(--accent-amber); color: var(--accent-amber);" onclick="startOfficialMockExam()">
+          <button id="btn-start-official-mock" class="btn btn-secondary" style="width: 100%; border-color: var(--accent-amber); color: var(--accent-amber); font-weight: 700;" onclick="startOfficialMockExam()">
             🏆 BẮT ĐẦU THI THẬT 60 CÂU (120 PHÚT) →
           </button>
         </div>
@@ -450,7 +469,7 @@
           --
         </div>
 
-        <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left;">
+        <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; text-align: left;">
           <h4 style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
             🎯 Báo Cáo Chi Tiết Theo 5 Domain
           </h4>
@@ -461,9 +480,9 @@
 
         <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left;">
           <h4 style="font-size: 0.95rem; color: var(--accent-purple); margin-bottom: 0.85rem; border-bottom: 1px solid rgba(139, 92, 246, 0.2); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-            📌 Chẩn Đoán Điểm Yếu Theo Tiểu Mục (TaskStatement)
+            🚩 Báo Cáo Theo Độ Tự Tin (Confidence Flags)
           </h4>
-          <div id="mock-subtopic-breakdown" style="font-size: 0.85rem; max-height: 180px; overflow-y: auto;">
+          <div id="mock-flag-breakdown" style="font-size: 0.88rem;">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -493,6 +512,6 @@
   <script src="js/data/mock-exam-data.js?v=131.0"></script>
   <script src="js/data/mock-exam-data_merged.js?v=1.0"></script>
   <script src="js/data/knowledge-data.js"></script>
-  <script src="js/mock-exam.js?v=132.0"></script>
+  <script src="js/mock-exam.js?v=133.0"></script>
 </body>
 </html>
