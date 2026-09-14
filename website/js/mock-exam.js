@@ -198,11 +198,12 @@ window.toggleMockConcepts = function(selectState) {
 // Backward compatibility alias
 window.toggleMockTerms = window.toggleMockConcepts;
 
-let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'BOTH'
+let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'BOTH', 'HARD'
 
 window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) {
   const v1 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V1) || (typeof MOCK_EXAM_POOL_V1 !== 'undefined' ? MOCK_EXAM_POOL_V1 : []);
   const v2 = (typeof window !== 'undefined' && (window.MOCK_EXAM_POOL_MERGED || window.MOCK_EXAM_POOL_V2)) || (typeof MOCK_EXAM_POOL_MERGED !== 'undefined' ? MOCK_EXAM_POOL_MERGED : []);
+  const hard = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_HARD) || (typeof MOCK_EXAM_POOL_HARD !== 'undefined' ? MOCK_EXAM_POOL_HARD : []);
   const fallback = v2.length ? v2 : ((typeof window !== 'undefined' && window.MOCK_EXAM_QUESTION_POOL) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []));
 
   if (datasetCode === 'V1') {
@@ -210,6 +211,9 @@ window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) 
   }
   if (datasetCode === 'V2') {
     return v2.length ? v2 : fallback;
+  }
+  if (datasetCode === 'HARD') {
+    return hard.length ? hard : fallback;
   }
   if (datasetCode === 'BOTH') {
     if (v1.length && v2.length) {
@@ -251,17 +255,19 @@ window.updateDomainCheckboxLabels = function() {
 };
 
 window.switchPracticeDataset = function(datasetCode) {
-  if (!['V1', 'V2', 'BOTH'].includes(datasetCode)) datasetCode = 'V2';
+  if (!['V1', 'V2', 'BOTH', 'HARD'].includes(datasetCode)) datasetCode = 'V2';
   currentPracticeDataset = datasetCode;
 
   // Update button active styles
   const btnV1 = document.getElementById('btn-dataset-v1');
   const btnV2 = document.getElementById('btn-dataset-v2');
   const btnBoth = document.getElementById('btn-dataset-both');
+  const btnHard = document.getElementById('btn-dataset-hard');
 
   if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
   if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
   if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnHard) btnHard.className = (datasetCode === 'HARD') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
 
   // Update domain checkbox labels
   window.updateDomainCheckboxLabels();
@@ -274,26 +280,29 @@ window.switchPracticeDataset = function(datasetCode) {
     const names = {
       'V1': 'Bộ 1: Nền Tảng (644 câu)',
       'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
-      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)'
+      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)',
+      'HARD': '🔥 Bộ Đề Khó: Mức 1 & 2 (655 câu)'
     };
     AppStore.showToast(`📚 Đã chuyển nguồn sang: ${names[datasetCode]}`);
   }
 };
 
-let currentOfficialDataset = 'V2'; // 'V1', 'V2', 'BOTH'
+let currentOfficialDataset = 'V2'; // 'V1', 'V2', 'BOTH', 'HARD'
 
 window.switchOfficialDataset = function(datasetCode) {
-  if (!['V1', 'V2', 'BOTH'].includes(datasetCode)) datasetCode = 'V2';
+  if (!['V1', 'V2', 'BOTH', 'HARD'].includes(datasetCode)) datasetCode = 'V2';
   currentOfficialDataset = datasetCode;
 
   // Update button active styles
   const btnV1 = document.getElementById('btn-official-dataset-v1');
   const btnV2 = document.getElementById('btn-official-dataset-v2');
   const btnBoth = document.getElementById('btn-official-dataset-both');
+  const btnHard = document.getElementById('btn-official-dataset-hard');
 
   if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
   if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
   if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  if (btnHard) btnHard.className = (datasetCode === 'HARD') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
 
   const pool = window.getPracticeQuestionPool(currentOfficialDataset);
   const badgeEl = document.getElementById('official-pool-badge');
@@ -304,7 +313,7 @@ window.switchOfficialDataset = function(datasetCode) {
   const startBtn = document.getElementById('btn-start-official-mock');
   if (startBtn) {
     const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
-    const tag = datasetCode === 'V1' ? 'Bộ 1' : (datasetCode === 'V2' ? 'Bộ 2' : 'Kết Hợp');
+    const tag = datasetCode === 'V1' ? 'Bộ 1' : (datasetCode === 'V2' ? 'Bộ 2' : (datasetCode === 'HARD' ? 'Bộ Khó' : 'Kết Hợp'));
     startBtn.innerHTML = curLang === 'EN'
       ? `🏆 START 60Q MOCK EXAM (${tag} - 120 MINS) →`
       : `🏆 BẮT ĐẦU THI THẬT 60 CÂU (${tag} - 120 PHÚT) →`;
@@ -314,7 +323,8 @@ window.switchOfficialDataset = function(datasetCode) {
     const names = {
       'V1': 'Bộ 1: Nền Tảng (644 câu)',
       'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
-      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)'
+      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)',
+      'HARD': '🔥 Bộ Đề Khó: Mức 1 & 2 (655 câu)'
     };
     AppStore.showToast(`🏆 Nguồn thi thật: ${names[datasetCode]}`);
   }

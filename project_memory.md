@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-04 23:12 (Local Time)*  
+> *Last Updated: 2026-09-14 15:35 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -26,6 +26,8 @@
   *Master Knowledge Base: 47 Core Architectural Concepts across 5 Domains with definitions, step-by-step mechanisms, usage criteria, exam anti-patterns, distinctions, code snippets, and intuitive real-world analogies (100% coverage of 254 official questions & 644 mock questions).*
 - **Doc 6:** `d:\AI\CCAF\tài liệu\data_ccaf_master_533.json`  
   *533 Authentic Bilingual Questions Master Dataset (Anthropic Official 254 + LNQuyen 155 + VieHub 127).*
+- **Doc 7:** `d:\AI\CCAF\tài liệu\data_ccaf_hard.json`  
+  *655 Level 1 & Level 2 Hard Scenario Questions Master Dataset extracted from V1 (469Q) and V2 (186Q).*
 
 ---
 
@@ -67,6 +69,7 @@ d:\AI\CCAF/
 ├── .gitignore                       # Git ignore configuration (includes __pycache__, node_modules, scratch/)
 ├── validate_option_lengths.py       # Automated test suite for MCQ option length ranking & standard deviation
 ├── balance_all_dataset.py           # Core deterministic dataset normalization & length balancing engine
+├── build_hard_dataset.py            # Extraction engine for 655 Level 1 & 2 Hard Scenario Questions
 ├── validate_exam.py                 # Core dataset schema & domain distribution validator
 ├── tài liệu/
 │   ├── CCA_Foundations_Study_Guide.md
@@ -75,7 +78,8 @@ d:\AI\CCAF/
 │   ├── CCAF_254_Official_Mock_Exam_Bank.md
 │   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
-│   └── data_ccaf_master_533.json            # 533 Authentic Bilingual Questions Master Dataset
+│   ├── data_ccaf_master_533.json            # 533 Authentic Bilingual Questions Master Dataset
+│   └── data_ccaf_hard.json                  # 655 Level 1 & 2 Hard Scenario Questions Dataset
 └── website/                         # Web Application Root (Python HTTP server on 8899)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
@@ -83,7 +87,7 @@ d:\AI\CCAF/
     ├── learn.html                   # 13 Unabridged Theory Chapters with Collapsible Part 2 Accordions & Part 3 Summary Modal
     ├── principles.html              # 67 Core Architectural Principles module (English-First + Deep Breakdown Modal)
     ├── knowledge.html               # 🧠 47+ Master Core Knowledge Concepts Module (Mobile Responsive + TOC Drawer + FAB)
-    ├── mock-exam.html               # 60Q Simulator + Dataset Switcher (V1: 644Q, V2: 533Q, BOTH: 1,177Q) + Core Concepts Practice + Instant Feedback
+    ├── mock-exam.html               # 60Q Simulator + Dataset Switcher (V1: 644Q, V2: 533Q, BOTH: 1,177Q, HARD: 655Q) + Core Concepts Practice + Instant Feedback
     ├── css/
     │   └── style.css                # Dark/Light CSS design system, keyword badges, grid button styles (.grid-nav-btn), Mobile touch nav scroll
     └── js/
@@ -92,7 +96,7 @@ d:\AI\CCAF/
         ├── learn.js                 # Collapsible accordion reader, Part 3 summary popup modal controls
         ├── principles.js            # Principles English-First filter & deep explanation modal trigger
         ├── knowledge.js             # Controller for 47+ Core Concepts (Mobile Drawer, ScrollSpy, Bookmarks, Real-time Search)
-        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Dataset Switcher (V1/V2/BOTH), 47+ Concepts Practice Mode, Instant Feedback
+        ├── mock-exam.js             # Proctored 60Q Simulator Engine, Dataset Switcher (V1/V2/BOTH/HARD), 47+ Concepts Practice Mode, Instant Feedback
         └── data/
             ├── domains-overview.js  # Unabridged technical overview data for 5 CCAF Exam Domains (D1-D5)
             ├── chapters.js          # 13 Complete visual theory modules (English-First + VI translations for 100% of blocks)
@@ -101,12 +105,21 @@ d:\AI\CCAF/
             ├── keyword-glossary.js  # 35+ Technical Keyword Glossary dictionary
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
-            └── mock-exam-data_merged.js # Dataset V2: 533 Authentic Questions Master Pool (MOCK_EXAM_POOL_MERGED)
+            ├── mock-exam-data_merged.js # Dataset V2: 533 Authentic Questions Master Pool (MOCK_EXAM_POOL_MERGED)
+            └── mock-exam-data_hard.js   # Dataset Hard: 655 Level 1 & 2 Scenario Questions (MOCK_EXAM_POOL_HARD)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-09-14 (Hard Questions Dataset Extraction & Hard Mode Integration - 655 Questions)**:
+  - Trích xuất thành công bộ đề chuyên sâu 655 câu khó ở Mức 1 (Khó nhất) và Mức 2 (Khó) từ cả 2 bộ đề (469 câu từ Bộ 1 và 186 câu từ Bộ 2), bao phủ trọn vẹn cả 5 Domain: D1 (147 câu), D2 (119 câu), D3 (120 câu), D4 (166 câu), D5 (103 câu).
+  - Giữ nguyên vẹn 100% nội dung gốc, ID, câu hỏi, các lựa chọn và phần giải thích song ngữ chuẩn Anthropic.
+  - Tạo 2 file dữ liệu mới: `website/js/data/mock-exam-data_hard.js` (`MOCK_EXAM_POOL_HARD`) và `tài liệu/data_ccaf_hard.json`.
+  - Tích hợp tùy chọn `🔥 Bộ Đề Khó (655 câu)` vào cả Chế độ 1 (Ôn tập tùy chỉnh) và Chế độ 2 (Thi thật mô phỏng 60 câu) trên `mock-exam.html` và `mock-exam.js`.
+  - Bảo toàn 100% tính độc lập và không làm ảnh hưởng đến bất kỳ chế độ hay nguồn đề cũ nào (V1, V2, BOTH).
+  - Kiểm thử cú pháp Node.js và Browser Subagent đạt 100% PASS.
+  - Đồng bộ `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-09-03 (Bilingual Alignment Fix for ccaf-323 & Official254 Bank)**:
   - Rà soát và sửa triệt để lỗi lệch nội dung song ngữ giữa bản Tiếng Anh (EN) và Tiếng Việt (VI) cho câu hỏi trọng tâm `ccaf-323` (`q-3-1-018` - PreCompact Hook).
   - Loại bỏ hoàn toàn các phương án dịch giả định ("chế") chứa từ khóa Windows/Linux/C++ còn sót lại trong ngân hàng Official254, chuẩn hóa 100% bản dịch theo tài liệu chuẩn của Anthropic cho 4 câu:
