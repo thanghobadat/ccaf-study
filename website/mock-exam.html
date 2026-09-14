@@ -114,6 +114,56 @@
       font-weight: 600;
     }
 
+    /* Modern Dropdown Select Styling for Dataset Switchers */
+    .dataset-select-dropdown {
+      width: 100%;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 2.2rem 0.65rem 0.85rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      background-size: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dataset-select-dropdown:hover {
+      border-color: var(--accent-blue);
+      background-color: var(--bg-card);
+    }
+
+    .dataset-select-dropdown:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .dataset-select-dropdown optgroup {
+      background-color: var(--bg-secondary);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.4rem 0;
+    }
+
+    .dataset-select-dropdown option {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem;
+    }
+
     /* Responsive adjustments for Mobile (iPhone 15 Pro, etc.) */
     @media (max-width: 768px) {
       .main-container {
@@ -221,25 +271,28 @@
             <span class="badge badge-d3">Tùy Số Câu & Chủ Đề</span>
           </div>
 
-          <!-- Dataset Switcher (Bộ 1, Bộ 2, Kết Hợp) -->
+          <!-- Dataset Switcher Dropdown (6 Chế Độ: 4 Đơn Lẻ + 2 Hợp Nhất) -->
           <div style="margin-bottom: 1.15rem; background: var(--bg-tertiary); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.55rem; display: flex; align-items: center; justify-content: space-between;">
-              <span>📚 Chọn Nguồn Bộ Đề Ôn Tập:</span>
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.45rem; display: flex; align-items: center; justify-content: space-between;">
+              <label for="select-practice-dataset" style="cursor: pointer; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0;">
+                <span>📚 Chọn Nguồn Bộ Đề Ôn Tập:</span>
+              </label>
               <span id="practice-pool-badge" class="badge badge-d1" style="font-size: 0.75rem;">533 câu</span>
             </div>
-            <div class="dataset-switcher-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.45rem;">
-              <button type="button" id="btn-dataset-v1" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchPracticeDataset('V1')">
-                📘 Bộ 1: Nền Tảng (644 câu)
-              </button>
-              <button type="button" id="btn-dataset-v2" class="btn btn-primary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchPracticeDataset('V2')">
-                🎯 Bộ 2: Thực Chiến (533 câu)
-              </button>
-              <button type="button" id="btn-dataset-both" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchPracticeDataset('BOTH')">
-                ⚡ Kết Hợp (1,177 câu)
-              </button>
-              <button type="button" id="btn-dataset-hard" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchPracticeDataset('HARD')">
-                🔥 Bộ Đề Khó (655 câu)
-              </button>
+            <select id="select-practice-dataset" class="dataset-select-dropdown" onchange="window.switchPracticeDataset(this.value)">
+              <optgroup label="── 📁 BỘ ĐỀ ĐƠN LẺ (4 NGUỒN) ──">
+                <option value="V2" selected>🎯 Bộ 2: Đề Thi Thực Chiến (533 câu)</option>
+                <option value="V1">📘 Bộ 1: Nền Tảng Lý Thuyết & Scenarios (644 câu)</option>
+                <option value="HARD_V1">🚀 Khó Bộ 1: Mức 3 & 4 (415 câu)</option>
+                <option value="HARD">🔥 Khó Bộ 2: Mức 3 & 4 (140 câu)</option>
+              </optgroup>
+              <optgroup label="── ⚡ BỘ ĐỀ HỢP NHẤT (MERGED) ──">
+                <option value="BOTH">⚡ Hợp Nhất Thường: Bộ 1 + Bộ 2 (1,177 câu)</option>
+                <option value="HARD_BOTH">💥 Hợp Nhất Khó: Khó Bộ 1 + Khó Bộ 2 (555 câu)</option>
+              </optgroup>
+            </select>
+            <div id="practice-dataset-description" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.45rem; line-height: 1.4;">
+              🎯 <strong>Bộ 2:</strong> Bộ đề thi thực chiến Pearson VUE bám sát cấu trúc đề thi chính thức của Anthropic.
             </div>
           </div>
 
@@ -355,25 +408,28 @@
             Mô phỏng 100% quy trình và tâm lý phòng thi thật của Anthropic. Rút 60 câu ngẫu nhiên theo chuẩn tỷ lệ 5 Domain.
           </p>
 
-          <!-- Dataset Switcher for Official Exam (Bộ 1, Bộ 2, Kết Hợp) -->
+          <!-- Dataset Switcher Dropdown for Official Exam (6 Chế Độ) -->
           <div style="margin-bottom: 1.15rem; background: var(--bg-tertiary); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.55rem; display: flex; align-items: center; justify-content: space-between;">
-              <span>📚 Chọn Nguồn Bộ Đề Thi Thật:</span>
-              <span id="official-pool-badge" class="badge badge-d4" style="font-size: 0.75rem;">533 câu</span>
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.45rem; display: flex; align-items: center; justify-content: space-between;">
+              <label for="select-official-dataset" style="cursor: pointer; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0;">
+                <span>📚 Chọn Nguồn Bộ Đề Thi Thật:</span>
+              </label>
+              <span id="official-pool-badge" class="badge badge-d4" style="font-size: 0.75rem;">555 câu</span>
             </div>
-            <div class="dataset-switcher-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.45rem;">
-              <button type="button" id="btn-official-dataset-v1" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('V1')">
-                📘 Bộ 1: Nền Tảng (644 câu)
-              </button>
-              <button type="button" id="btn-official-dataset-v2" class="btn btn-primary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('V2')">
-                🎯 Bộ 2: Thực Chiến (533 câu)
-              </button>
-              <button type="button" id="btn-official-dataset-both" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('BOTH')">
-                ⚡ Kết Hợp (1,177 câu)
-              </button>
-              <button type="button" id="btn-official-dataset-hard" class="btn btn-secondary dataset-choice-btn" style="padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: nowrap; text-align: center;" onclick="window.switchOfficialDataset('HARD')">
-                🔥 Bộ Đề Khó (655 câu)
-              </button>
+            <select id="select-official-dataset" class="dataset-select-dropdown" onchange="window.switchOfficialDataset(this.value)">
+              <optgroup label="── 💥 BỘ ĐỀ HỢP NHẤT (KHUYÊN DÙNG CHO PHÒNG THI) ──">
+                <option value="HARD_BOTH" selected>💥 Hợp Nhất Khó: Khó Bộ 1 + Khó Bộ 2 (555 câu)</option>
+                <option value="BOTH">⚡ Hợp Nhất Thường: Bộ 1 + Bộ 2 (1,177 câu)</option>
+              </optgroup>
+              <optgroup label="── 📁 CÁC BỘ ĐỀ ĐƠN LẺ ──">
+                <option value="HARD">🔥 Khó Bộ 2: Mức 3 & 4 (140 câu)</option>
+                <option value="HARD_V1">🚀 Khó Bộ 1: Mức 3 & 4 (415 câu)</option>
+                <option value="V2">🎯 Bộ 2: Đề Thi Thực Chiến (533 câu)</option>
+                <option value="V1">📘 Bộ 1: Nền Tảng Lý Thuyết (644 câu)</option>
+              </optgroup>
+            </select>
+            <div id="official-dataset-description" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.45rem; line-height: 1.4;">
+              💥 <strong>Hợp Nhất Khó:</strong> Đấu trường 555 câu hỏi Mức 3 & 4 cạm bẫy sâu, cascading failures & multi-agent recovery từ cả 2 bộ.
             </div>
           </div>
 
@@ -522,6 +578,7 @@
   <script src="js/data/mock-exam-data.js?v=131.0"></script>
   <script src="js/data/mock-exam-data_merged.js?v=1.0"></script>
   <script src="js/data/mock-exam-data_hard.js?v=1.0"></script>
+  <script src="js/data/mock-exam-data_hard_v1.js?v=1.0"></script>
   <script src="js/data/knowledge-data.js"></script>
   <script src="js/mock-exam.js?v=138.0"></script>
 </body>

@@ -7868,7 +7868,7 @@ function generateMockQuestionsPoolMerged() {
     "difficulty": "application",
     "scenarioId": "s-ccaf-213",
     "questionEN": "The agent often calls get_customer when users ask about order status, when lookup_order would be better. What should you check first?",
-    "question": "Người dùng hỏi về đơn hàng thường vô tình kích hoạt `get_customer` thay vì `lookup_order`; cả hai tool đều có mô tả tối giản, tương tự nhau và trùng lặp về định dạng định danh. Bước đầu tiên hiệu quả nhất là gì?",
+    "question": "Agent thường gọi `get_customer` khi người dùng hỏi về trạng thái đơn hàng, trong khi gọi `lookup_order` sẽ phù hợp hơn. Bạn nên kiểm tra điều gì đầu tiên?",
     "optionsEN": [
       "A. Implement a preprocessing classifier to route order requests directly",
       "B. Reduce the number of available tools to simplify choice",
@@ -7876,10 +7876,10 @@ function generateMockQuestionsPoolMerged() {
       "D. Check the tool descriptions to ensure they clearly differentiate each tool's purpose"
     ],
     "options": [
-      "A. Triển khai một tầng routing chọn trước tool dựa trên từ khóa đầu vào.",
-      "B. Gộp cả hai tool thành một tool `lookup_entity` duy nhất.",
-      "C. Thêm 5–8 ví dụ few-shot định hướng câu hỏi đơn hàng sang `lookup_order`.",
-      "D. Mở rộng mô tả của từng tool kèm theo định dạng input, câu query mẫu, các trường hợp biên và ranh giới phân biệt với các tool tương tự."
+      "A. Triển khai một bộ phân loại tiền xử lý để điều hướng trực tiếp các yêu cầu đơn hàng.",
+      "B. Giảm số lượng tool khả dụng để đơn giản hóa lựa chọn của agent.",
+      "C. Thêm các ví dụ few-shot bao quát mọi cách diễn đạt yêu cầu đơn hàng có thể có.",
+      "D. Kiểm tra mô tả của các tool để đảm bảo chúng phân biệt rõ ràng mục đích của từng tool."
     ],
     "correct": 3,
     "optionExplanations": [

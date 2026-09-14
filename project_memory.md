@@ -1,7 +1,7 @@
 # 🧠 PROJECT MEMORY SNAPSHOT — CCAF LEARNING & EXAM PLATFORM
 
 > **MACHINE READABLE MEMORY FILE FOR AGENT RESUME**  
-> *Last Updated: 2026-09-14 15:35 (Local Time)*  
+> *Last Updated: 2026-09-14 22:50 (Local Time)*  
 > *Target Goal: Pass Claude Certified Architect - Foundations (CCAF) exam in 15 Days in 100% English Mode.*
 
 ---
@@ -27,7 +27,9 @@
 - **Doc 6:** `d:\AI\CCAF\tài liệu\data_ccaf_master_533.json`  
   *533 Authentic Bilingual Questions Master Dataset (Anthropic Official 254 + LNQuyen 155 + VieHub 127).*
 - **Doc 7:** `d:\AI\CCAF\tài liệu\data_ccaf_hard.json`  
-  *655 Level 1 & Level 2 Hard Scenario Questions Master Dataset extracted from V1 (469Q) and V2 (186Q).*
+  *140 Level 3 & Level 4 Hard Scenario Questions Master Dataset extracted from V2 (533Q).*
+- **Doc 8:** `d:\AI\CCAF\tài liệu\data_ccaf_hard_v1.json`  
+  *415 Level 3 & Level 4 Hard Scenario Questions Master Dataset extracted from Foundation Pool V1 (644Q).*
 
 ---
 
@@ -79,7 +81,8 @@ d:\AI\CCAF/
 │   ├── CCAF_Master_Knowledge_Reference.md   # 47 Master Core Architectural Concepts (100% CCAF Coverage)
 │   ├── CCAF_Addition_Guide_for_Weak_Models.md
 │   ├── data_ccaf_master_533.json            # 533 Authentic Bilingual Questions Master Dataset
-│   └── data_ccaf_hard.json                  # 655 Level 1 & 2 Hard Scenario Questions Dataset
+│   ├── data_ccaf_hard.json                  # 140 Level 3 & 4 Hard Scenario Questions Dataset (Bộ 2)
+│   └── data_ccaf_hard_v1.json               # 415 Level 3 & 4 Hard Scenario Questions Dataset (Bộ 1)
 └── website/                         # Web Application Root (Python HTTP server on 8899)
     ├── favicon.ico                  # High resolution multi-size website icon
     ├── index.html                   # Auto-redirect 0s landing page pointing to mock-exam.html
@@ -106,12 +109,31 @@ d:\AI\CCAF/
             ├── principles-deep-explanations.js # Structured deep 4-part explanations dataset for 67 Principles (IDs 1-67)
             ├── mock-exam-data.js    # Dataset V1: 644 Unique Scenario Questions (MOCK_EXAM_POOL_V1)
             ├── mock-exam-data_merged.js # Dataset V2: 533 Authentic Questions Master Pool (MOCK_EXAM_POOL_MERGED)
-            └── mock-exam-data_hard.js   # Dataset Hard: 655 Level 1 & 2 Scenario Questions (MOCK_EXAM_POOL_HARD)
+            ├── mock-exam-data_hard.js   # Dataset Hard V2: 140 Level 3 & 4 Scenario Questions (MOCK_EXAM_POOL_HARD)
+            └── mock-exam-data_hard_v1.js # Dataset Hard V1: 415 Level 3 & 4 Scenario Questions (MOCK_EXAM_POOL_HARD_V1)
 ```
 
 ---
 
 ## 🚀 5. RECENT ACTIONS & STATUS
+- **2026-09-14 (6 Dataset Modes, Sleek Glassmorphism Dropdowns, Fisher-Yates Random Engine & Zero-Duplicate Guarantee)**:
+  - **Trích xuất Bộ đề Khó Bộ 1 (415 câu Mức 3 & 4)**: Đánh giá toàn bộ 644 câu của Bộ 1 (`mock-exam-data.js`), loại bỏ 100% câu hỏi Mức 1 (Basic Recall) và Mức 2 (Standard Application đơn giản), giữ lại 415 câu Mức 3 (399Q) & Mức 4 (16Q) có tình huống chuyên sâu, cạm bẫy kiến trúc và trade-offs (D1: 84, D2: 80, D3: 67, D4: 113, D5: 71). Tạo mới file `mock-exam-data_hard_v1.js` và `data_ccaf_hard_v1.json`.
+  - **Tái cấu trúc Bộ đề Khó Bộ 2 (140 câu Mức 3 & 4)**: Sàng lọc chuẩn hóa 140 câu khó từ Bộ 533 câu (`mock-exam-data_hard.js` và `data_ccaf_hard.json`).
+  - **Thiết lập Hệ thống 6 Chế độ Bộ đề**:
+    1. `V2`: 🎯 Bộ 2: Đề Thi Thực Chiến (533 câu)
+    2. `V1`: 📘 Bộ 1: Nền Tảng Lý Thuyết & Scenarios (644 câu)
+    3. `HARD_V1`: 🚀 Khó Bộ 1: Mức 3 & 4 (415 câu)
+    4. `HARD`: 🔥 Khó Bộ 2: Mức 3 & 4 (140 câu)
+    5. `BOTH`: ⚡ Hợp Nhất Thường: Bộ 1 + Bộ 2 (1,177 câu)
+    6. `HARD_BOTH`: 💥 Hợp Nhất Khó: Khó Bộ 1 + Khó Bộ 2 (555 câu đỉnh cao, không trùng lặp bất kỳ ID nào)
+  - **Nâng cấp Giao diện Dropdown Hiện Đại (UI/UX)**: Thay thế toàn bộ cụm nút bấm cũ bằng Select Dropdown chuẩn Glassmorphism dark-mode có phân nhóm `<optgroup>`, badge số lượng và text giải thích động cho cả Chế độ 1 (Ôn tập tùy chỉnh) và Chế độ 2 (Thi thật 60 câu). Mặc định Chế độ Thi Thật đặt sẵn tại `HARD_BOTH` (555 câu).
+  - **Khắc phục Triệt để Lỗi Trùng Lặp Câu Hỏi Khi Random**:
+    - Nâng cấp thuật toán xáo trộn Fisher-Yates (Knuth) Shuffle thay thế `Math.random() - 0.5`.
+    - Bổ sung cơ chế lọc trùng 3 lớp toàn cục (`globalPickedIds`, `globalPickedViTexts`, `globalPickedEnTexts`) dùng chung cho cả 5 Domain trong đề thi 60 câu.
+    - Xóa bỏ hoàn toàn cơ chế round-robin nhân bản câu hỏi trong Chế độ Ôn tập khi $N < qCount$.
+    - Hiệu đính bản dịch tiếng Việt câu `ccaf-196` để không còn trùng lặp với `ccaf-197`.
+    - Chạy kiểm thử tự động 120 đề thi 60 câu liên tiếp trên cả 6 bộ đề, đạt chuẩn 100% không trùng lặp bất kỳ câu nào.
+  - Đồng bộ `project_memory.md` và thực hiện `git push` theo yêu cầu trực tiếp từ người dùng.
 - **2026-09-14 (Hard Questions Dataset Extraction & Hard Mode Integration - 655 Questions)**:
   - Trích xuất thành công bộ đề chuyên sâu 655 câu khó ở Mức 1 (Khó nhất) và Mức 2 (Khó) từ cả 2 bộ đề (469 câu từ Bộ 1 và 186 câu từ Bộ 2), bao phủ trọn vẹn cả 5 Domain: D1 (147 câu), D2 (119 câu), D3 (120 câu), D4 (166 câu), D5 (103 câu).
   - Giữ nguyên vẹn 100% nội dung gốc, ID, câu hỏi, các lựa chọn và phần giải thích song ngữ chuẩn Anthropic.

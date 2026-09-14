@@ -198,12 +198,47 @@ window.toggleMockConcepts = function(selectState) {
 // Backward compatibility alias
 window.toggleMockTerms = window.toggleMockConcepts;
 
-let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'BOTH', 'HARD'
+let currentPracticeDataset = 'V2'; // 'V1', 'V2', 'HARD_V1', 'HARD', 'BOTH', 'HARD_BOTH'
+let currentOfficialDataset = 'HARD_BOTH'; // default to the complete 555Q hard merged arena
+
+const DATASET_METADATA = {
+  'V2': {
+    name: '🎯 Bộ 2: Đề Thi Thực Chiến (533 câu)',
+    tag: 'Bộ 2 (533Q)',
+    desc: '🎯 <strong>Bộ 2:</strong> Bộ đề thi thực chiến Pearson VUE bám sát cấu trúc đề thi chính thức của Anthropic.'
+  },
+  'V1': {
+    name: '📘 Bộ 1: Nền Tảng Lý Thuyết & Scenarios (644 câu)',
+    tag: 'Bộ 1 (644Q)',
+    desc: '📘 <strong>Bộ 1:</strong> Nền tảng toàn diện về lý thuyết, API Claude và các tình huống chuẩn hóa.'
+  },
+  'HARD_V1': {
+    name: '🚀 Khó Bộ 1: Mức 3 & 4 (415 câu)',
+    tag: 'Khó Bộ 1 (415Q)',
+    desc: '🚀 <strong>Khó Bộ 1:</strong> 415 câu hỏi kịch bản phức tạp, trade-offs về độ trễ, chi phí và tool routing.'
+  },
+  'HARD': {
+    name: '🔥 Khó Bộ 2: Mức 3 & 4 (140 câu)',
+    tag: 'Khó Bộ 2 (140Q)',
+    desc: '🔥 <strong>Khó Bộ 2:</strong> 140 câu cạm bẫy sâu, cascading failures, FSM crash recovery & multi-select.'
+  },
+  'BOTH': {
+    name: '⚡ Hợp Nhất Thường: Bộ 1 + Bộ 2 (1,177 câu)',
+    tag: 'Hợp Nhất Thường (1,177Q)',
+    desc: '⚡ <strong>Hợp Nhất Thường:</strong> Tổng hợp toàn bộ 1,177 câu hỏi thông thường từ cả 2 bộ đề.'
+  },
+  'HARD_BOTH': {
+    name: '💥 Hợp Nhất Khó: Khó Bộ 1 + Khó Bộ 2 (555 câu)',
+    tag: 'Hợp Nhất Khó (555Q)',
+    desc: '💥 <strong>Hợp Nhất Khó:</strong> Đấu trường đỉnh cao 555 câu hỏi Mức 3 & 4 cạm bẫy sâu và đánh đổi kiến trúc từ cả 2 bộ.'
+  }
+};
 
 window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) {
   const v1 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_V1) || (typeof MOCK_EXAM_POOL_V1 !== 'undefined' ? MOCK_EXAM_POOL_V1 : []);
   const v2 = (typeof window !== 'undefined' && (window.MOCK_EXAM_POOL_MERGED || window.MOCK_EXAM_POOL_V2)) || (typeof MOCK_EXAM_POOL_MERGED !== 'undefined' ? MOCK_EXAM_POOL_MERGED : []);
   const hard = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_HARD) || (typeof MOCK_EXAM_POOL_HARD !== 'undefined' ? MOCK_EXAM_POOL_HARD : []);
+  const hardV1 = (typeof window !== 'undefined' && window.MOCK_EXAM_POOL_HARD_V1) || (typeof MOCK_EXAM_POOL_HARD_V1 !== 'undefined' ? MOCK_EXAM_POOL_HARD_V1 : []);
   const fallback = v2.length ? v2 : ((typeof window !== 'undefined' && window.MOCK_EXAM_QUESTION_POOL) || (typeof MOCK_EXAM_QUESTION_POOL !== 'undefined' ? MOCK_EXAM_QUESTION_POOL : []));
 
   if (datasetCode === 'V1') {
@@ -212,14 +247,23 @@ window.getPracticeQuestionPool = function(datasetCode = currentPracticeDataset) 
   if (datasetCode === 'V2') {
     return v2.length ? v2 : fallback;
   }
-  if (datasetCode === 'HARD') {
+  if (datasetCode === 'HARD' || datasetCode === 'HARD_V2') {
     return hard.length ? hard : fallback;
+  }
+  if (datasetCode === 'HARD_V1') {
+    return hardV1.length ? hardV1 : fallback;
   }
   if (datasetCode === 'BOTH') {
     if (v1.length && v2.length) {
       return [...v2, ...v1];
     }
     return v2.length ? v2 : (v1.length ? v1 : fallback);
+  }
+  if (datasetCode === 'HARD_BOTH' || datasetCode === 'HARD_MERGED') {
+    if (hardV1.length && hard.length) {
+      return [...hardV1, ...hard];
+    }
+    return hardV1.length ? hardV1 : (hard.length ? hard : fallback);
   }
   return v2.length ? v2 : (v1.length ? v1 : fallback);
 };
@@ -255,21 +299,37 @@ window.updateDomainCheckboxLabels = function() {
 };
 
 window.switchPracticeDataset = function(datasetCode) {
-  if (!['V1', 'V2', 'BOTH', 'HARD'].includes(datasetCode)) datasetCode = 'V2';
+  if (datasetCode === 'HARD_MERGED') datasetCode = 'HARD_BOTH';
+  if (datasetCode === 'HARD_V2') datasetCode = 'HARD';
+  if (!['V1', 'V2', 'BOTH', 'HARD', 'HARD_V1', 'HARD_BOTH'].includes(datasetCode)) datasetCode = 'V2';
   currentPracticeDataset = datasetCode;
 
-  // Update button active styles
-  const btnV1 = document.getElementById('btn-dataset-v1');
-  const btnV2 = document.getElementById('btn-dataset-v2');
-  const btnBoth = document.getElementById('btn-dataset-both');
-  const btnHard = document.getElementById('btn-dataset-hard');
+  // Sync Dropdown
+  const selectEl = document.getElementById('select-practice-dataset');
+  if (selectEl && selectEl.value !== datasetCode) {
+    selectEl.value = datasetCode;
+  }
 
-  if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnHard) btnHard.className = (datasetCode === 'HARD') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  // Update Dynamic Description
+  const descEl = document.getElementById('practice-dataset-description');
+  if (descEl && DATASET_METADATA[datasetCode]) {
+    descEl.innerHTML = DATASET_METADATA[datasetCode].desc;
+  }
 
-  // Update domain checkbox labels
+  // Legacy button active styles if present
+  ['v1', 'v2', 'both', 'hard', 'hard-v1'].forEach(k => {
+    const btn = document.getElementById(`btn-dataset-${k}`);
+    if (btn) {
+      const activeMatch = (k === 'v1' && datasetCode === 'V1') ||
+                          (k === 'v2' && datasetCode === 'V2') ||
+                          (k === 'both' && datasetCode === 'BOTH') ||
+                          (k === 'hard' && datasetCode === 'HARD') ||
+                          (k === 'hard-v1' && datasetCode === 'HARD_V1');
+      btn.className = activeMatch ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+    }
+  });
+
+  // Update domain checkbox labels & badge
   window.updateDomainCheckboxLabels();
 
   // Clear concept question cache & re-render concept grid
@@ -277,32 +337,41 @@ window.switchPracticeDataset = function(datasetCode) {
   window.renderPracticeConceptsGrid();
 
   if (typeof AppStore !== 'undefined' && AppStore.showToast) {
-    const names = {
-      'V1': 'Bộ 1: Nền Tảng (644 câu)',
-      'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
-      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)',
-      'HARD': '🔥 Bộ Đề Khó: Mức 1 & 2 (655 câu)'
-    };
-    AppStore.showToast(`📚 Đã chuyển nguồn sang: ${names[datasetCode]}`);
+    const info = DATASET_METADATA[datasetCode] || { name: datasetCode };
+    AppStore.showToast(`📚 Đã chuyển nguồn sang: ${info.name}`);
   }
 };
 
-let currentOfficialDataset = 'V2'; // 'V1', 'V2', 'BOTH', 'HARD'
-
 window.switchOfficialDataset = function(datasetCode) {
-  if (!['V1', 'V2', 'BOTH', 'HARD'].includes(datasetCode)) datasetCode = 'V2';
+  if (datasetCode === 'HARD_MERGED') datasetCode = 'HARD_BOTH';
+  if (datasetCode === 'HARD_V2') datasetCode = 'HARD';
+  if (!['V1', 'V2', 'BOTH', 'HARD', 'HARD_V1', 'HARD_BOTH'].includes(datasetCode)) datasetCode = 'HARD_BOTH';
   currentOfficialDataset = datasetCode;
 
-  // Update button active styles
-  const btnV1 = document.getElementById('btn-official-dataset-v1');
-  const btnV2 = document.getElementById('btn-official-dataset-v2');
-  const btnBoth = document.getElementById('btn-official-dataset-both');
-  const btnHard = document.getElementById('btn-official-dataset-hard');
+  // Sync Dropdown
+  const selectEl = document.getElementById('select-official-dataset');
+  if (selectEl && selectEl.value !== datasetCode) {
+    selectEl.value = datasetCode;
+  }
 
-  if (btnV1) btnV1.className = (datasetCode === 'V1') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnV2) btnV2.className = (datasetCode === 'V2') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnBoth) btnBoth.className = (datasetCode === 'BOTH') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
-  if (btnHard) btnHard.className = (datasetCode === 'HARD') ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+  // Update Dynamic Description
+  const descEl = document.getElementById('official-dataset-description');
+  if (descEl && DATASET_METADATA[datasetCode]) {
+    descEl.innerHTML = DATASET_METADATA[datasetCode].desc;
+  }
+
+  // Legacy button active styles if present
+  ['v1', 'v2', 'both', 'hard', 'hard-v1'].forEach(k => {
+    const btn = document.getElementById(`btn-official-dataset-${k}`);
+    if (btn) {
+      const activeMatch = (k === 'v1' && datasetCode === 'V1') ||
+                          (k === 'v2' && datasetCode === 'V2') ||
+                          (k === 'both' && datasetCode === 'BOTH') ||
+                          (k === 'hard' && datasetCode === 'HARD') ||
+                          (k === 'hard-v1' && datasetCode === 'HARD_V1');
+      btn.className = activeMatch ? 'btn btn-primary dataset-choice-btn' : 'btn btn-secondary dataset-choice-btn';
+    }
+  });
 
   const pool = window.getPracticeQuestionPool(currentOfficialDataset);
   const badgeEl = document.getElementById('official-pool-badge');
@@ -313,20 +382,15 @@ window.switchOfficialDataset = function(datasetCode) {
   const startBtn = document.getElementById('btn-start-official-mock');
   if (startBtn) {
     const curLang = typeof AppStore !== 'undefined' ? AppStore.getLang() : 'VI';
-    const tag = datasetCode === 'V1' ? 'Bộ 1' : (datasetCode === 'V2' ? 'Bộ 2' : (datasetCode === 'HARD' ? 'Bộ Khó' : 'Kết Hợp'));
+    const tag = DATASET_METADATA[datasetCode]?.tag || datasetCode;
     startBtn.innerHTML = curLang === 'EN'
       ? `🏆 START 60Q MOCK EXAM (${tag} - 120 MINS) →`
       : `🏆 BẮT ĐẦU THI THẬT 60 CÂU (${tag} - 120 PHÚT) →`;
   }
 
   if (typeof AppStore !== 'undefined' && AppStore.showToast) {
-    const names = {
-      'V1': 'Bộ 1: Nền Tảng (644 câu)',
-      'V2': 'Bộ 2: Đề Thi Thực Chiến (533 câu)',
-      'BOTH': 'Kết hợp cả 2 bộ (1,177 câu hỏi)',
-      'HARD': '🔥 Bộ Đề Khó: Mức 1 & 2 (655 câu)'
-    };
-    AppStore.showToast(`🏆 Nguồn thi thật: ${names[datasetCode]}`);
+    const info = DATASET_METADATA[datasetCode] || { name: datasetCode };
+    AppStore.showToast(`🏆 Nguồn thi thật: ${info.name}`);
   }
 };
 
@@ -447,6 +511,26 @@ window.renderPracticeConceptsGrid = function() {
 // Backward compatibility alias
 window.renderPracticeTermsGrid = window.renderPracticeConceptsGrid;
 
+// Robust Fisher-Yates (Knuth) Shuffle Algorithm (Zero bias, uniform distribution)
+function shuffleArray(arr) {
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+// Normalize question text to catch duplicate stems even if punctuation, case, or brackets differ
+function normalizeQuestionStem(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/^\[.*?\]\s*/, '') // strip [q-xx], [ccaf-xx], etc.
+    .toLowerCase()
+    .replace(/[\s\.,:;\?\!\'\"—\-\(\)\[\]\{\}`]+/g, ' ')
+    .trim();
+}
+
 window.startCustomPracticeExam = function(isInstant = false) {
   isInstantFeedbackMode = (isInstant === true);
   const countInput = document.getElementById('practice-count-input');
@@ -496,45 +580,31 @@ window.startCustomPracticeExam = function(isInstant = false) {
     return;
   }
 
-  // Deduplicate base pool by question text & id
+  // Deduplicate base pool by 3-layer check (ID, Vietnamese stem, English stem)
   const basePool = [];
   const baseIds = new Set();
-  const baseTexts = new Set();
+  const baseViTexts = new Set();
+  const baseEnTexts = new Set();
   for (const q of pool) {
-    const cleanText = q.question.replace(/^\[.*?\]\s*/, '');
-    if (!baseIds.has(q.id) && !baseTexts.has(cleanText)) {
-      baseIds.add(q.id);
-      baseTexts.add(cleanText);
-      basePool.push(q);
-    }
+    const qid = (q.id || '').trim();
+    const cleanVi = normalizeQuestionStem(q.question);
+    const cleanEn = normalizeQuestionStem(q.questionEN);
+
+    if (baseIds.has(qid)) continue;
+    if (cleanVi && baseViTexts.has(cleanVi)) continue;
+    if (cleanEn && baseEnTexts.has(cleanEn)) continue;
+
+    baseIds.add(qid);
+    if (cleanVi) baseViTexts.add(cleanVi);
+    if (cleanEn) baseEnTexts.add(cleanEn);
+    basePool.push(q);
   }
 
   const N = basePool.length;
-  const pickedList = [];
-
-  if (qCount <= N) {
-    // Standard random pick without duplicates
-    const shuffled = [...basePool].sort(() => Math.random() - 0.5);
-    for (let i = 0; i < qCount; i++) {
-      pickedList.push(shuffled[i]);
-    }
-  } else {
-    // Round-robin repetition: Ensure full rounds sweep through all N base questions before repeating
-    const fullRounds = Math.floor(qCount / N);
-    const remainder = qCount % N;
-
-    for (let r = 0; r < fullRounds; r++) {
-      const roundPool = [...basePool].sort(() => Math.random() - 0.5);
-      pickedList.push(...roundPool);
-    }
-
-    if (remainder > 0) {
-      const remPool = [...basePool].sort(() => Math.random() - 0.5);
-      for (let i = 0; i < remainder; i++) {
-        pickedList.push(remPool[i]);
-      }
-    }
-  }
+  // NEVER duplicate questions in an exam! Cap at available unique count
+  const finalCount = Math.min(qCount, N);
+  const shuffled = shuffleArray(basePool);
+  const pickedList = shuffled.slice(0, finalCount);
 
   // Assign unique instance IDs to guarantee zero collision in answers/flags
   mockExamQuestions = pickedList.map((item, idx) => {
@@ -586,19 +656,29 @@ window.startOfficialMockExam = function() {
   updateHeaderBarState();
 
   // Draw 60 UNIQUE questions matching official domain weight distribution (D1: 16Q, D2: 11Q, D3: 12Q, D4: 12Q, D5: 9Q)
+  // Shared global tracking across ALL 5 domains to guarantee ZERO duplicate questions across the entire exam
+  const globalPickedIds = new Set();
+  const globalPickedViTexts = new Set();
+  const globalPickedEnTexts = new Set();
+
   const drawUniqueDomain = (domCode, count) => {
-    const subPool = officialPool.filter(q => q.domain === domCode).sort(() => Math.random() - 0.5);
+    const subPool = shuffleArray(officialPool.filter(q => q.domain === domCode));
     const picked = [];
-    const pickedIds = new Set();
-    const pickedTexts = new Set();
     for (const q of subPool) {
-      const cleanText = q.question.replace(/^\[.*?\]\s*/, '');
-      if (!pickedIds.has(q.id) && !pickedTexts.has(cleanText)) {
-        pickedIds.add(q.id);
-        pickedTexts.add(cleanText);
-        picked.push(q);
-        if (picked.length >= count) break;
-      }
+      const qid = (q.id || '').trim();
+      const cleanVi = normalizeQuestionStem(q.question);
+      const cleanEn = normalizeQuestionStem(q.questionEN);
+
+      if (globalPickedIds.has(qid)) continue;
+      if (cleanVi && globalPickedViTexts.has(cleanVi)) continue;
+      if (cleanEn && globalPickedEnTexts.has(cleanEn)) continue;
+
+      globalPickedIds.add(qid);
+      if (cleanVi) globalPickedViTexts.add(cleanVi);
+      if (cleanEn) globalPickedEnTexts.add(cleanEn);
+      picked.push(q);
+
+      if (picked.length >= count) break;
     }
     return picked;
   };
@@ -609,7 +689,8 @@ window.startOfficialMockExam = function() {
   const d4Pool = drawUniqueDomain('D4', 12);
   const d5Pool = drawUniqueDomain('D5', 9);
 
-  mockExamQuestions = [...d1Pool, ...d2Pool, ...d3Pool, ...d4Pool, ...d5Pool].sort(() => Math.random() - 0.5).map((item, idx) => {
+  const combined60 = shuffleArray([...d1Pool, ...d2Pool, ...d3Pool, ...d4Pool, ...d5Pool]);
+  mockExamQuestions = combined60.map((item, idx) => {
     return {
       ...item,
       uniqueId: `${item.id}_official_${idx}`
@@ -1533,21 +1614,28 @@ window.startTopicSpecificPracticeExam = function(topics = ['3.2', '3.3', '3.5', 
     return;
   }
 
-  // Deduplicate base pool by question text & id
+  // Deduplicate base pool by 3-layer check (ID, Vietnamese stem, English stem)
   const basePool = [];
   const baseIds = new Set();
-  const baseTexts = new Set();
+  const baseViTexts = new Set();
+  const baseEnTexts = new Set();
   for (const q of matched) {
-    const cleanText = q.question.replace(/^\[.*?\]\s*/, '');
-    if (!baseIds.has(q.id) && !baseTexts.has(cleanText)) {
-      baseIds.add(q.id);
-      baseTexts.add(cleanText);
-      basePool.push(q);
-    }
+    const qid = (q.id || '').trim();
+    const cleanVi = normalizeQuestionStem(q.question);
+    const cleanEn = normalizeQuestionStem(q.questionEN);
+
+    if (baseIds.has(qid)) continue;
+    if (cleanVi && baseViTexts.has(cleanVi)) continue;
+    if (cleanEn && baseEnTexts.has(cleanEn)) continue;
+
+    baseIds.add(qid);
+    if (cleanVi) baseViTexts.add(cleanVi);
+    if (cleanEn) baseEnTexts.add(cleanEn);
+    basePool.push(q);
   }
 
-  // Shuffle questions
-  const shuffled = [...basePool].sort(() => Math.random() - 0.5);
+  // Shuffle questions using Fisher-Yates
+  const shuffled = shuffleArray(basePool);
 
   mockExamQuestions = shuffled.map((item, idx) => ({
     ...item,
